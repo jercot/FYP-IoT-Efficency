@@ -1,4 +1,4 @@
-package controller;
+package ie.fyp.jer.repository;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

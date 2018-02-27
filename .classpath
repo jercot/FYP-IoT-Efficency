@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="Mobile Application/app/build/generated/source/buildConfig/androidTest/debug"/>
+	<classpathentry kind="src" path="Mobile Application/app/build/generated/source/buildConfig/debug"/>
+	<classpathentry kind="src" path="Mobile Application/app/build/generated/source/r/androidTest/debug"/>
+	<classpathentry kind="src" path="Mobile Application/app/build/generated/source/r/debug"/>
+	<classpathentry kind="src" path="Mobile Application/app/src/androidTest/java"/>
+	<classpathentry kind="src" path="Mobile Application/app/src/main/java"/>
+	<classpathentry kind="src" path="Mobile Application/app/src/test/java"/>
+	<classpathentry kind="src" path="Web Application/src"/>
+	<classpathentry kind="lib" path="Mobile Application/app/build/generated/mockable-android-26.v3.jar"/>
+	<classpathentry kind="lib" path="Mobile Application/gradle/wrapper/gradle-wrapper.jar"/>
+	<classpathentry kind="lib" path="Web Application/WebContent/WEB-INF/lib/postgresql-42.2.1.jar"/>
+	<classpathentry kind="output" path="Web Application/build/classes"/>
+</classpath>
