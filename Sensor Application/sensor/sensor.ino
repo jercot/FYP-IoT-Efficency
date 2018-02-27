@@ -11,7 +11,7 @@
 #define TEMP_PIN 0
 #define LIGHT_PIN 1
 #define FREQUENCY 30
-#define VARIANCE 10
+#define VARIANCE 2
 #define DELAY 30000
 SR04 sr04 = SR04(ECHO_PIN, TRIG_PIN);
 dht DHT;
@@ -32,7 +32,7 @@ EthernetClient client;
 void setup() {
   Serial.begin(9600);
   prev = sr04.Distance();
-  if (Ethernet.begin(mac) == 0) {
+  if(Ethernet.begin(mac)==0) {
     //light red if true?
   }
 }
@@ -42,23 +42,26 @@ void loop() {
   incr();
   if(count==FREQUENCY) {
     char str[255];
-    char str_temp[6];
-    dtostrf(calcAveF(temp), 4, 2, str_temp);
-    sprintf(str, "/upload?humidity=%d&movement=%d&temp=%s&light=%d", calcAve(hum), calcMov(ult), str_temp, calcAve(light));
-    Serial.println();
-    Serial.print("Humidity: ");
-    Serial.println(calcAve(hum));
-    Serial.print("Movement: ");
-    Serial.println(calcMov(ult));
-    print(ult, "Distance: ");
-    Serial.print("Temperature: ");
-    Serial.println(calcAveF(temp));
-    Serial.print("Light: ");
-    Serial.println(calcAve(light));
+    char humS[72];
+    char lightS[72];
+    char tempS[72];
+    char aveF[6], medF[6], minS[6], maxS[6];
+    int minI, maxI;
+    float minF, maxF;
+    int med = calcMed(hum, &minI, &maxI);
+    sprintf(humS, "&humAve=%d&humMed=%d&humMin=%d&humMax=%d", calcAve(hum), med, minI, maxI);
+    med = calcMed(light, &minI, &maxI);
+    sprintf(lightS, "&lightAve=%d&lightMed=%d&lightMin=%d&lightMax=%d", calcAve(light), med, minI, maxI);
+    dtostrf(calcAveF(temp), 4, 2, aveF);
+    dtostrf(calcMedF(temp, &minF, &maxF), 4, 2, medF);
+    dtostrf(minF, 4, 2, minS);
+    dtostrf(maxF, 4, 2, maxS);
+    sprintf(tempS, "&tempAve=%s&tempMed=%s&tempMin=%s&tempMax=%s", aveF, medF, minS, maxS);
+    sprintf(str, "/upload?movement=%d%s%s&%s&bucket=123JA423SD4A23FX", calcMov(ult), humS, lightS, tempS);
     Serial.println(str);
-    if(!upload(server, str)) 
+    if(!upload(server, str))
       Serial.println("Fail");
-    else 
+    else
       Serial.println("Pass");
     count=0;
   }
@@ -78,13 +81,12 @@ byte upload(char *ipBuf, char *upload) {
     Serial.println("failed");
     return 0;
   }
-
-  while(client.connected()) {
+  /*while(client.connected()) {
     while(client.available()) {
       inChar = client.read();
       Serial.write(inChar);
     }
-  }
+  }*/
   Serial.println();
   Serial.println("disconnecting.");
   client.stop();
@@ -109,12 +111,81 @@ int calcAve(int arr[]) {
   return(total/FREQUENCY);
 }
 
+int calcMed(int arr[], int* minT, int* maxT) {
+  quickSort(arr, 0, FREQUENCY-1);
+  *minT = arr[0];
+  *maxT = arr[FREQUENCY-1];
+  return ((arr[FREQUENCY/2-1]+arr[FREQUENCY/2])/2);
+}
+
+void swap(int* a, int* b) {
+    int t = *a;
+    *a = *b;
+    *b = t;
+}
+
+int partition (int arr[], int low, int high) {
+    int pivot = arr[high];
+    int i = (low - 1);
+    for (int j = low; j <= high- 1; j++) {
+        if (arr[j] <= pivot) {
+            i++;
+            swap(&arr[i], &arr[j]);
+        }
+    }
+    swap(&arr[i + 1], &arr[high]);
+    return (i + 1);
+}
+
+void quickSort(int arr[], int low, int high) {
+    if (low < high) {
+        int pi = partition(arr, low, high);
+        quickSort(arr, low, pi - 1);
+        quickSort(arr, pi + 1, high);
+    }
+}
+
 float calcAveF(float arr[]) {
   float total = 0;
   for(int i=0; i<FREQUENCY; i++) {
     total += arr[i];
   }
   return(total/FREQUENCY);
+}
+
+float calcMedF(float arr[], float* minF, float* maxF) {
+  quickSortF(arr, 0, FREQUENCY-1);
+  *minF = arr[0];
+  *maxF = arr[FREQUENCY-1];
+  Serial.println(arr[FREQUENCY-1]);
+  return ((arr[FREQUENCY/2-1]+arr[FREQUENCY/2])/2);
+}
+
+void swapF(float* a, float* b) {
+    float t = *a;
+    *a = *b;
+    *b = t;
+}
+
+int partitionF(float arr[], int low, int high) {
+    float pivot = arr[high];
+    int i = (low - 1);
+    for (int j = low; j <= high- 1; j++) {
+        if (arr[j] <= pivot) {
+            i++;
+            swapF(&arr[i], &arr[j]);
+        }
+    }
+    swapF(&arr[i + 1], &arr[high]);
+    return (i + 1);
+}
+
+void quickSortF(float arr[], int low, int high) {
+    if (low < high) {
+        int pi = partitionF(arr, low, high);
+        quickSortF(arr, low, pi - 1);
+        quickSortF(arr, pi + 1, high);
+    }
 }
 
 int calcMov(int arr[]) {
