@@ -1,0 +1,117 @@
+body {
+    margin: 0;
+  	padding: 0;
+  	height: 100%;
+    font-size: 16px;
+}
+
+div#logo {
+	top: 0;
+	left: 0;
+    height: 48px;
+    width: 300px;
+    position: fixed; 
+    background-color: #6565ff;
+    text-align: center;
+    line-height: 50px;
+    border-bottom: 2px solid #333333;
+}
+
+div#title {
+	top: 0;
+    right: 0;
+    left: 300px;
+	height:48px;
+    position: fixed; 
+    text-align: left;
+    line-height: 50px;
+    border-bottom: 2px solid #333333;
+}
+
+div#sideMenu {
+	top: 50px;
+	left: 0;
+    bottom: 0;
+    width: 300px;
+    position: fixed; 
+    background-color: #aaaaaa;
+    overflow-x: hidden;
+    transition: 0.5s; 
+    padding-top: 15px;
+    style: inline-block;
+}
+
+#sideMenu a {
+	text-decoration: none;
+	color: #000000;
+}
+
+div#main {
+	top: 50px;
+    right: 0;
+    left: 300px;
+    bottom: 0;
+    position: fixed; 
+    transition: margin-left .5s;
+    overflow-y: auto;
+    overflow-x: none;
+}
+
+hr.left {
+	height:2px;
+	border:none;
+	color:#333333;
+	background-color:#333333;
+}
+
+div.menu {
+	margin-left: 10px;
+	width: 200px;
+	height: 25px;
+	text-align: center;
+	line-height: 25px;
+	border: 2px solid #aaaaaa;
+	cursor: pointer;
+}
+
+div.menu:hover {
+	border-color: #0000002b;
+}
+
+div.menuYellow {
+	background-color: #ffff00;
+}
+
+div.menuGreen {
+	background-color: #00b100;
+}
+
+div.menuGreen:hover {
+	border-color: #aaaaaa;
+	cursor: auto;
+}
+
+div.menuCyan {
+	background-color: #00ffff;
+}
+
+div.menuRed {
+	background-color: #ff0000;
+}
+
+div.menuOrange {
+	background-color: #ffa500;
+}
+
+div.menuWhite {
+	background-color: #ffffff;
+}
+
+div.menuHouse {
+	margin-left: 30px;
+	background-color: pink;
+}
+
+div.houses {
+	height: 60px;
+}
