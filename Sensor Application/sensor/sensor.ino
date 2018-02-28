@@ -1,4 +1,4 @@
-#include <dht.h>
+ #include <dht.h>
 #include <SR04.h>
 #include <Ethernet.h>
 #include <EEPROM.h>
@@ -10,9 +10,9 @@
 #define ECHO_PIN 5
 #define TEMP_PIN 0
 #define LIGHT_PIN 1
-#define FREQUENCY 30
+#define READINGS 20
 #define VARIANCE 2
-#define DELAY 30
+#define MINUTES 10
 #define GREEN 9
 #define YELLOW 2
 #define RED 3
@@ -20,10 +20,10 @@ SR04 sr04 = SR04(ECHO_PIN, TRIG_PIN);
 dht DHT;
 int count = 0;
 int prev = 0;
-int hum[FREQUENCY];
-int ult[FREQUENCY];
-float temp[FREQUENCY];
-int light[FREQUENCY];
+int hum[READINGS];
+int ult[READINGS];
+float temp[READINGS];
+int light[READINGS];
 
 #include <SPI.h>
 #include <Ethernet.h>
@@ -38,17 +38,17 @@ void setup() {
   pinMode(GREEN, OUTPUT);
   pinMode(YELLOW, OUTPUT);
   pinMode(RED, OUTPUT);
- digitalWrite(RED, HIGH);
+  digitalWrite(RED, HIGH);
   if(Ethernet.begin(mac)!=0) {
     digitalWrite(RED, LOW);
   }
+  delay(1000);
 }
 
 void loop() {
-  digitalWrite(GREEN, LOW);
   Serial.print(count);
   incr();
-  if(count==FREQUENCY) {
+  if(count==READINGS) {
     digitalWrite(GREEN, HIGH);
     char str[255];
     char humS[72];
@@ -76,17 +76,20 @@ void loop() {
       Serial.println("Pass");
       digitalWrite(RED, LOW);
     }
+    delay(1000);
+    digitalWrite(GREEN, LOW);
     count=0;
   }
-  flash(DELAY/2);
+  //delay((MINUTES*60000)/READINGS);
+  flash((MINUTES*60)/READINGS);
 }
 
 void flash(int c) {
   digitalWrite(YELLOW, HIGH);
-  delay(1000);
+  delay(500);
   digitalWrite(YELLOW, LOW);
-  delay(1000);
-  if(c>1)
+  delay(500);
+  if(c>=0)
     flash(c-1);
 }
 
@@ -105,13 +108,6 @@ byte upload(char *ipBuf, char *param, int attempt) {
       upload(ipBuf, param, attempt-1);
     return 0;
   }
-  /*while(client.connected()) {
-    while(client.available()) {
-      inChar = client.read();
-      Serial.write(inChar);
-    }
-  }*/
-  Serial.println();
   Serial.println("disconnecting.");
   client.stop();
   return 1;
@@ -119,9 +115,9 @@ byte upload(char *ipBuf, char *param, int attempt) {
 
 void print(int arr[], const char *title) {
   Serial.print(title);
-  for(int i=0; i<FREQUENCY; i++) {
+  for(int i=0; i<READINGS; i++) {
     Serial.print(arr[i]);
-    if(i<FREQUENCY-1)
+    if(i<READINGS-1)
       Serial.print(", ");
   }
   Serial.println();
@@ -129,17 +125,17 @@ void print(int arr[], const char *title) {
 
 int calcAve(int arr[]) {
   int total = 0;
-  for(int i=0; i<FREQUENCY; i++) {
+  for(int i=0; i<READINGS; i++) {
     total += arr[i];
   }
-  return(total/FREQUENCY);
+  return(total/READINGS);
 }
 
 int calcMed(int arr[], int* minT, int* maxT) {
-  quickSort(arr, 0, FREQUENCY-1);
+  quickSort(arr, 0, READINGS-1);
   *minT = arr[0];
-  *maxT = arr[FREQUENCY-1];
-  return ((arr[FREQUENCY/2-1]+arr[FREQUENCY/2])/2);
+  *maxT = arr[READINGS-1];
+  return ((arr[READINGS/2-1]+arr[READINGS/2])/2);
 }
 
 void swap(int* a, int* b) {
@@ -171,18 +167,17 @@ void quickSort(int arr[], int low, int high) {
 
 float calcAveF(float arr[]) {
   float total = 0;
-  for(int i=0; i<FREQUENCY; i++) {
+  for(int i=0; i<READINGS; i++) {
     total += arr[i];
   }
-  return(total/FREQUENCY);
+  return(total/READINGS);
 }
 
 float calcMedF(float arr[], float* minF, float* maxF) {
-  quickSortF(arr, 0, FREQUENCY-1);
+  quickSortF(arr, 0, READINGS-1);
   *minF = arr[0];
-  *maxF = arr[FREQUENCY-1];
-  Serial.println(arr[FREQUENCY-1]);
-  return ((arr[FREQUENCY/2-1]+arr[FREQUENCY/2])/2);
+  *maxF = arr[READINGS-1];
+  return ((arr[READINGS/2-1]+arr[READINGS/2])/2);
 }
 
 void swapF(float* a, float* b) {
@@ -213,10 +208,10 @@ void quickSortF(float arr[], int low, int high) {
 }
 
 int calcMov(int arr[]) {
-  for (int i=0; i<FREQUENCY; i++) {
+  for (int i=0; i<READINGS; i++) {
     int curr = arr[i];
     if(curr>=prev+VARIANCE || curr<=prev-VARIANCE) {
-      prev = arr[FREQUENCY-1];
+      prev = arr[READINGS-1];
       return 1;
     }
     prev = curr;
