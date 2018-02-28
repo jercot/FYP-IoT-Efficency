@@ -12,7 +12,10 @@
 #define LIGHT_PIN 1
 #define FREQUENCY 30
 #define VARIANCE 2
-#define DELAY 30000
+#define DELAY 30
+#define GREEN 9
+#define YELLOW 2
+#define RED 3
 SR04 sr04 = SR04(ECHO_PIN, TRIG_PIN);
 dht DHT;
 int count = 0;
@@ -32,15 +35,21 @@ EthernetClient client;
 void setup() {
   Serial.begin(9600);
   prev = sr04.Distance();
-  if(Ethernet.begin(mac)==0) {
-    //light red if true?
+  pinMode(GREEN, OUTPUT);
+  pinMode(YELLOW, OUTPUT);
+  pinMode(RED, OUTPUT);
+ digitalWrite(RED, HIGH);
+  if(Ethernet.begin(mac)!=0) {
+    digitalWrite(RED, LOW);
   }
 }
 
 void loop() {
+  digitalWrite(GREEN, LOW);
   Serial.print(count);
   incr();
   if(count==FREQUENCY) {
+    digitalWrite(GREEN, HIGH);
     char str[255];
     char humS[72];
     char lightS[72];
@@ -59,26 +68,41 @@ void loop() {
     sprintf(tempS, "&tempAve=%s&tempMed=%s&tempMin=%s&tempMax=%s", aveF, medF, minS, maxS);
     sprintf(str, "/upload?movement=%d%s%s&%s&bucket=123JA423SD4A23FX", calcMov(ult), humS, lightS, tempS);
     Serial.println(str);
-    if(!upload(server, str))
+    if(!upload(server, str, 3)) {
       Serial.println("Fail");
-    else
+      digitalWrite(RED, HIGH);
+    }
+    else {
       Serial.println("Pass");
+      digitalWrite(RED, LOW);
+    }
     count=0;
   }
-  delay(DELAY);
+  flash(DELAY/2);
 }
 
-byte upload(char *ipBuf, char *upload) {
+void flash(int c) {
+  digitalWrite(YELLOW, HIGH);
+  delay(1000);
+  digitalWrite(YELLOW, LOW);
+  delay(1000);
+  if(c>1)
+    flash(c-1);
+}
+
+byte upload(char *ipBuf, char *param, int attempt) {
   int inChar;
   char outBuf[64];
   Serial.print("connecting...");
   if(client.connect(ipBuf,80)) {
     Serial.println("connected");
-    sprintf(outBuf,"GET %s HTTP/1.0\r\n\r\n", upload);
+    sprintf(outBuf,"GET %s HTTP/1.0\r\n\r\n", param);
     client.write(outBuf);
   } 
   else {
-    Serial.println("failed");
+    Serial.println("Failed attempt");
+    if(attempt>3)
+      upload(ipBuf, param, attempt-1);
     return 0;
   }
   /*while(client.connected()) {
@@ -211,4 +235,3 @@ void incr() {
   light[count] = analogRead(LIGHT_PIN);
   count += 1;
 }
-
