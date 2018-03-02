@@ -1,9 +1,8 @@
- #include <dht.h>
+#include <dht.h>
 #include <SR04.h>
 #include <Ethernet.h>
 #include <EEPROM.h>
-//https://www.arduino.cc/en/Reference/EthernetLocalIP
-//http://www.instructables.com/id/Arduino-Ethernet-Shield-Tutorial/
+#include <SPI.h>
 
 #define DHT11_PIN 7
 #define TRIG_PIN 6
@@ -16,6 +15,7 @@
 #define GREEN 9
 #define YELLOW 2
 #define RED 3
+
 SR04 sr04 = SR04(ECHO_PIN, TRIG_PIN);
 dht DHT;
 int count = 0;
@@ -24,13 +24,11 @@ int hum[READINGS];
 int ult[READINGS];
 float temp[READINGS];
 int light[READINGS];
-
-#include <SPI.h>
-#include <Ethernet.h>
-
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-char server[] = "fyp-iot-efficiency.eu-west-1.elasticbeanstalk.com";    // AWS
+char webServer[] = "fyp-iot-efficiency.eu-west-1.elasticbeanstalk.com";    // AWS
+char bucket[25] = "123JA423SD4A23FX";
 EthernetClient client;
+EthernetServer arduinoServer(80);
 
 void setup() {
   Serial.begin(9600);
@@ -42,12 +40,15 @@ void setup() {
   if(Ethernet.begin(mac)!=0) {
     digitalWrite(RED, LOW);
   }
-  delay(1000);
+  arduinoServer.begin();
+  Serial.print("Arduino Server is at ");
+  Serial.println(Ethernet.localIP());
 }
 
 void loop() {
   Serial.print(count);
   incr();
+  digitalWrite(GREEN, LOW);
   if(count==READINGS) {
     digitalWrite(GREEN, HIGH);
     char str[255];
@@ -66,18 +67,15 @@ void loop() {
     dtostrf(minF, 4, 2, minS);
     dtostrf(maxF, 4, 2, maxS);
     sprintf(tempS, "&tempAve=%s&tempMed=%s&tempMin=%s&tempMax=%s", aveF, medF, minS, maxS);
-    sprintf(str, "/upload?movement=%d%s%s&%s&bucket=123JA423SD4A23FX", calcMov(ult), humS, lightS, tempS);
+    sprintf(str, "/upload?movement=%d%s%s%s&bucket=%s", calcMov(ult), humS, lightS, tempS, bucket);
     Serial.println(str);
-    if(!upload(server, str, 3)) {
-      Serial.println("Fail");
+    if(!upload(webServer, str, 3)) {
       digitalWrite(RED, HIGH);
     }
     else {
-      Serial.println("Pass");
       digitalWrite(RED, LOW);
     }
     delay(1000);
-    digitalWrite(GREEN, LOW);
     count=0;
   }
   //delay((MINUTES*60000)/READINGS);
@@ -85,6 +83,7 @@ void loop() {
 }
 
 void flash(int c) {
+  settings();
   digitalWrite(YELLOW, HIGH);
   delay(500);
   digitalWrite(YELLOW, LOW);
@@ -93,34 +92,55 @@ void flash(int c) {
     flash(c-1);
 }
 
+int settings() {
+  client = arduinoServer.available();
+  if (client) {
+    if (client.connected()) {
+      int i = 0, k = 25;
+      String param;
+      while (client.available() && i < k) {
+        char c = client.read();
+        param += c;
+        i += 1;
+      }
+      int s = param.indexOf("/")+1;
+      param = param.substring(s, param.indexOf(" ", s));
+      s = param.indexOf("?")+1;
+      int d = param.indexOf("=")+1;
+      if(s!=0 && d!=0) {
+        String nameA = param.substring(s, d-1);
+        String value = param.substring(" ", d);
+        if(nameA.compareTo("update")==0)
+          updateBucket(nameA, value);
+        else
+          client.print("3, ");
+      }
+      else
+        client.print("1, ");
+      client.print(bucket);
+    }
+    client.stop();
+  }
+}
+
+void updateBucket(String nameA, String value) {
+  client.print("2, ");
+}
+
 byte upload(char *ipBuf, char *param, int attempt) {
   int inChar;
   char outBuf[64];
-  Serial.print("connecting...");
   if(client.connect(ipBuf,80)) {
-    Serial.println("connected");
     sprintf(outBuf,"GET %s HTTP/1.0\r\n\r\n", param);
     client.write(outBuf);
   } 
   else {
-    Serial.println("Failed attempt");
     if(attempt>3)
       upload(ipBuf, param, attempt-1);
     return 0;
   }
-  Serial.println("disconnecting.");
   client.stop();
   return 1;
-}
-
-void print(int arr[], const char *title) {
-  Serial.print(title);
-  for(int i=0; i<READINGS; i++) {
-    Serial.print(arr[i]);
-    if(i<READINGS-1)
-      Serial.print(", ");
-  }
-  Serial.println();
 }
 
 int calcAve(int arr[]) {
