@@ -10,9 +10,9 @@
 #define ECHO_PIN 5
 #define TEMP_PIN 0
 #define LIGHT_PIN 1
-#define READINGS 30
+#define READINGS 15
 #define VARIANCE 2
-#define MINUTES 10
+#define MINUTES 15
 #define GREEN 9
 #define YELLOW 2
 #define RED 3
@@ -26,7 +26,8 @@ int ult[READINGS];
 float temp[READINGS];
 int light[READINGS];
 byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
-char bucket[20];
+char webServer[] = "fyp-iot-efficiency.eu-west-1.elasticbeanstalk.com"; 
+char bucket[21];
 EthernetClient client;
 EthernetServer arduinoServer(80);
 
@@ -42,9 +43,8 @@ void setup() {
   }
   arduinoServer.begin();
   Serial.println(Ethernet.localIP());
-  !readBucket();
-  for(int i=0;i<20;i++)
-    Serial.print(bucket[i]);
+  readBucket();
+  Serial.println(bucket);
 }
 
 void loop() {
@@ -53,6 +53,8 @@ void loop() {
   digitalWrite(GREEN, LOW);
   if(count==READINGS) {
     createRequest();
+    Serial.println();
+    count=0;
   }
   flash((MINUTES*60)/READINGS);
 }
@@ -69,9 +71,7 @@ void flash(int c) {
 
 byte readBucket() {
   for(int i=0; i<20; i++) {
-    //if(req[j]>='0'&&req[j]<='9')
-      bucket[i] = EEPROM.read(i);
-    //else return 0;
+    bucket[i] = EEPROM.read(i);
   }
   return 1;
 }
@@ -88,15 +88,19 @@ int server() {
         i++;
       }
       char set[] = "settings", var[] = "bucket";
-      if (!request('/', req, set))
-          client.print("-1");
-      else if (!request('?', req, var)) {
-          client.print("1, ");
+      if (request('/', req, set)) {
+        if (!request('?', req, var)) {
+            client.print("1, ");
+            client.print(bucket);
+        }
+        else {
+          updateBucket(req);
+          client.print("2, ");
           client.print(bucket);
+        }
       }
       else {
-        client.print("UPDATED");
-        updateBucket(req);
+        client.print("0");
       }
     }
     client.stop();
@@ -109,7 +113,9 @@ byte request(char start, char *req, char *check) {
   while(req[j]!='\0'&&req[j-1]!=start) {
     j++;
   }
-  while(req[i+j]!='\0'&&check[i]!='\0')  {
+  if(req[j-1]!=start)
+    compare = 0;
+  while(req[i+j]!='\0'&&check[i]!='\0'&&compare)  {
     if(req[i+j]!=check[i])
       compare = 0;
     i++;
@@ -131,9 +137,9 @@ void updateBucket(char *req) {
   while(req[j]!='\0'&&req[j-1]!='=') {
     j++;
   }
-  while(req[j]!='\0'&&req[j]!=' '&&j<20) {
+  while(req[j]!='\0'&&req[j-1]!=' '&&i<20) {
     EEPROM.write(i, req[j]);
-    bucket[i] = EEPROM.read(i);
+    bucket[i] = req[j];
     i++;
     j++;
   }
@@ -141,45 +147,42 @@ void updateBucket(char *req) {
 
 void createRequest() {
   digitalWrite(GREEN, HIGH);
-  char str[255];
-  char humS[60];
-  char lightS[60];
-  char tempS[60];
+  char str[200];
+  char humS[50];
+  char lightS[50];
+  char tempS[50];
   char aveF[6], medF[6], minS[6], maxS[6];
   int minI, maxI;
   float minF, maxF;
   int med = calcMed(hum, &minI, &maxI);
-  sprintf(humS, "&humAve=%d&humMed=%d&humMin=%d&humMax=%d", calcAve(hum), med, minI, maxI);
+  sprintf(humS, "&hAve=%d&hMed=%d&hMin=%d&hMax=%d", calcAve(hum), med, minI, maxI);
   med = calcMed(light, &minI, &maxI);
-  sprintf(lightS, "&lightAve=%d&lightMed=%d&lightMin=%d&lightMax=%d", calcAve(light), med, minI, maxI);
+  sprintf(lightS, "&lAve=%d&lMed=%d&lMin=%d&lMax=%d", calcAve(light), med, minI, maxI);
   dtostrf(calcAveF(temp), 4, 2, aveF);
   dtostrf(calcMedF(temp, &minF, &maxF), 4, 2, medF);
   dtostrf(minF, 4, 2, minS);
   dtostrf(maxF, 4, 2, maxS);
-  sprintf(tempS, "&tempAve=%s&tempMed=%s&tempMin=%s&tempMax=%s", aveF, medF, minS, maxS);
-  sprintf(str, "/upload?movement=%d%s%s%s&bucket=%s", calcMov(ult), humS, lightS, tempS, bucket);
-  Serial.println(str);
-  if(!upload(str, 3)) {
+  sprintf(tempS, "&tAve=%s&tMed=%s&tMin=%s&tMax=%s", aveF, medF, minS, maxS);
+  sprintf(str, "/upload?mvmt=%d%s%s%s&bucket=%s", calcMov(ult), humS, lightS, tempS, bucket);
+  //Serial.print(str);
+  if(!upload(webServer, str, 3)) {
     digitalWrite(RED, HIGH);
   }
   else {
     digitalWrite(RED, LOW);
   }
-  delay(1000);
-  count=0;
 }
 
-byte upload(char *param, int attempt) {
-  char webServer[] = "fyp-iot-efficiency.eu-west-1.elasticbeanstalk.com"; 
+byte upload(char *serv, char *param, int attempt) {
   int inChar;
-  char outBuf[64];
-  if(client.connect(webServer,80)) {
+  char outBuf[200];
+  if(client.connect(serv,80)) {
     sprintf(outBuf,"GET %s HTTP/1.0\r\n\r\n", param);
     client.write(outBuf);
   } 
   else {
     if(attempt>3)
-      upload(param, attempt-1);
+      upload(serv, param, attempt-1);
     return 0;
   }
   client.stop();
