@@ -29,7 +29,7 @@ byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
 char webServer[] = "fyp-iot-efficiency.eu-west-1.elasticbeanstalk.com"; 
 char bucket[21];
 EthernetClient client;
-EthernetServer arduinoServer(80);
+EthernetServer arduinoServer(32109);
 
 void setup() {
   Serial.begin(9600);
@@ -80,27 +80,35 @@ int server() {
   client = arduinoServer.available();
   if (client) {
     if (client.connected()) {
+      client.println("HTTP/1.1 200 OK");
+      client.println("Content-Type: application/json");
+      client.println("Connection: close");
+      client.println();
+      client.print("{\"code\":\"");
       char req[42];
       int i = 0;
       while (client.available() && i < sizeof(req)) {
         char c = client.read();
+        Serial.print(c);
         req[i] = c;
         i++;
       }
       char set[] = "settings", var[] = "bucket";
       if (request('/', req, set)) {
         if (!request('?', req, var)) {
-            client.print("1, ");
+            client.print("1\", \"bucket\":\"");
             client.print(bucket);
+            client.print("\"}");
         }
         else {
           updateBucket(req);
-          client.print("2, ");
+          client.print("2\", \"bucket\":\"");
           client.print(bucket);
+          client.print("\"}");
         }
       }
       else {
-        client.print("0");
+        client.print("2\"}");
       }
     }
     client.stop();
