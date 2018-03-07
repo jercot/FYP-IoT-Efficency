@@ -1,13 +1,17 @@
 package ie.fyp.jer.controller;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import javax.annotation.Resource;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import ie.fyp.jer.repository.DatabaseController;
+import javax.sql.DataSource;
 
 /**
  * Servlet implementation class Upload
@@ -15,7 +19,8 @@ import ie.fyp.jer.repository.DatabaseController;
 @WebServlet("/upload")
 public class Upload extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
+	@Resource(name="jdbc/aws-rds")
+	private DataSource dataSource;   
     /**
      * @see HttpServlet#HttpServlet()
      */
@@ -27,8 +32,17 @@ public class Upload extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		try {
+		String input = request.getQueryString()+ "&time=" + System.currentTimeMillis();
 		System.out.println(request.getParameter("type"));
-		response.getWriter().append(DatabaseController.insert(((HttpServletRequest)request).getQueryString() + "&time=" + System.currentTimeMillis()));
+		String query = "INSERT INTO public.\"Temp\" (\"string\") VALUES('" + input + "');";
+		Connection con;
+			con = dataSource.getConnection();
+		Statement compStmt = con.createStatement();
+		compStmt.executeUpdate(query);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**

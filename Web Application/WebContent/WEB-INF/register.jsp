@@ -10,12 +10,25 @@
 	</head>
 	<body>
 		<form action="register" method="POST">		
-		    <label for="uname"><b>Email</b></label>
-		    <input type="email" placeholder="Enter Email" name="email" required>
-		    <label for="psw"><b>Password</b></label>
-		    <input type="password" placeholder="Enter Password" name="pass" required>
+		    <label><b>First Name*</b></label>
+		    <input type="text" placeholder="name" name="fName" required> <br>
+		    <label><b>Last Name*</b></label>
+		    <input type="text" placeholder="name" name="lName" required> <br>
+		    <label><b>Email*</b></label>
+		    <input type="email" placeholder="email" name="email" required> <br>
+		    <label><b>Password*</b></label>
+		    <input type="password" placeholder="password" name="pass" required><br>
+		    <label><b>Street</b></label>
+		    <input type="text" placeholder="street" name="street"> <br>
+		    <label><b>Town*</b></label>
+		    <input type="text" placeholder="town" name="town" required> <br>
+		    <label for="county"><b>County*</b></label>
+		    <input type="text" placeholder="county" name="county" required> <br>
+		    <label for="num"><b>Phone Number</b></label>
+		    <input type="text" placeholder="number" name="num"> <br>
 		    <button type="submit">Register</button>
 		</form>
-		<a href="register">Register</a>
+		<a href="">Home</a>
+		${requestScope.message == null ? '' : requestScope.message}
 	</body>
 </html>
