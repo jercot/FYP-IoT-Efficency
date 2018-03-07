@@ -35,18 +35,18 @@ public class DatabaseController implements ServletContextListener {
      * @see ServletContextListener#contextDestroyed(ServletContextEvent)
      */
     public void contextDestroyed(ServletContextEvent arg0)  { 
-         try {
+      /*   try {
 			con.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}
+		}*/
     }
 
 	/**
      * @see ServletContextListener#contextInitialized(ServletContextEvent)
      */
     public void contextInitialized(ServletContextEvent arg0)  { 
-    	try {
+    	/*try {
 			Class.forName("org.postgresql.Driver");
 		String dbName = "######";
 		String userName = "######";
@@ -61,7 +61,7 @@ public class DatabaseController implements ServletContextListener {
 			e.printStackTrace();
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}
+		}*/
     }
     
     public static String insert(String input) {
