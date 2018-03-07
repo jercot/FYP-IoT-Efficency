@@ -32,7 +32,7 @@ public class Login extends HttpServlet {
 		if(request.getSession().getAttribute("logged")==null)
 			request.getRequestDispatcher("/WEB-INF/login.jsp").forward(request, response);
 		else
-			request.getRequestDispatcher("/WEB-INF/index.jsp").forward(request, response);
+			response.sendRedirect(request.getContextPath());
 	}
 
 	/**

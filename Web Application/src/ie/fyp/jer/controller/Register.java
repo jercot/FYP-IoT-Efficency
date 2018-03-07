@@ -38,7 +38,7 @@ public class Register extends HttpServlet {
 		if(request.getSession().getAttribute("logged")==null)
 			request.getRequestDispatcher("/WEB-INF/register.jsp").forward(request, response);
 		else
-			request.getRequestDispatcher("/WEB-INF/index.jsp").forward(request, response);
+			response.sendRedirect(request.getContextPath());
 	}
 
 	/**
