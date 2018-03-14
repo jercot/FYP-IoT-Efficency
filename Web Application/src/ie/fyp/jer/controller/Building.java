@@ -1,23 +1,27 @@
 package ie.fyp.jer.controller;
 
 import java.io.IOException;
+
+import javax.annotation.Resource;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
 
 /**
- * Servlet implementation class Main
+ * Servlet implementation class AddBuilding
  */
-@WebServlet("/index.jsp")
-public class Main extends HttpServlet {
+@WebServlet("/building")
+public class Building extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
+	@Resource(name="jdbc/aws-rds")
+	private DataSource dataSource;      
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public Main() {
+    public Building() {
         super();
     }
 
@@ -25,19 +29,22 @@ public class Main extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		request.setAttribute("main", "main");
-		request.setAttribute("hello", "main hello");
+		System.out.println(request.getContextPath());
 		if(request.getSession().getAttribute("logged")!=null) {
+			request.setAttribute("main", "building");
 			request.getRequestDispatcher("/WEB-INF/index.jsp").forward(request, response);
 		}
 		else
-			request.getRequestDispatcher("/WEB-INF/homepage.jsp").forward(request, response);
+			response.sendRedirect("");
 	}
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String insert = "INSERT INTO \"FYP\".\"Building\"(accountid, name, location) VALUES (?, ?, ?);";
+		System.out.print(insert);
 		doGet(request, response);
 	}
+
 }
