@@ -15,7 +15,7 @@
 				IoT Efficiency
 			</div>
 			<div id="sideMenu">
-				<a href="">
+				<a href="<c:url value="/" />">
 					<div class="menu menuYellow">
 						Dashboard <br>
 					</div>

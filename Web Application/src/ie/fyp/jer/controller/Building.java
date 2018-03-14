@@ -29,13 +29,13 @@ public class Building extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		System.out.println(request.getContextPath());
 		if(request.getSession().getAttribute("logged")!=null) {
 			request.setAttribute("main", "building");
+			request.setAttribute("hello", "building hello");
 			request.getRequestDispatcher("/WEB-INF/index.jsp").forward(request, response);
 		}
 		else
-			response.sendRedirect("");
+			response.sendRedirect(request.getContextPath());
 	}
 
 	/**
