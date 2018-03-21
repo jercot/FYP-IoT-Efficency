@@ -25,9 +25,13 @@
 					<div class="menu menuGreen">
 						Houses <br>
 					</div>
-					<div class="menu menuHouse">
-						House 1
-					</div>
+					<c:forEach items="${houses}" var="house">
+						<a href="house?name=<c:out value="${house}"/>">
+							<div class="menu menuHouse">
+								${house}
+							</div>
+						</a>
+					</c:forEach>
 				</div>
 				<a href="building">
 					<div class="menu menuCyan">
@@ -57,16 +61,31 @@
 				Account Name - Selected House
 			</div>
 			<div id="main" class="main">
-			<c:choose>
-				<c:when test="${main == 'main'}">
-					<%@ include file="main.jsp" %>
-				</c:when>
-			</c:choose>
-			<c:choose>
-				<c:when test="${main == 'building'}">
-					<%@ include file="building.jsp" %>
-				</c:when>
-			</c:choose>
+				<c:choose>
+					<c:when test="${main == 'main'}">
+						<%@ include file="main.jsp" %>
+					</c:when>
+				</c:choose>
+				<c:choose>
+					<c:when test="${main == 'building'}">
+						<%@ include file="building.jsp" %>
+					</c:when>
+				</c:choose>
+				<c:choose>
+					<c:when test="${main == 'settings'}">
+						<%@ include file="settings.jsp" %>
+					</c:when>
+				</c:choose>
+				<c:choose>
+					<c:when test="${main == 'compare'}">
+						<%@ include file="compare.jsp" %>
+					</c:when>
+				</c:choose>
+				<c:choose>
+					<c:when test="${main == 'house'}">
+						<%@ include file="house.jsp" %>
+					</c:when>
+				</c:choose>
 			</div>
 			<script type="text/javascript" src="javascript/colorbrewer.js"></script>
 			<script type="text/javascript" src="javascript/d3.js"></script>

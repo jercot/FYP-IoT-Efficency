@@ -1,27 +1,23 @@
 package ie.fyp.jer.controller;
 
 import java.io.IOException;
-
-import javax.annotation.Resource;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
 
 /**
- * Servlet implementation class AddBuilding
+ * Servlet implementation class Compare
  */
-@WebServlet("/building")
-public class Building extends HttpServlet {
+@WebServlet("/compare")
+public class Compare extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	@Resource(name="jdbc/aws-rds")
-	private DataSource dataSource;      
+       
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public Building() {
+    public Compare() {
         super();
     }
 
@@ -30,8 +26,8 @@ public class Building extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		if(request.getSession().getAttribute("logged")!=null) {
-			request.setAttribute("main", "building");
-			request.setAttribute("hello", "building attribute");
+			request.setAttribute("main", "compare");
+			request.setAttribute("hello", "building 2");
 			request.getRequestDispatcher("/WEB-INF/index.jsp").forward(request, response);
 		}
 		else
@@ -42,8 +38,6 @@ public class Building extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String insert = "INSERT INTO \"FYP\".\"Building\"(accountid, name, location) VALUES (?, ?, ?);";
-		System.out.print(insert);
 		doGet(request, response);
 	}
 
