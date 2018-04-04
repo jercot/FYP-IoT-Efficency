@@ -1,15 +1,19 @@
 package ie.fyp.jer.domain;
 
-import java.util.Random;
+import java.util.ArrayList;
+
+import ie.fyp.jer.config.Token;
 
 public class Logged {
 	private int id;
 	private String token;
+	private ArrayList<String> buildings;
 
 	public Logged(int id) {
 		super();
 		this.id = id;
 		generate();
+		buildings = new ArrayList<>();
 	}
 
 	public int getId() {
@@ -28,6 +32,18 @@ public class Logged {
 		this.token = token;
 	}
 
+	public ArrayList<String> getBuildings() {
+		return buildings;
+	}
+
+	public void setBuildings(ArrayList<String> buildings) {
+		this.buildings = buildings;
+	}
+	
+	public void addBuilding(String name) {
+		buildings.add(name);
+	}
+
 	public boolean compare(String token) {
 		String temp = this.token;
 		generate();
@@ -37,13 +53,6 @@ public class Logged {
 	}
 	
 	private void generate() {
-		String SALTCHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-        StringBuilder salt = new StringBuilder();
-        Random rnd = new Random();
-        while (salt.length() < 18) { // length of the random string.
-            int index = (int) (rnd.nextFloat() * SALTCHARS.length());
-            salt.append(SALTCHARS.charAt(index));
-        }
-        token = salt.toString();
+		this.token =  Token.generate();
 	}
 }
