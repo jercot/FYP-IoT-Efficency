@@ -20,6 +20,7 @@ CREATE TABLE FYP.Account
 	town text COLLATE pg_catalog."default" NOT NULL,
 	county text COLLATE pg_catalog."default" NOT NULL,
     regDate bigint NOT NULL,
+	UNIQUE email,
     CONSTRAINT "Account_pkey" PRIMARY KEY (id)
 )
 WITH (
