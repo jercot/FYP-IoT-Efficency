@@ -22,6 +22,7 @@ public class Register extends HttpServlet {
 	@Resource(name="jdbc/aws-rds")
 	private DataSource dataSource;
 	private boolean registered;
+	
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
