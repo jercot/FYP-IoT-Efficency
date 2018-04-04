@@ -63,10 +63,8 @@ public class Register extends HttpServlet {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		finally {
-			registered = true;
-			doGet(request, response);
-		}
+		registered = true;
+		doGet(request, response);
 	}
 
 	private int insertName(Connection con, String fName, String lName, String email, String street, String town, String county, String num) throws SQLException {
