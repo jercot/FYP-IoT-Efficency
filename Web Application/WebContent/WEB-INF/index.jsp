@@ -25,7 +25,7 @@
 					<div class="menu menuGreen">
 						Houses <br>
 					</div>
-					<c:forEach items="${houses}" var="house">
+					<c:forEach items="${logged.buildings}" var="house">
 						<a href="house?name=<c:out value="${house}"/>">
 							<div class="menu menuHouse">
 								${house}

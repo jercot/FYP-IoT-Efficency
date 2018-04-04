@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import ie.fyp.jer.config.Token;
 import ie.fyp.jer.domain.Logged;
 
 /**
@@ -32,9 +31,7 @@ public class Main extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		if(request.getSession().getAttribute("logged")!=null) {
-			if(request.getSession().getAttribute("houses")==null)
-				setHouses((Logged)request.getAttribute("logged"), request.getSession());
-			request.setAttribute("token", Token.generate());
+			request.setAttribute("message", request.getParameter("message"));
 			request.setAttribute("main", "main");
 			request.setAttribute("hello", "main hello");
 			request.getRequestDispatcher("/WEB-INF/index.jsp").forward(request, response);
@@ -48,13 +45,5 @@ public class Main extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doGet(request, response);
-	}
-
-	private void setHouses(Logged account, HttpSession session) {
-		//Read houses from database using account id.
-		ArrayList<String> houses = new ArrayList<>();
-		houses.add("Cottage");
-		houses.add("Holiday");
-		session.setAttribute("houses", houses);
 	}
 }

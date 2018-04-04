@@ -61,8 +61,16 @@ public class Login extends HttpServlet {
 				ptst.setString(1, email);
 				ResultSet rs = ptst.executeQuery();
 				if(rs.next()) {
-					if(rs.getString(2).equals(password))
-						request.getSession().setAttribute("logged", new Logged(rs.getInt(1)));
+					if(rs.getString(2).equals(password)) {
+						Logged log = new Logged(rs.getInt(1));
+						query = "SELECT name FROM FYP.building WHERE accountId = ?";
+						ptst = con.prepareStatement(query);
+						ptst.setInt(1, log.getId());
+						ResultSet rs1 = ptst.executeQuery();
+						while(rs1.next())
+							log.addBuilding(rs1.getString(1));
+						request.getSession().setAttribute("logged", log);
+					}
 				}
 				else {
 					request.setAttribute("message", "Password or Email incorrect");
