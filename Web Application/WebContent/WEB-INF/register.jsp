@@ -31,6 +31,6 @@
 		    <button type="submit">Register</button>
 		</form>
 		<a href="<c:url value="/" />">Home</a>
-		${requestScope.message == null ? '' : requestScope.message}
+		${requestScope.message==null ? '' : requestScope.message}
 	</body>
 </html>
