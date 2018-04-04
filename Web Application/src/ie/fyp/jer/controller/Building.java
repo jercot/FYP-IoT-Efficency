@@ -39,7 +39,6 @@ public class Building extends HttpServlet {
 		if(request.getSession().getAttribute("logged")!=null&&!added) {
 			added = false;
 			request.setAttribute("main", "building");
-			request.setAttribute("hello", "building attribute");
 			request.getRequestDispatcher("/WEB-INF/index.jsp").forward(request, response);
 		}
 		else
