@@ -1,17 +1,24 @@
-DROP TABLE IF EXISTS "FYP"."Recording";
-DROP TABLE IF EXISTS "FYP"."Room";
-DROP TABLE IF EXISTS "FYP"."Building";
-DROP TABLE IF EXISTS "FYP"."Login";
-DROP TABLE IF EXISTS "FYP"."Password";
-DROP TABLE IF EXISTS "FYP"."Account";
+DROP TABLE IF EXISTS FYP.Recording;
+DROP TABLE IF EXISTS FYP.Room;
+DROP TABLE IF EXISTS FYP.Building;
+DROP TABLE IF EXISTS FYP.Login;
+DROP TABLE IF EXISTS FYP.Password;
+DROP TABLE IF EXISTS FYP.Account;
+DROP SCHEMA IF EXISTS FYP;
 
--- Table: "FYP"."Account"
-CREATE TABLE "FYP"."Account"
+CREATE SCHEMA FYP;
+
+-- Table: FYP.Account
+CREATE TABLE FYP.Account
 (
     id serial NOT NULL,
-    name text COLLATE pg_catalog."default" NOT NULL,
+    fName text COLLATE pg_catalog."default" NOT NULL,
+	lName text COLLATE pg_catalog."default" NOT NULL,
     email text COLLATE pg_catalog."default" NOT NULL,
-    phone integer,
+    phone text COLLATE pg_catalog."default",
+	street text COLLATE pg_catalog."default",
+	town text COLLATE pg_catalog."default" NOT NULL,
+	county text COLLATE pg_catalog."default" NOT NULL,
     regDate bigint NOT NULL,
     CONSTRAINT "Account_pkey" PRIMARY KEY (id)
 )
@@ -20,11 +27,11 @@ WITH (
 )
 TABLESPACE pg_default;
 
-ALTER TABLE "FYP"."Account"
+ALTER TABLE FYP.Account
     OWNER to "Jer";
 	
--- Table: "FYP"."Password"
-CREATE TABLE "FYP"."Password"
+-- Table: FYP.Password
+CREATE TABLE FYP.Password
 (
     id serial NOT NULL,
     accountId integer NOT NULL,
@@ -32,7 +39,7 @@ CREATE TABLE "FYP"."Password"
     date bigint NOT NULL,
     CONSTRAINT "Password_pkey" PRIMARY KEY (id),
     CONSTRAINT "passwordAccountId" FOREIGN KEY (accountId)
-        REFERENCES "FYP"."Account" (id) MATCH SIMPLE
+        REFERENCES FYP.Account (id) MATCH SIMPLE
         ON UPDATE CASCADE
         ON DELETE CASCADE
 )
@@ -41,11 +48,11 @@ WITH (
 )
 TABLESPACE pg_default;
 
-ALTER TABLE "FYP"."Password"
+ALTER TABLE FYP.Password
     OWNER to "Jer";
 	
--- Table: "FYP"."Login"
-CREATE TABLE "FYP"."Login"
+-- Table: FYP.Login
+CREATE TABLE FYP.Login
 (
     id serial NOT NULL,
     accountId integer NOT NULL,
@@ -53,7 +60,7 @@ CREATE TABLE "FYP"."Login"
     location text COLLATE pg_catalog."default" NOT NULL,
     CONSTRAINT "Login_pkey" PRIMARY KEY (id),
     CONSTRAINT "loginAccountId" FOREIGN KEY (accountId)
-        REFERENCES "FYP"."Account" (id) MATCH SIMPLE
+        REFERENCES FYP.Account (id) MATCH SIMPLE
         ON UPDATE CASCADE
         ON DELETE CASCADE
 )
@@ -62,19 +69,20 @@ WITH (
 )
 TABLESPACE pg_default;
 
-ALTER TABLE "FYP"."Login"
+ALTER TABLE FYP.Login
     OWNER to "Jer";
 	
--- Table: "FYP"."Building"
-CREATE TABLE "FYP"."Building"
+-- Table: FYP.Building
+CREATE TABLE FYP.Building
 (
     id serial NOT NULL,
     accountId integer NOT NULL,
     name text COLLATE pg_catalog."default" NOT NULL,
     location text COLLATE pg_catalog."default" NOT NULL,
+	UNIQUE(accountId, name),
     CONSTRAINT "Building_pkey" PRIMARY KEY (id),
     CONSTRAINT "buildingAccountId" FOREIGN KEY (accountId)
-        REFERENCES "FYP"."Account" (id) MATCH SIMPLE
+        REFERENCES FYP.Account (id) MATCH SIMPLE
         ON UPDATE CASCADE
         ON DELETE CASCADE
 )
@@ -83,11 +91,11 @@ WITH (
 )
 TABLESPACE pg_default;
 
-ALTER TABLE "FYP"."Building"
+ALTER TABLE FYP.Building
     OWNER to "Jer";
 	
--- Table: "FYP"."Room"
-CREATE TABLE "FYP"."Room"
+-- Table: FYP.Room
+CREATE TABLE FYP.Room
 (
     id serial NOT NULL,
     buildingId integer NOT NULL,
@@ -96,7 +104,7 @@ CREATE TABLE "FYP"."Room"
     floor integer,
     CONSTRAINT "Room_pkey" PRIMARY KEY (id),
     CONSTRAINT "roomBuildingId" FOREIGN KEY (buildingId)
-        REFERENCES "FYP"."Building" (id) MATCH SIMPLE
+        REFERENCES FYP.Building (id) MATCH SIMPLE
         ON UPDATE CASCADE
         ON DELETE CASCADE
 )
@@ -105,11 +113,11 @@ WITH (
 )
 TABLESPACE pg_default;
 
-ALTER TABLE "FYP"."Room"
+ALTER TABLE FYP.Room
     OWNER to "Jer";
 	
--- Table: "FYP"."Recording"
-CREATE TABLE "FYP"."Recording"
+-- Table: FYP.Recording
+CREATE TABLE FYP.Recording
 (
     id serial NOT NULL,
     roomId integer NOT NULL,
@@ -129,7 +137,7 @@ CREATE TABLE "FYP"."Recording"
     time bigint NOT NULL,
     CONSTRAINT "Recording_pkey" PRIMARY KEY (id),
     CONSTRAINT "Recording_roomId_fkey" FOREIGN KEY (roomId)
-        REFERENCES "FYP"."Room" (id) MATCH SIMPLE
+        REFERENCES FYP.Room (id) MATCH SIMPLE
         ON UPDATE CASCADE
         ON DELETE CASCADE
 )
@@ -138,5 +146,5 @@ WITH (
 )
 TABLESPACE pg_default;
 
-ALTER TABLE "FYP"."Recording"
+ALTER TABLE FYP.Recording
     OWNER to "Jer";
