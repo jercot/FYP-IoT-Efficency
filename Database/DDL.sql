@@ -20,7 +20,7 @@ CREATE TABLE FYP.Account
 	town text COLLATE pg_catalog."default" NOT NULL,
 	county text COLLATE pg_catalog."default" NOT NULL,
     regDate bigint NOT NULL,
-	UNIQUE email,
+	UNIQUE (email),
     CONSTRAINT "Account_pkey" PRIMARY KEY (id)
 )
 WITH (
@@ -103,6 +103,7 @@ CREATE TABLE FYP.Room
     name text COLLATE pg_catalog."default" NOT NULL,
     bucket text COLLATE pg_catalog."default" NOT NULL,
     floor integer,
+	UNIQUE (name),
     CONSTRAINT "Room_pkey" PRIMARY KEY (id),
     CONSTRAINT "roomBuildingId" FOREIGN KEY (buildingId)
         REFERENCES FYP.Building (id) MATCH SIMPLE
