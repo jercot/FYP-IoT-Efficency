@@ -103,7 +103,7 @@ CREATE TABLE FYP.Room
     name text COLLATE pg_catalog."default" NOT NULL,
     bucket text COLLATE pg_catalog."default" NOT NULL,
     floor integer,
-	UNIQUE (name),
+	UNIQUE (buildingId, name),
     CONSTRAINT "Room_pkey" PRIMARY KEY (id),
     CONSTRAINT "roomBuildingId" FOREIGN KEY (buildingId)
         REFERENCES FYP.Building (id) MATCH SIMPLE
