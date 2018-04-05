@@ -1,16 +1,21 @@
-body {
+html,body {
     margin: 0;
-  	padding: 0;
   	height: 100%;
-    font-size: 16px;
+}
+
+div#left {
+	position: relative;
+	float: left;
+	min-height:100%;
+}
+
+div#right {
+	min-width: 980px;
 }
 
 div#logo {
-	top: 0;
-	left: 0;
     height: 48px;
     width: 300px;
-    position: fixed; 
     background-color: #6565ff;
     text-align: center;
     line-height: 50px;
@@ -18,27 +23,24 @@ div#logo {
 }
 
 div#title {
-	top: 0;
-    right: 0;
+	position: absolute;
     left: 300px;
-	height:48px;
-    position: fixed; 
+    right: 0;
+    min-width: inherit;
+	height: 48px;
     text-align: left;
     line-height: 50px;
     border-bottom: 2px solid #333333;
 }
 
 div#sideMenu {
+	position: absolute;
 	top: 50px;
-	left: 0;
     bottom: 0;
     width: 300px;
-    position: fixed; 
     background-color: #aaaaaa;
     overflow-x: hidden;
-    transition: 0.5s; 
     padding-top: 15px;
-    style: inline-block;
 }
 
 #sideMenu a {
@@ -47,20 +49,18 @@ div#sideMenu {
 }
 
 div#main {
+	position: absolute;
+	left: 300px;
 	top: 50px;
-    right: 0;
-    left: 300px;
     bottom: 0;
-    position: fixed; 
-    transition: margin-left .5s;
-    overflow-y: auto;
-    overflow-x: none;
+    right: 0;
+    min-width: inherit;
+    overflow-x: hidden;
 }
 
 hr.left {
 	height:2px;
 	border:none;
-	color:#333333;
 	background-color:#333333;
 }
 

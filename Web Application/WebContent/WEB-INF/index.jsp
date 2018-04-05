@@ -11,6 +11,7 @@
 		<link rel="stylesheet" type="text/css" href="css/layout.css"/>
 	</head>
 	<body>
+		<div id="left">
 			<div id="logo">
 				IoT Efficiency
 			</div>
@@ -57,6 +58,8 @@
 					</div>
 				</a>
 			</div>
+		</div>
+		<div id="right">
 			<div id="title">
 				Account Name - Selected House
 			</div>
@@ -87,11 +90,6 @@
 					</c:when>
 				</c:choose>
 			</div>
-			<script type="text/javascript" src="javascript/colorbrewer.js"></script>
-			<script type="text/javascript" src="javascript/d3.js"></script>
-			<script type="text/javascript" src="javascript/crossfilter.js"></script>
-			<script type="text/javascript" src="javascript/dc.js"></script>
-			<script type="text/javascript" src="javascript/jquery-3.2.1.min.js"></script>
-			<script type="text/javascript" src="javascript/custom.js"></script>
+		</div>
 	</body>
 </html>
