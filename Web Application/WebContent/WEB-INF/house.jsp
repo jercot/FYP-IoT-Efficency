@@ -2,6 +2,9 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <c:out value="${message}"/><hr>
 GRAPH GOES UP HERE FOR EACH HOUSE<hr>
+<div id="graph">
+	<div id="lineChart"></div>
+</div>
 
 <c:choose>
 	<c:when test="${not empty rooms}">
@@ -39,4 +42,12 @@ Modify Building:
 </form>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="javascript/d3.js"></script>
+<script src="javascript/crossfilter.js"></script>
+<script src="javascript/dc.js"></script>
 <script src="javascript/custom.js"></script>
+<script>
+	$(document).ready(function() {
+		startVisual("${bName}");
+	});
+</script>
