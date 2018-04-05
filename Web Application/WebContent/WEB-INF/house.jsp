@@ -37,3 +37,6 @@ Modify Building:
 	<input type="hidden" name="token" value="${fn:escapeXml(logged.token)}">
 	<button type="submit">Modify</button>
 </form>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="javascript/custom.js"></script>
