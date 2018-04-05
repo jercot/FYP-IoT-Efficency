@@ -27,9 +27,8 @@ public class Main extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		if(request.getSession().getAttribute("logged")!=null) {
-			request.setAttribute("message", request.getParameter("message"));
 			request.setAttribute("main", "main");
-			request.setAttribute("hello", "main hello");
+			request.setAttribute("subtitle", "Dashboard");
 			request.getRequestDispatcher("/WEB-INF/index.jsp").forward(request, response);
 		}
 		else

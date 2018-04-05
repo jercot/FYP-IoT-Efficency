@@ -27,9 +27,9 @@
 						Houses <br>
 					</div>
 					<c:forEach items="${logged.buildings}" var="house">
-						<a href="house?name=<c:out value="${house}"/>">
+						<a href="house?bName=<c:out value="${house}"/>">
 							<div class="menu menuHouse">
-								${house}
+								${fn:escapeXml(house)}
 							</div>
 						</a>
 					</c:forEach>
@@ -61,7 +61,7 @@
 		</div>
 		<div id="right">
 			<div id="title">
-				Account Name - Selected House
+				${fn:escapeXml(logged.title)} - ${fn:escapeXml(subtitle)}
 			</div>
 			<div id="main" class="main">
 				<c:choose>

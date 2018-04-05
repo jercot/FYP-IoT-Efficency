@@ -51,7 +51,7 @@ public class Login extends HttpServlet {
 		if(email!=null&&password!=null) {
 			try {
 				Connection con = dataSource.getConnection();
-				String query = "SELECT a.id, p.password, p.date " + 
+				String query = "SELECT CONCAT(a.fName, ' ', a.lName), a.id, p.password, p.date " + 
 						"FROM FYP.Account a " + 
 						"LEFT JOIN FYP.Password p ON a.id = p.accountId " + 
 						"WHERE UPPER(a.email) = UPPER(?) " + 
@@ -61,8 +61,8 @@ public class Login extends HttpServlet {
 				ptst.setString(1, email);
 				ResultSet rs = ptst.executeQuery();
 				if(rs.next()) {
-					if(rs.getString(2).equals(password)) {
-						Logged log = new Logged(rs.getInt(1));
+					if(rs.getString(3).equals(password)) {
+						Logged log = new Logged(rs.getString(1), rs.getInt(2));
 						query = "SELECT name FROM FYP.building WHERE accountId = ?";
 						ptst = con.prepareStatement(query);
 						ptst.setInt(1, log.getId());

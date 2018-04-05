@@ -37,12 +37,14 @@ public class Building extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		if(request.getSession().getAttribute("logged")!=null&&!added) {
-			added = false;
 			request.setAttribute("main", "building");
+			request.setAttribute("subtitle", "Add House to System");
 			request.getRequestDispatcher("/WEB-INF/index.jsp").forward(request, response);
 		}
-		else
+		else {
+			added = false;
 			response.sendRedirect(request.getContextPath());
+		}
 	}
 
 	/**
@@ -73,7 +75,8 @@ public class Building extends HttpServlet {
 				e.printStackTrace();
 			}
 		}
-		else request.getSession().setAttribute("logged", null);
+		else 
+			request.getSession().setAttribute("logged", null);
 		doGet(request, response);
 	}
 }

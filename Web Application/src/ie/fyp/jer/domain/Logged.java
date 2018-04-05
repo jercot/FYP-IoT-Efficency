@@ -6,14 +6,23 @@ import ie.fyp.jer.config.Token;
 
 public class Logged {
 	private int id;
-	private String token;
+	private String title, token;
 	private ArrayList<String> buildings;
 
-	public Logged(int id) {
+	public Logged(String title, int id) {
 		super();
+		this.title = title;
 		this.id = id;
 		generate();
 		buildings = new ArrayList<>();
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
 	public int getId() {
@@ -54,5 +63,12 @@ public class Logged {
 	
 	private void generate() {
 		this.token =  Token.generate();
+	}
+
+	public void editBuilding(String pName, String bName) {
+		for(int i=0; i<buildings.size(); i++) {
+			if(buildings.get(i).equals(pName))
+				buildings.set(i, bName);
+		}
 	}
 }
