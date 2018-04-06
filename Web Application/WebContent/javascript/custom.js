@@ -25,12 +25,19 @@ function switchStatement(data) {
 }
 
 function createGraph(data) {
+	data.forEach(function (d) {
+		var date = new Date(+d.ti);
+        d.month = d3.time.month(date);
+        d.week = d3.time.week(date);
+        d.day = d3.time.day(date);
+        d.hour = d3.time.hour(date);
+    });
 	var ndx = crossfilter(data),
 	parentDimension = ndx.dimension(function (d) {
-		return d.room;
+		return d.te;
 	}),
 	parentGroup = parentDimension.group().reduceSum(function(d) {
-		return d.tem;
+		return 1;
 	});
 
 	lineChart
@@ -42,7 +49,7 @@ function createGraph(data) {
 	.dimension(parentDimension)
 	.group(parentGroup)
 	.round(d3.time.month.round)
-	.x(d3.scale.linear().domain([0,20]))
+	.x(d3.scale.linear().domain([13,21]))
 	.xUnits(d3.time.months)
 	.elasticY(true)
 	.yAxisLabel("Test")

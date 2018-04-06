@@ -1,10 +1,13 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
-<c:out value="${message}"/><hr>
-GRAPH GOES UP HERE FOR EACH HOUSE<hr>
+<c:choose>
+	<c:when test="${not empty message}">
+		<c:out value="${message}"/><hr>
+	</c:when>
+</c:choose>
 <div id="graph">
 	<div id="lineChart"></div>
-</div>
+</div><hr>
 
 <c:choose>
 	<c:when test="${not empty rooms}">
