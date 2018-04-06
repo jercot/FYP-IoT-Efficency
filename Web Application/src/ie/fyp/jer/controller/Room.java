@@ -24,7 +24,7 @@ public class Room extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	@Resource(name="jdbc/aws-rds")
 	private DataSource dataSource;
-	
+
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
@@ -37,7 +37,7 @@ public class Room extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		if(request.getSession().getAttribute("logged")!=null) {
-			response.sendRedirect("house?name="+request.getParameter("bName"));}
+			response.sendRedirect("house?bName="+request.getParameter("bName"));}
 		else
 			response.sendRedirect(request.getContextPath());
 	}
@@ -50,20 +50,42 @@ public class Room extends HttpServlet {
 		if(log!=null&&log.compare(request.getParameter("token"))) {
 			String building = request.getParameter("bName");
 			String name = request.getParameter("rName");
-			int floor = Integer.parseInt(request.getParameter("floor"));
+			String oName = request.getParameter("oName");
+			int floor = -1;
+			if(!request.getParameter("floor").equals(""))
+				floor = Integer.parseInt(request.getParameter("floor"));
 			String bucket = Bucket.generate();
 			String insert = "INSERT INTO fyp.room (buildingid, name, bucket, floor) " + 
 					"SELECT id, ?, ?, ? " + 
 					"FROM FYP.building " + 
 					"WHERE name = ?;";
+			String update = "UPDATE fyp.room " + 
+					"SET name = COALESCE(?, name), floor = " + 
+					"CASE " + 
+					"WHEN ?=-1 then floor " + 
+					"ELSE ? " + 
+					"END " + 
+					"WHERE name = ?;";
 			try {
 				Connection con = dataSource.getConnection();
-				PreparedStatement ptst = con.prepareStatement(insert);
-				ptst.setString(1, name);
-				ptst.setString(2, bucket);
-				ptst.setInt(3, floor);
-				ptst.setString(4, building);
-				ptst.executeUpdate();
+				if(request.getParameter("type").equals("add")) {
+					PreparedStatement ptst = con.prepareStatement(insert);
+					ptst.setString(1, name);
+					ptst.setString(2, bucket);
+					ptst.setInt(3, floor);
+					ptst.setString(4, building);
+					ptst.executeUpdate();
+				}
+				else {
+					PreparedStatement ptst = con.prepareStatement(update);
+					if(name.equals(""))
+						name = null;
+					ptst.setString(1, name);
+					ptst.setInt(2, floor);
+					ptst.setInt(3, floor);
+					ptst.setString(4, oName);
+					ptst.executeUpdate();
+				}
 				request.setAttribute("message", "Room " + name + " added!");
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -71,5 +93,4 @@ public class Room extends HttpServlet {
 		}
 		doGet(request, response);
 	}
-
 }

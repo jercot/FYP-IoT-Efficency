@@ -2,9 +2,12 @@ var lineChart = dc.lineChart("#lineChart");
 
 function startVisual(house) {
 	$.post("data", {bName: house},function(data) {
-		console.log(data.code);
+		console.log("Post Request Success");
 		switchStatement(data);
-	},"json");
+	},"json")
+	.fail(function(d) {
+		console.log("Post Request Failed");
+	});
 	/*$.ajax({
 	    type : 'POST',
 	    url : "data",
@@ -57,4 +60,5 @@ function createGraph(data) {
 	.renderHorizontalGridLines(true);
 	
 	dc.renderAll();
+	$("#graph").append("<br><hr><br>");
 }

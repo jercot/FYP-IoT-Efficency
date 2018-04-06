@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
 import ie.fyp.jer.domain.Logged;
+import ie.fyp.jer.domain.HouseData;
 
 /**
  * Servlet implementation class House
@@ -39,16 +40,20 @@ public class House extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		Logged log = (Logged)request.getSession().getAttribute("logged");
 		if(log!=null) {
-			ArrayList<String> rooms = new ArrayList<>();
-			String query = "SELECT * FROM FYP.room where buildingId IN(SELECT id FROM FYP.Building WHERE name = ? AND accountId = ?)";
+			ArrayList<HouseData> rooms = new ArrayList<>();
+			String query = "SELECT DISTINCT ON (ro.id) " + 
+					"ro.name, ro.floor, COALESCE(re.humidAve, -1), COALESCE(re.lightAve, -1), COALESCE(re.tempAve, -1) " + 
+					"FROM FYP.Recording re " + 
+					"FULL JOIN FYP.Room ro ON ro.id = re.roomId " +
+					"WHERE ro.buildingId IN (SELECT id FROM FYP.building WHERE accountId=? AND name=?)";
 			try {
 				Connection con = dataSource.getConnection();
 				PreparedStatement ptst = con.prepareStatement(query);
-				ptst.setString(1, request.getParameter("bName"));
-				ptst.setInt(2, log.getId());
+				ptst.setInt(1, log.getId());
+				ptst.setString(2, request.getParameter("bName"));
 				ResultSet rs = ptst.executeQuery();
 				while(rs.next()) {
-					rooms.add("Name: " + rs.getString(3) + " - Floor: " + rs.getInt(5));
+					rooms.add(new HouseData(rs.getString(1), rs.getInt(2), rs.getInt(3), rs.getInt(4), rs.getFloat(5)));
 				}
 				request.setAttribute("rooms", rooms);
 			} catch (SQLException e) {

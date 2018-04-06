@@ -58,6 +58,12 @@ div#main {
     overflow-x: hidden;
 }
 
+
+div#scroll {
+	margin: auto;
+	width: 980px;
+}
+
 hr.left {
 	height:2px;
 	border:none;
@@ -110,4 +116,106 @@ div.menuWhite {
 div.menuHouse {
 	margin-left: 30px;
 	background-color: pink;
+}
+
+div#graph {
+	padding-top:30px;
+}
+
+hr {
+	clear:both;
+}
+
+div#roomList {
+	width: calc(100% - 80px);
+	padding-left: 40px;
+}
+
+div.room {
+	border:1px solid black;
+	clear: both;
+	text-align: center;
+	overflow: auto;
+}
+
+div.thermo {
+	width: 150px;
+	float: left;
+	margin-right: 150px;
+}
+
+.temp0 {
+	fill: #0000FF;
+}
+
+.temp1 {
+	fill: #00CBFF;
+}
+
+.temp2 {
+	fill: #00FF65;
+}
+
+.temp3 {
+	fill: #65FF00;
+}
+
+.temp4 {
+	fill: #FFCC00;
+}
+
+.temp5 {
+	fill: #FF0000;
+}
+
+div.lumens {
+	width: 150px;
+	float: left;
+	margin-right: 100px;
+}
+
+div.tIcon{
+	padding-left: 50px;
+	float: left;
+}
+
+div.tText{
+	line-height: 100px;
+}
+
+.light0 {
+	fill: #000050;
+}
+
+.light1 {
+	fill: #323340;
+}
+
+.light2 {
+	fill: #656630;
+}
+
+.light3 {
+	fill: #989920;
+}
+
+.light4 {
+	fill: #CBCC10;
+}
+
+.light5 {
+	fill: #FEFF00;
+}
+
+.edit {
+	line-height: 25px;
+	float: left;
+}
+
+div#addRoom {
+	padding-left: 40px;
+}
+
+div#modBuild {
+	padding-left: 40px;
 }
