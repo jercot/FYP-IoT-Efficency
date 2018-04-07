@@ -18,7 +18,7 @@ import javax.sql.DataSource;
  */
 @WebServlet("/register")
 public class Register extends HttpServlet {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 8L;
 	@Resource(name="jdbc/aws-rds")
 	private DataSource dataSource;
 	private boolean registered;
@@ -40,7 +40,7 @@ public class Register extends HttpServlet {
 		if(request.getSession().getAttribute("logged")==null)
 			request.getRequestDispatcher(forward).forward(request, response);
 		else
-			response.sendRedirect(request.getContextPath());
+			response.sendRedirect("");
 	}
 
 	/**

@@ -21,7 +21,7 @@ import ie.fyp.jer.domain.Logged;
  */
 @WebServlet("/data")
 public class GetData extends HttpServlet {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 13L;
 	@Resource(name="jdbc/aws-rds")
 	private DataSource dataSource;
 

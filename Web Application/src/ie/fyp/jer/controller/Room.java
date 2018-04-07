@@ -21,7 +21,7 @@ import ie.fyp.jer.domain.Logged;
  */
 @WebServlet("/room")
 public class Room extends HttpServlet {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 9L;
 	@Resource(name="jdbc/aws-rds")
 	private DataSource dataSource;
 

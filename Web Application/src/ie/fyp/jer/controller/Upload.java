@@ -18,7 +18,7 @@ import javax.sql.DataSource;
  */
 @WebServlet("/upload")
 public class Upload extends HttpServlet {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 12L;
 	@Resource(name="jdbc/aws-rds")
 	private DataSource dataSource;   
     /**

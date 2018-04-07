@@ -21,7 +21,7 @@ import ie.fyp.jer.domain.Logged;
  */
 @WebServlet("/login")
 public class Login extends HttpServlet {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 5L;
 	@Resource(name="jdbc/aws-rds")
 	private DataSource dataSource;
 	
@@ -36,10 +36,11 @@ public class Login extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		response.getWriter().write(request.getContextPath());
 		if(request.getSession().getAttribute("logged")==null)
 			request.getRequestDispatcher("/WEB-INF/homepage.jsp").forward(request, response);
 		else
-			response.sendRedirect(request.getContextPath());
+			response.sendRedirect("");
 	}
 
 	/**

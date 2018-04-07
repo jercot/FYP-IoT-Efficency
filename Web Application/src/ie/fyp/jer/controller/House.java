@@ -23,7 +23,7 @@ import ie.fyp.jer.domain.HouseData;
  */
 @WebServlet("/house")
 public class House extends HttpServlet {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 4L;
 	@Resource(name="jdbc/aws-rds")
 	private DataSource dataSource;
 	

@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 @WebServlet("/settings")
 public class Settings extends HttpServlet {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 10L;
        
     /**
      * @see HttpServlet#HttpServlet()

@@ -20,7 +20,7 @@ import ie.fyp.jer.domain.Logged;
  */
 @WebServlet("/building")
 public class Building extends HttpServlet {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 	@Resource(name="jdbc/aws-rds")
 	private DataSource dataSource;
 	private boolean added;
