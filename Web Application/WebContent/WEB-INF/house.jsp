@@ -9,80 +9,81 @@
 	<div id="lineChart"></div>
 </div>
 
-<c:choose>
-<c:when test="${not empty rooms}">
 <div id="roomList">
+	<c:choose>
+	<c:when test="${not empty rooms}">
 	Room List:<br>
 	<c:forEach items="${rooms}" var="room">
-		<div class="room">
-			<span class="roomTitle">Room: ${fn:escapeXml(room.name)} - Floor: ${fn:escapeXml(room.floor)}</span> <br>
-			<div class="thermo">
+	<div class="room">
+		<span class="roomTitle">Room: ${fn:escapeXml(room.name)} - Floor: ${fn:escapeXml(room.floor)}</span> <br>
+		<div class="thermo">
+		<c:choose>
+		<c:when test="${room.temp ne -1}">
+			<div class="tIcon">
+				<svg width="40" viewbox="0 0 100 300">
+					<circle cx="50" cy="245" r="33" stroke="none" class="temp${room.heat}" />
+					<c:forEach begin="0" end="${room.heat}" varStatus="loop">
+					<rect x="30" y="${190-30*loop.index}" width="40px" height="30px" class="temp${room.heat}"/>
+					</c:forEach>
+					<path d="M34,40 34,223 a31,31 0 1,0 32,0 L66,40 a1,1 0 0,0 -32,0" 
+					 fill="none" stroke="white" stroke-width="3px"/>
+					<path d="M30,40 30,220 a35,35 0 1,0 40,0 L70,40 a1,1 0 0,0 -40,0" 
+					 fill="none" stroke="black" stroke-width="6px"/>
+					<path d="M70,200 55,200 M70,180 55,180 M70,160 55,160 
+					M70,140 55,140 M70,120 55,120 M70,100 55,100 
+					M70,80 55,80 M70,60 55,60" stroke="black" stroke-width="2px"/>
+				</svg>
+			</div>
+			<div class="tText"> 
+				${fn:escapeXml(room.temp)}&deg;C
+			</div>
+		</c:when>
+		<c:otherwise>
+			No Recent Temperature Reading for Room.
+		</c:otherwise>
+		</c:choose>
+		</div>
+		<div class="lumens">
 			<c:choose>
-			<c:when test="${room.temp ne -1}">
-				<div class="tIcon">
-					<svg width="40" viewBox="0 0 100 300">
-						<circle cx="50" cy="245" r="33" stroke="none" class="temp${room.heat}" />
-						<c:forEach begin="0" end="${room.heat}" varStatus="loop">
-						<rect x="30" y="${190-30*loop.index}" width="40px" height="30px" class="temp${room.heat}"/>
-						</c:forEach>
-						<path d="M34,40 34,223 a31,31 0 1,0 32,0 L66,40 a1,1 0 0,0 -32,0" 
-						 fill="none" stroke="white" stroke-width="3px"/>
-						<path d="M30,40 30,220 a35,35 0 1,0 40,0 L70,40 a1,1 0 0,0 -40,0" 
-						 fill="none" stroke="black" stroke-width="6px"/>
-						<path d="M70,200 55,200 M70,180 55,180 M70,160 55,160 
-						M70,140 55,140 M70,120 55,120 M70,100 55,100 
-						M70,80 55,80 M70,60 55,60" stroke="black" stroke-width="2px"/>
+			<c:when test="${room.light ne -1}">
+				<div class="lIcon">
+					<svg width="60" viewbox="0 0 200 300">
+						<path d="M60,210 60,270 a10,1 0 0,0 80,0 L140,210" stroke="black" fill="grey" stroke-width="6px"/>
+						<path d="M140,220 60,230 M140,240 60,250 M140,260 60,270" stroke="black" fill="grey" stroke-width="3px"/>
+						<path d="M20,140 a90,90 0 1,1 160,0 L140,210 a8,1 0 1,1 -80,0 L20,140" stroke="black" stroke-width="6px" class="light${room.lum}"/>
 					</svg>
 				</div>
-				<div class="tText"> 
-					${fn:escapeXml(room.temp)}&deg;C
+				<div class="lText"> 
+					${fn:escapeXml(room.light)} lumens
 				</div>
 			</c:when>
 			<c:otherwise>
-				No Recent Temperature Reading for Room.
+				No Recent Lumen Reading for Room.
 			</c:otherwise>
 			</c:choose>
-			</div>
-			<div class="lumens">
-				<c:choose>
-				<c:when test="${room.light ne -1}">
-					<div class="lIcon">
-						<svg width="60" viewBox="0 0 200 300">
-							<path d="M60,210 60,270 a10,1 0 0,0 80,0 L140,210" stroke="black" fill="grey" stroke-width="6px"/>
-							<path d="M140,220 60,230 M140,240 60,250 M140,260 60,270" stroke="black" fill="grey" stroke-width="3px"/>
-							<path d="M20,140 a90,90 0 1,1 160,0 L140,210 a8,1 0 1,1 -80,0 L20,140" stroke="black" stroke-width="6px" class="light${room.lum}"/>
-						</svg>
-					</div>
-					<div class="lText"> 
-						${fn:escapeXml(room.light)} lumens
-					</div>
-				</c:when>
-				<c:otherwise>
-					No Recent Lumen Reading for Room.
-				</c:otherwise>
-				</c:choose>
-			</div>
-			<div class="edit">
-				Modify Room:
-				<form action="room" method="POST">
-					<label><b>Room Name</b></label>
-					<input type="text" placeholder="name" name="rName"><br>
-					<label><b>Floor</b></label>
-					<input type="number" min="1" max="25" placeholder="floor" name="floor">
-					<input type="hidden" name="type" value="modify">
-					<input type="hidden" name="bName" value="${fn:escapeXml(bName)}">
-					<input type="hidden" name="oName" value="${fn:escapeXml(room.name)}">
-					<input type="hidden" name="token" value="${fn:escapeXml(logged.token)}">
-					<button type="submit">Modify</button>
-				</form>
-			</div>
 		</div>
+		<div class="edit">
+			Modify Room:
+			<form action="room" method="POST">
+				<label><b>Room Name</b></label>
+				<input type="text" placeholder="name" name="rName"><br>
+				<label><b>Floor</b></label>
+				<input type="number" min="1" max="25" placeholder="floor" name="floor">
+				<input type="hidden" name="type" value="modify">
+				<input type="hidden" name="bName" value="${fn:escapeXml(bName)}">
+				<input type="hidden" name="oName" value="${fn:escapeXml(room.name)}">
+				<input type="hidden" name="token" value="${fn:escapeXml(logged.token)}">
+				<button type="submit">Modify</button>
+			</form>
+		</div>
+	</div>
 	</c:forEach>
+	</c:when>
+	<c:otherwise>
+	No rooms in the system for the selected house.
+	</c:otherwise>
+	</c:choose>
 </div>
-</c:when>
-<c:otherwise>
-</c:otherwise>
-</c:choose>
 
 <br>
 <hr>

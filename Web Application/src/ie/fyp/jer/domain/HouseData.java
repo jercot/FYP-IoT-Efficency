@@ -24,15 +24,15 @@ public class HouseData {
 			heat = 1;
 		else
 			heat = 0;
-		if(this.light>=600)
+		if(this.light>=800)
 			lum = 5;
-		else if(this.light>=400)
+		else if(this.light>=600)
 			lum = 4;
-		else if(this.light>=200)
+		else if(this.light>=400)
 			lum = 3;
-		else if(this.light>=100)
+		else if(this.light>=200)
 			lum = 2;
-		else if(this.light>=50)
+		else if(this.light>=100)
 			lum = 1;
 		else
 			lum = 0;

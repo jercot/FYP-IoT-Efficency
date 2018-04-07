@@ -45,7 +45,8 @@ public class House extends HttpServlet {
 					"ro.name, ro.floor, COALESCE(re.humidAve, -1), COALESCE(re.lightAve, -1), COALESCE(re.tempAve, -1) " + 
 					"FROM FYP.Recording re " + 
 					"FULL JOIN FYP.Room ro ON ro.id = re.roomId " +
-					"WHERE ro.buildingId IN (SELECT id FROM FYP.building WHERE accountId=? AND name=?)";
+					"WHERE ro.buildingId IN (SELECT id FROM FYP.building WHERE accountId=? AND name=?) " + 
+					"ORDER BY ro.id, re.time DESC;";
 			try {
 				Connection con = dataSource.getConnection();
 				PreparedStatement ptst = con.prepareStatement(query);

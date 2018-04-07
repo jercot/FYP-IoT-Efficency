@@ -62,7 +62,7 @@ public class Upload extends HttpServlet {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		//request.getRequestDispatcher("tempup?"+request.getQueryString()).forward(request, response);
+		request.getRequestDispatcher("tempup?"+request.getQueryString()).forward(request, response);
 	}
 
 	/**
