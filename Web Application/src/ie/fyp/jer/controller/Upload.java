@@ -2,8 +2,8 @@ package ie.fyp.jer.controller;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletException;
@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
 /**
- * Servlet implementation class Upload
+ * Servlet implementation class TempUp
  */
 @WebServlet("/upload")
 public class Upload extends HttpServlet {
@@ -33,16 +33,36 @@ public class Upload extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		try {
-		String input = request.getQueryString()+ "&time=" + System.currentTimeMillis();
-		System.out.println(request.getParameter("type"));
-		String query = "INSERT INTO public.\"Temp\" (\"string\") VALUES('" + input + "');";
-		Connection con;
-			con = dataSource.getConnection();
-		Statement compStmt = con.createStatement();
-		compStmt.executeUpdate(query);
+			String insert = "INSERT INTO fyp.recording(roomid, movement, humidave, humidmed, humidmin, "
+					+ "humidmax, lightave, lightmed, lightmin, lightmax, tempave, tempmed, tempmin, tempmax, \"time\") " + 
+					"SELECT id, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? " + 
+					"FROM FYP.room " + 
+					"WHERE bucket = ?";
+			Connection con = dataSource.getConnection();
+			PreparedStatement ptst = con.prepareStatement(insert);
+			ptst.setInt(1, Integer.parseInt(request.getParameter("mvmt")));
+			ptst.setInt(2, Integer.parseInt(request.getParameter("hAve")));
+			ptst.setInt(3, Integer.parseInt(request.getParameter("hMed")));
+			ptst.setInt(4, Integer.parseInt(request.getParameter("hMin")));
+			ptst.setInt(5, Integer.parseInt(request.getParameter("hMax")));
+			ptst.setInt(6, Integer.parseInt(request.getParameter("lAve")));
+			ptst.setInt(7, Integer.parseInt(request.getParameter("lMed")));
+			ptst.setInt(8, Integer.parseInt(request.getParameter("lMin")));
+			ptst.setInt(9, Integer.parseInt(request.getParameter("lMax")));
+			ptst.setFloat(10, Float.parseFloat(request.getParameter("tAve")));
+			ptst.setFloat(11, Float.parseFloat(request.getParameter("tMed")));
+			ptst.setFloat(12, Float.parseFloat(request.getParameter("tMin")));
+			ptst.setFloat(13, Float.parseFloat(request.getParameter("tMax")));
+			ptst.setLong(14, System.currentTimeMillis());
+			ptst.setString(15, request.getParameter("bucket"));
+			ptst.executeUpdate();
+			con.close();
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		//request.getRequestDispatcher("tempup?"+request.getQueryString()).forward(request, response);
 	}
 
 	/**
@@ -52,3 +72,5 @@ public class Upload extends HttpServlet {
 		doGet(request, response);
 	}
 }
+
+
