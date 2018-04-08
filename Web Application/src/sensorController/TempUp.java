@@ -1,4 +1,4 @@
-package ie.fyp.jer.controller;
+package sensorController;
 
 import java.io.IOException;
 import java.sql.Connection;
