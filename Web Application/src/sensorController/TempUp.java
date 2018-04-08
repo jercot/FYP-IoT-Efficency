@@ -38,6 +38,7 @@ public class TempUp extends HttpServlet {
 			Connection con = dataSource.getConnection();
 			Statement compStmt = con.createStatement();
 			compStmt.executeUpdate(query);
+			con.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

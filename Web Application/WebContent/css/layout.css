@@ -10,7 +10,13 @@ div#left {
 }
 
 div#right {
-	min-width: 980px;
+	position: absolute;
+	left: 300px;
+	top: 0;
+    bottom: 0;
+    right: 0;
+    min-width: 980px;
+    overflow-x: hidden;
 }
 
 div#logo {
@@ -23,8 +29,6 @@ div#logo {
 }
 
 div#title {
-	position: absolute;
-    left: 300px;
     right: 0;
     min-width: inherit;
 	height: 48px;
@@ -49,13 +53,6 @@ div#sideMenu {
 }
 
 div#main {
-	position: absolute;
-	left: 300px;
-	top: 50px;
-    bottom: 0;
-    right: 0;
-    min-width: inherit;
-    overflow-x: hidden;
 }
 
 

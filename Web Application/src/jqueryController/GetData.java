@@ -47,17 +47,10 @@ public class GetData extends HttpServlet {
 		String bName = request.getParameter("bName");
 		Logged log = (Logged)request.getSession().getAttribute("logged");
 		if(log!=null) {
-			String query = "SELECT ro.name, re.humidAve, re.lightAve, re.tempAve, re.time " + 
-					"FROM FYP.Recording re " + 
-					"JOIN FYP.Room ro ON ro.id = re.roomId " + 
-					"WHERE ro.buildingId IN (SELECT id FROM FYP.building WHERE accountId=? AND name=?)";
-			try {
+			try (Connection con = dataSource.getConnection();
+				PreparedStatement ptst = prepare(con, log.getId(), bName);
+				ResultSet rs = ptst.executeQuery()) {
 				output = "{\"code\":1,\"records\":[";
-				Connection con = dataSource.getConnection();
-				PreparedStatement ptst = con.prepareStatement(query);
-				ptst.setInt(1, log.getId());
-				ptst.setString(2, bName);
-				ResultSet rs = ptst.executeQuery();
 				if(rs.next()) {
 					output += addResult(rs);
 					while(rs.next())
@@ -66,12 +59,24 @@ public class GetData extends HttpServlet {
 				else 
 					output = "{\"code\":2,\"records\":[";
 				output += "]}";
+				con.close();
 			} catch (SQLException e) {
 				output = "{\"code\":3,\"records\":[]}";
 				e.printStackTrace();
 			}
 		}
 		response.getWriter().write(output);
+	}
+	
+	private PreparedStatement prepare(Connection con, int id, String bName) throws SQLException {
+		String query = "SELECT ro.name, re.humidAve, re.lightAve, re.tempAve, re.time " + 
+				"FROM FYP.Recording re " + 
+				"JOIN FYP.Room ro ON ro.id = re.roomId " + 
+				"WHERE ro.buildingId IN (SELECT id FROM FYP.building WHERE accountId=? AND name=?)";
+		PreparedStatement ptst = con.prepareStatement(query);
+		ptst.setInt(1, id);
+		ptst.setString(2, bName);
+		return ptst;
 	}
 	
 	private String addResult(ResultSet rs) throws SQLException {

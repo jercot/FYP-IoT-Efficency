@@ -85,6 +85,7 @@ public class Room extends HttpServlet {
 					ptst.setInt(3, floor);
 					ptst.setString(4, oName);
 					ptst.executeUpdate();
+					con.close();
 				}
 				request.setAttribute("message", "Room " + name + " added!");
 			} catch (SQLException e) {

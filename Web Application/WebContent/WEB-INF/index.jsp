@@ -5,7 +5,8 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width">
 		<title>Insert title here</title>
 		<link rel="stylesheet" type="text/css" href="css/dc.css"/>
 		<link rel="stylesheet" type="text/css" href="css/layout.css"/>

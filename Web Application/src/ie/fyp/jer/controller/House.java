@@ -57,6 +57,7 @@ public class House extends HttpServlet {
 					rooms.add(new HouseData(rs.getString(1), rs.getInt(2), rs.getInt(3), rs.getInt(4), rs.getFloat(5)));
 				}
 				request.setAttribute("rooms", rooms);
+				con.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}

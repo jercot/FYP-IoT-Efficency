@@ -65,9 +65,9 @@ public class Building extends HttpServlet {
 				ptst.setString(3, location);
 				ptst.executeUpdate();
 				log.addBuilding(name);
-				con.close();
 				request.setAttribute("message", "Building added to system");
 				added=true;
+				con.close();
 			} catch (SQLException e) {
 				request.setAttribute("bName", name);
 				request.setAttribute("location", location);
