@@ -1,4 +1,4 @@
-package ie.fpy.jer.jqueryController;
+package ie.fyp.jer.jqueryController;
 
 import java.io.IOException;
 import java.sql.Connection;
