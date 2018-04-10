@@ -53,6 +53,7 @@
 				    <input type="password" placeholder="Enter Password" name="pass" required><br>
 					<a href="register">Register</a> - <a href="">Forgot Password?</a>
 				    <button type="submit">Login</button>
+				    ${message}
 				</form>
 			</div>
 			<div id="mobile">

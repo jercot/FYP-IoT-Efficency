@@ -38,7 +38,10 @@ public class Login extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		response.sendRedirect("");
+		if(request.getSession().getAttribute("logged")!=null)
+			response.sendRedirect("");
+		else
+			request.getRequestDispatcher("/WEB-INF/homepage.jsp").forward(request, response);
 	}
 
 	/**
