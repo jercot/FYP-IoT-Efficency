@@ -57,18 +57,25 @@ public class Login extends HttpServlet {
 					"WHERE UPPER(a.email) = UPPER(?) " + 
 					"ORDER BY date DESC " + 
 					"LIMIT 1;";
+			Object val[] = {email};
 			try (Connection con = dataSource.getConnection();
-					PreparedStatement ptst = prepare(con, sql, email);
+					PreparedStatement ptst = prepare(con, sql, val);
 					ResultSet rs = ptst.executeQuery()) {
 				if(rs.next()) {
 					if(BCrypt.checkpw(password, rs.getString(3))) {
 						Logged log = new Logged(rs.getString(1), rs.getInt(2));
 						sql = "SELECT name FROM FYP.building WHERE accountId = ?";
-						try (PreparedStatement ptst1 = prepare(con, sql, log.getId());
+						Object val2[] = {log.getId()};
+						try (PreparedStatement ptst1 = prepare(con, sql, val2);
 								ResultSet rs1 = ptst1.executeQuery()) {
 							while(rs1.next())
 								log.addBuilding(rs1.getString(1));
 							request.getSession().setAttribute("logged", log);
+						}
+						Object val3[] = {log.getId(), System.currentTimeMillis(), request.getRemoteAddr()};
+						sql = "INSERT INTO FYP.Login(accountid, datetime, location)VALUES (?, ?, ?);";
+						try (PreparedStatement ptst1 = prepare(con, sql, val3)) {
+							ptst1.executeUpdate();
 						}
 					}
 					else {
@@ -82,9 +89,11 @@ public class Login extends HttpServlet {
 		doGet(request, response);
 	}
 
-	private PreparedStatement prepare(Connection con, String sql, Object param) throws SQLException {
+	private PreparedStatement prepare(Connection con, String sql, Object values[]) throws SQLException {
 		final PreparedStatement ptst = con.prepareStatement(sql);
-		ptst.setObject(1, param);
+		for (int i = 0; i < values.length; i++) {
+			ptst.setObject(i+1, values[i]);
+		}
 		return ptst;
 	}
 }
