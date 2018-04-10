@@ -14,6 +14,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 import ie.fyp.jer.domain.Logged;
 
 /**
@@ -24,13 +26,13 @@ public class Login extends HttpServlet {
 	private static final long serialVersionUID = 5L;
 	@Resource(name="jdbc/aws-rds")
 	private DataSource dataSource;
-	
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public Login() {
-        super();
-    }
+
+	/**
+	 * @see HttpServlet#HttpServlet()
+	 */
+	public Login() {
+		super();
+	}
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -46,37 +48,40 @@ public class Login extends HttpServlet {
 		String email = request.getParameter("email");
 		String password = request.getParameter("pass");
 		if(email!=null&&password!=null) {
-			try {
-				Connection con = dataSource.getConnection();
-				String query = "SELECT CONCAT(a.fName, ' ', a.lName), a.id, p.password, p.date " + 
-						"FROM FYP.Account a " + 
-						"LEFT JOIN FYP.Password p ON a.id = p.accountId " + 
-						"WHERE UPPER(a.email) = UPPER(?) " + 
-						"ORDER BY date DESC " + 
-						"LIMIT 1;";
-				PreparedStatement ptst = con.prepareStatement(query);
-				ptst.setString(1, email);
-				ResultSet rs = ptst.executeQuery();
+			String sql = "SELECT CONCAT(a.fName, ' ', a.lName), a.id, p.password, p.date " + 
+					"FROM FYP.Account a " + 
+					"LEFT JOIN FYP.Password p ON a.id = p.accountId " + 
+					"WHERE UPPER(a.email) = UPPER(?) " + 
+					"ORDER BY date DESC " + 
+					"LIMIT 1;";
+			try (Connection con = dataSource.getConnection();
+					PreparedStatement ptst = prepare(con, sql, email);
+					ResultSet rs = ptst.executeQuery()) {
 				if(rs.next()) {
-					if(rs.getString(3).equals(password)) {
+					if(BCrypt.checkpw(password, rs.getString(3))) {
 						Logged log = new Logged(rs.getString(1), rs.getInt(2));
-						query = "SELECT name FROM FYP.building WHERE accountId = ?";
-						ptst = con.prepareStatement(query);
-						ptst.setInt(1, log.getId());
-						ResultSet rs1 = ptst.executeQuery();
-						while(rs1.next())
-							log.addBuilding(rs1.getString(1));
-						request.getSession().setAttribute("logged", log);
+						sql = "SELECT name FROM FYP.building WHERE accountId = ?";
+						try (PreparedStatement ptst1 = prepare(con, sql, log.getId());
+								ResultSet rs1 = ptst1.executeQuery()) {
+							while(rs1.next())
+								log.addBuilding(rs1.getString(1));
+							request.getSession().setAttribute("logged", log);
+						}
+					}
+					else {
+						request.setAttribute("message", "Password or Email incorrect");
 					}
 				}
-				else {
-					request.setAttribute("message", "Password or Email incorrect");
-				}
-				con.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 		}
 		doGet(request, response);
+	}
+
+	private PreparedStatement prepare(Connection con, String sql, Object param) throws SQLException {
+		final PreparedStatement ptst = con.prepareStatement(sql);
+		ptst.setObject(1, param);
+		return ptst;
 	}
 }
