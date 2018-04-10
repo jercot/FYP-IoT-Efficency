@@ -48,17 +48,17 @@ div#mobile {
 
 @media screen and (max-width: 1000px) { 
 	div#info {
-		width: 96%;
+		width: 95%;
 		min-width: 400px;
 	}
 
 	div#login {
-		width: 96%;
+		width: 956%;
 		min-width: 400px;
 	}
 
 	div#mobile {
-		width: 96%;
+		width: 95%;
 		min-width: 400px;
 	}
 }
