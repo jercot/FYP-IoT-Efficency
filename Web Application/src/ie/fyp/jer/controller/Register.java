@@ -24,7 +24,7 @@ public class Register extends HttpServlet {
 	@Resource(name="jdbc/aws-rds")
 	private DataSource dataSource;
 	private boolean registered;
-	
+
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
@@ -65,7 +65,7 @@ public class Register extends HttpServlet {
 				"INSERT INTO FYP.Password (accountid, password, date) VALUES (currval('FYP.Account_id_seq'), ?, ?);" + 
 				"COMMIT;";
 		try (Connection con = dataSource.getConnection();
-			PreparedStatement ptst = prepare(con, sql, values)) {
+				PreparedStatement ptst = prepare(con, sql, values)) {
 			ptst.executeUpdate();
 		}
 		catch (SQLException e) {
@@ -73,12 +73,12 @@ public class Register extends HttpServlet {
 		}
 		doGet(request, response);
 	}
-	
+
 	private PreparedStatement prepare(Connection con, String sql, Object... values) throws SQLException {
 		final PreparedStatement ptst = con.prepareStatement(sql);
-	      for (int i = 0; i < values.length; i++) {
-	         ptst.setObject(i+1, values[i]);
-	      }
-	      return ptst;
+		for (int i = 0; i < values.length; i++) {
+			ptst.setObject(i+1, values[i]);
+		}
+		return ptst;
 	}
 }
