@@ -39,25 +39,24 @@ public class House extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		Logged log = (Logged)request.getSession().getAttribute("logged");
-		if(log!=null) {
+		if(request.getQueryString()==null)
+			response.sendRedirect("house?bName=" + request.getParameter("bName"));
+		else if(log!=null) {
+			Object values[] = {log.getId(), request.getParameter("bName")};
 			ArrayList<HouseData> rooms = new ArrayList<>();
-			String query = "SELECT DISTINCT ON (ro.id) " + 
+			String sql = "SELECT DISTINCT ON (ro.id) " + 
 					"ro.name, ro.floor, COALESCE(re.humidAve, -1), COALESCE(re.lightAve, -1), COALESCE(re.tempAve, -1) " + 
 					"FROM FYP.Recording re " + 
 					"FULL JOIN FYP.Room ro ON ro.id = re.roomId " +
 					"WHERE ro.buildingId IN (SELECT id FROM FYP.building WHERE accountId=? AND name=?) " + 
 					"ORDER BY ro.id, re.time DESC;";
-			try {
-				Connection con = dataSource.getConnection();
-				PreparedStatement ptst = con.prepareStatement(query);
-				ptst.setInt(1, log.getId());
-				ptst.setString(2, request.getParameter("bName"));
-				ResultSet rs = ptst.executeQuery();
+			try (Connection con = dataSource.getConnection();
+				PreparedStatement ptst = prepare(con, sql, values);
+				ResultSet rs = ptst.executeQuery()) {
 				while(rs.next()) {
 					rooms.add(new HouseData(rs.getString(1), rs.getInt(2), rs.getInt(3), rs.getInt(4), rs.getFloat(5)));
 				}
 				request.setAttribute("rooms", rooms);
-				con.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -75,27 +74,22 @@ public class House extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		Logged log = (Logged)request.getSession().getAttribute("logged");
+		String bName = request.getParameter("bName");
 		if(log!=null&&log.compare(request.getParameter("token"))) {
 			int id = log.getId();
-			String bName = request.getParameter("bName");
 			if(bName.equals(""))
 				bName = null;
 			String pName = request.getParameter("pName");
 			String location = request.getParameter("location");
 			if(location.equals(""))
 				location = null;
-			try {
-				Connection con = dataSource.getConnection();
-				String update = "UPDATE fyp.building SET name=COALESCE(?, name), location = COALESCE(?, location) WHERE name=? AND accountId=?;";
-				PreparedStatement ptst = con.prepareStatement(update);
-				ptst.setString(1, bName);
-				ptst.setString(2, location);
-				ptst.setString(3, pName);
-				ptst.setInt(4, id);
+			String sql = "UPDATE fyp.building SET name=COALESCE(?, name), location = COALESCE(?, location) WHERE name=? AND accountId=?;";
+			Object values[] = {bName, location, pName, id};
+			try (Connection con = dataSource.getConnection();
+				PreparedStatement ptst = prepare(con, sql, values)) {
 				ptst.executeUpdate();
 				if(bName!=null)
 					log.editBuilding(pName, bName);
-				con.close();
 				request.setAttribute("message", "Building updated");
 			} catch (SQLException e) {
 				request.setAttribute("message", "Building with that name already exists");
@@ -105,5 +99,13 @@ public class House extends HttpServlet {
 		else 
 			request.getSession().setAttribute("logged", null);
 		doGet(request, response);
+	}
+
+	private PreparedStatement prepare(Connection con, String sql, Object... values) throws SQLException {
+		final PreparedStatement ptst = con.prepareStatement(sql);
+		for (int i = 0; i < values.length; i++) {
+			ptst.setObject(i+1, values[i]);
+		}
+		return ptst;
 	}
 }

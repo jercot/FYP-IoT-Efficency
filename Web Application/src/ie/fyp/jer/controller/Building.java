@@ -56,13 +56,9 @@ public class Building extends HttpServlet {
 			int id = log.getId();
 			String name = request.getParameter("bName");
 			String location = request.getParameter("location");
-			String insert = "INSERT INTO FYP.Building (accountid, name, location) VALUES (?, ?, ?);";
-			try {
-				Connection con = dataSource.getConnection();
-				PreparedStatement ptst = con.prepareStatement(insert);
-				ptst.setInt(1, id);
-				ptst.setString(2, name);
-				ptst.setString(3, location);
+			String sql = "INSERT INTO FYP.Building (accountid, name, location) VALUES (?, ?, ?);";
+			try (Connection con = dataSource.getConnection();
+				PreparedStatement ptst = prepare(con, sql, id, name, location)) {
 				ptst.executeUpdate();
 				log.addBuilding(name);
 				request.setAttribute("message", "Building added to system");
@@ -78,5 +74,13 @@ public class Building extends HttpServlet {
 		else 
 			request.getSession().setAttribute("logged", null);
 		doGet(request, response);
+	}
+
+	private PreparedStatement prepare(Connection con, String sql, int id, String name, String location) throws SQLException {
+		final PreparedStatement ptst = con.prepareStatement(sql);
+		ptst.setInt(1, id);
+		ptst.setString(2, name);
+		ptst.setString(3, location);
+		return ptst;
 	}
 }

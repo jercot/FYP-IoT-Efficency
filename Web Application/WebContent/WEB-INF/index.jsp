@@ -7,7 +7,7 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width">
-		<title>Insert title here</title>
+		<title>IoT Efficiency - ${subtitle}</title>
 		<link rel="stylesheet" type="text/css" href="css/dc.css"/>
 		<link rel="stylesheet" type="text/css" href="css/layout.css"/>
 	</head>
