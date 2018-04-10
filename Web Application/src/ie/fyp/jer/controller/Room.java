@@ -13,7 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
-import ie.fyp.jer.config.Bucket;
 import ie.fyp.jer.domain.Logged;
 
 /**
@@ -48,50 +47,48 @@ public class Room extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		Logged log = (Logged)request.getSession().getAttribute("logged");
 		if(log!=null&&log.compare(request.getParameter("token"))) {
-			String building = request.getParameter("bName");
-			String name = request.getParameter("rName");
-			String oName = request.getParameter("oName");
-			int floor = -1;
+			int floor=-1;
 			if(!request.getParameter("floor").equals(""))
 				floor = Integer.parseInt(request.getParameter("floor"));
-			String bucket = Bucket.generate();
-			String insert = "INSERT INTO fyp.room (buildingid, name, bucket, floor) " + 
-					"SELECT id, ?, ?, ? " + 
-					"FROM FYP.building " + 
-					"WHERE name = ?;";
-			String update = "UPDATE fyp.room " + 
-					"SET name = COALESCE(?, name), floor = " + 
-					"CASE " + 
-					"WHEN ?=-1 then floor " + 
-					"ELSE ? " + 
-					"END " + 
-					"WHERE name = ?;";
-			try {
-				Connection con = dataSource.getConnection();
-				if(request.getParameter("type").equals("add")) {
-					PreparedStatement ptst = con.prepareStatement(insert);
-					ptst.setString(1, name);
-					ptst.setString(2, bucket);
-					ptst.setInt(3, floor);
-					ptst.setString(4, building);
+			if(request.getParameter("type").equals("add")) {
+				String sql = "INSERT INTO FYP.Room (buildingid, name, floor) " + 
+						"SELECT id, ?, ?, ? " + 
+						"FROM FYP.building " + 
+						"WHERE name = ?;";
+				Object val[] = {request.getParameter("rName"), floor, request.getParameter("bName")};
+				try (Connection con = dataSource.getConnection();
+						PreparedStatement ptst = prepare(con, sql, val)) {
 					ptst.executeUpdate();
+				} catch (SQLException e) {
+					e.printStackTrace();
 				}
-				else {
-					PreparedStatement ptst = con.prepareStatement(update);
-					if(name.equals(""))
-						name = null;
-					ptst.setString(1, name);
-					ptst.setInt(2, floor);
-					ptst.setInt(3, floor);
-					ptst.setString(4, oName);
-					ptst.executeUpdate();
-					con.close();
-				}
-				request.setAttribute("message", "Room " + name + " added!");
-			} catch (SQLException e) {
-				e.printStackTrace();
 			}
-		}
-		doGet(request, response);
+			else {
+				String sql = "UPDATE fyp.room " + 
+						"SET name = COALESCE(?, name), floor = " + 
+						"CASE " + 
+						"WHEN ?=-1 then floor " + 
+						"ELSE ? " + 
+						"END " + 
+						"WHERE name = ?;";
+				Object val[] = {request.getParameter("rName"), floor, floor, request.getParameter("oName")};
+				try (Connection con = dataSource.getConnection();
+						PreparedStatement ptst = prepare(con, sql, val)) {
+					ptst.executeUpdate();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			request.setAttribute("message", "Room " + request.getParameter("rName") + " added!");
 	}
+	doGet(request, response);
+}
+
+private PreparedStatement prepare(Connection con, String sql, Object... values) throws SQLException {
+	final PreparedStatement ptst = con.prepareStatement(sql);
+	for (int i = 0; i < values.length; i++) {
+		ptst.setObject(i+1, values[i]);
+	}
+	return ptst;
+}
 }
