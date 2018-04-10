@@ -20,7 +20,7 @@
 		<c:choose>
 		<c:when test="${room.temp ne -1}">
 			<div class="tIcon">
-				<svg width="40" viewbox="0 0 100 300">
+				<svg xmlns="http://www.w3.org/2000/svg" width="40" viewbox="0 0 100 300">
 					<circle cx="50" cy="245" r="33" stroke="none" class="temp${room.heat}" />
 					<c:forEach begin="0" end="${room.heat}" varStatus="loop">
 					<rect x="30" y="${190-30*loop.index}" width="40px" height="30px" class="temp${room.heat}"/>
@@ -47,7 +47,7 @@
 			<c:choose>
 			<c:when test="${room.light ne -1}">
 				<div class="lIcon">
-					<svg width="60" viewbox="0 0 200 300">
+					<svg xmlns="http://www.w3.org/2000/svg" width="60" viewbox="0 0 200 300">
 						<path d="M60,210 60,270 a10,1 0 0,0 80,0 L140,210" stroke="black" fill="grey" stroke-width="6px"/>
 						<path d="M140,220 60,230 M140,240 60,250 M140,260 60,270" stroke="black" fill="grey" stroke-width="3px"/>
 						<path d="M20,140 a90,90 0 1,1 160,0 L140,210 a8,1 0 1,1 -80,0 L20,140" stroke="black" stroke-width="6px" class="light${room.lum}"/>

@@ -1,0 +1,96 @@
+html,body {
+    margin: 0;
+  	height: 100%;
+	background-color: whitesmoke;
+}
+
+div#title {
+	background-color: #00438b;
+	border-bottom: 5px solid black;
+	min-width: 430px;
+}
+
+div#icon {
+	width: 100px;
+	margin: auto;
+}
+
+div#content {
+	height: calc(100% - 199px);
+	min-width: 420px;
+}
+
+div#info {
+	float: left;
+	width: calc(100% - 500px);
+	margin: 40px 10px;
+	padding: 10px;
+	font-size: 20px;
+}
+
+div#login {
+	text-align: center;
+	width: 400px;
+	border: 2px solid #9E9E9E;
+	float: left;
+	height: 300px;
+	margin: 40px 2px;
+	padding: 10px;
+}
+
+div#mobile {
+	width: 400px;
+	border: 2px solid #9E9E9E;
+	float: left;
+	margin: 0px 2px;
+	padding: 10px;
+}
+
+@media screen and (max-width: 1000px) { 
+	div#info {
+		width: 96%;
+		min-width: 400px;
+	}
+
+	div#login {
+		width: 96%;
+		min-width: 400px;
+	}
+
+	div#mobile {
+		width: 96%;
+		min-width: 400px;
+	}
+}
+
+input[type=email], input[type=password] {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+button {
+    background-color: #00438b;
+    color: white;
+    padding: 14px 20px;
+    border: none;
+    cursor: pointer;
+    width: 50%;
+    margin: 30px 25% 5px 25%;
+}
+
+button:hover {
+    opacity: 0.8;
+}
+
+img#google {
+	width: 190px;
+}
+
+img#apple {
+	width: 190px;
+	float: right;
+}
