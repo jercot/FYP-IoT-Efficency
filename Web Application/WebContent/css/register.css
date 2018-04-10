@@ -63,14 +63,14 @@ div#tText {
 @media screen and (max-width: 1000px) { 
 	div#register {
 		margin: 0px 0px;
-		width: 96%;
+		width: 95%;
 		min-width: 400px;
 	}
 
 	div#terms {
 		margin: 20px 10px;
 		float:left;
-		width: 96%;
+		width: 95%;
 		min-width: 400px;
 	}
 }
