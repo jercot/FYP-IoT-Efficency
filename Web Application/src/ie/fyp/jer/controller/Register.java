@@ -13,6 +13,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 /**
  * Servlet implementation class Register
  */
@@ -34,6 +36,7 @@ public class Register extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		request.setAttribute("website", "IoT Efficiency");
 		String forward = "/WEB-INF/register.jsp";
 		if(registered)
 			forward = "/WEB-INF/registered.jsp";
@@ -47,47 +50,35 @@ public class Register extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String fName = request.getParameter("fName");
-		String lName = request.getParameter("lName");
-		String email = request.getParameter("email");
-		String pass = request.getParameter("pass");
-		String street = request.getParameter("street");
-		String town = request.getParameter("town");
-		String county = request.getParameter("county");
-		String num = request.getParameter("phone");
-		try {
-			Connection con = dataSource.getConnection();
-			int id = insertName(con, fName, lName, email, street, town, county, num);
-			insertPassword(con, id, pass);
-			//request.getSession().setAttribute("logged", new Logged(id));
-			con.close();
-		} catch (SQLException e) {
+		String params[] = {"fName", "lName", "email", "phone", "street", "town", "county", "date", "pass", "date"};
+		Object[] values = new Object[params.length];
+		long currentTime = System.currentTimeMillis();
+		for(int i=0; i<params.length; i++) {
+			values[i] = request.getParameter(params[i]);
+			if(params[i].equals("date"))
+				values[i] = currentTime;
+			else if(params[i].equals("pass"))
+				values[i] = BCrypt.hashpw(params[i], BCrypt.gensalt());
+		}
+		String sql = "START TRANSACTION;" + 
+				"INSERT INTO FYP.Account (fname, lname, email, phone, street, town, county, regdate) VALUES (?, ?, ?, ?, ?, ?, ?, ?);" + 
+				"INSERT INTO FYP.Password (accountid, password, date) VALUES (currval('FYP.Account_id_seq'), ?, ?);" + 
+				"COMMIT;";
+		try (Connection con = dataSource.getConnection();
+			PreparedStatement ptst = prepare(con, sql, values)) {
+			ptst.executeUpdate();
+		}
+		catch (SQLException e) {
 			e.printStackTrace();
 		}
-		registered = true;
 		doGet(request, response);
 	}
-
-	private int insertName(Connection con, String fName, String lName, String email, String street, String town, String county, String num) throws SQLException {
-		String accountTable = "INSERT INTO FYP.Account (fname, lname, email, phone, street, town, county, regdate) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
-		PreparedStatement pdst = con.prepareStatement(accountTable);
-		pdst.setString(1, fName);
-		pdst.setString(2, lName);
-		pdst.setString(3, email);
-		pdst.setString(4, num);
-		pdst.setString(5, street);
-		pdst.setString(6, town);
-		pdst.setString(7, county);
-		pdst.setLong(8, System.currentTimeMillis());
-		return pdst.executeUpdate();
-	}
-
-	private void insertPassword(Connection con, int id, String pass) throws SQLException {
-		String passTable = "INSERT INTO FYP.Password (accountid, password, date) VALUES (?, ?, ?);";
-		PreparedStatement pdst = con.prepareStatement(passTable);
-		pdst.setInt(1, id);
-		pdst.setString(2, pass);
-		pdst.setLong(3, System.currentTimeMillis());
-		pdst.executeUpdate();
+	
+	private PreparedStatement prepare(Connection con, String sql, Object... values) throws SQLException {
+		final PreparedStatement ptst = con.prepareStatement(sql);
+	      for (int i = 0; i < values.length; i++) {
+	         ptst.setObject(i+1, values[i]);
+	      }
+	      return ptst;
 	}
 }

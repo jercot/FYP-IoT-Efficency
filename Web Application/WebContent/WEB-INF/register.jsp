@@ -46,14 +46,14 @@
 			<h1>Register New Account</h1>
 			<div id="register">
 				<form action="register" method="POST">		
-				    <input type="text" placeholder="name" name="fName" required> <br>
-				    <input type="text" placeholder="name" name="lName" required> <br>
-				    <input type="email" placeholder="email" name="email" required> <br>
-				    <input type="password" placeholder="password" name="pass" required><br>
-				    <input type="text" placeholder="street" name="street"> <br>
-				    <input type="text" placeholder="town" name="town" required> <br>
-				    <input type="text" placeholder="county" name="county" required> <br>
-				    <input type="text" placeholder="number" name="num"> <br>
+				    <input type="text" placeholder="First Name" name="fName" required>*<br>
+				    <input type="text" placeholder="Last Name" name="lName" required>*<br>
+				    <input type="email" placeholder="Email" name="email" required>*<br>
+				    <input type="password" placeholder="Password" name="pass" required>*<br>
+				    <input type="text" placeholder="Street" name="street"> <br>
+				    <input type="text" placeholder="Town" name="town" required>*<br>
+				    <input type="text" placeholder="County" name="county" required>*<br>
+				    <input type="text" placeholder="Phone Number" name="phone"> <br>
 			    	<input type="checkbox" required/>I Agree
 				    <button type="submit">Register</button>
 				</form>
