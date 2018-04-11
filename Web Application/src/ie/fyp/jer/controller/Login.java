@@ -60,7 +60,7 @@ public class Login extends HttpServlet {
 		String email = request.getParameter("email");
 		String password = request.getParameter("pass");
 		if(email!=null&&password!=null) {
-			String sql = "SELECT CONCAT(a.fName, ' ', a.lName), a.id, p.password, p.date " + 
+			String sql = "SELECT a.fName, a.id, p.password, p.date " + 
 					"FROM FYP.Account a " + 
 					"LEFT JOIN FYP.Password p ON a.id = p.accountId " + 
 					"WHERE UPPER(a.email) = UPPER(?) " + 

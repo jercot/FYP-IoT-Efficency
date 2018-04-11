@@ -268,7 +268,7 @@ div.thermo {
 div.lumens {
 	width: 150px;
 	float: left;
-	margin-right: 100px;
+	margin-right: 150px;
 }
 
 div.tIcon {
@@ -328,9 +328,16 @@ div#addBuilding {
 	text-align: center;
 }
 
-input[type=text], input[type=number] {
+div#settings {
+	width: 80%;
+	margin: 0 auto;
+	min width: 400px;
+	text-align: center;
+}
+
+input[type=text], input[type=number], input[type=email], input[type=password] {
     width: 100%;
-    padding: 02px 0px 2px 20px;
+    padding: 2px 0px 2px 20px;
     margin: 2px 0px 2px ;
     display: inline-block;
     border: 1px solid #cccccc;
@@ -466,15 +473,8 @@ button:hover {
 		float: left;
 		margin-right: 0px;
 	}
-}
-@media screen and (max-width: 750px) {
-	div.thermo {
-		width: 150px;
-		float: left;
-		margin-right: 10px;
-	}
 	div.edit{
-		margin-left: 10px;
+		margin-left: 60px;
 		clear:both;
 	}
 }
