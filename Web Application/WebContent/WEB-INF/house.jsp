@@ -39,7 +39,7 @@
 			</div>
 		</c:when>
 		<c:otherwise>
-			No Recent Temperature Reading for Room.
+			No Temperature Reading.
 		</c:otherwise>
 		</c:choose>
 		</div>
@@ -54,21 +54,19 @@
 					</svg>
 				</div>
 				<div class="lText"> 
-					${fn:escapeXml(room.light)} lumens
+					${fn:escapeXml(room.light)} lux
 				</div>
 			</c:when>
 			<c:otherwise>
-				No Recent Lumen Reading for Room.
+				No Light Level Reading.
 			</c:otherwise>
 			</c:choose>
 		</div>
 		<div class="edit">
 			Modify Room:
 			<form action="room" method="POST">
-				<label><b>Room Name</b></label>
-				<input type="text" placeholder="name" name="rName"><br>
-				<label><b>Floor</b></label>
-				<input type="number" min="1" max="25" placeholder="floor" name="floor">
+				<input type="text" placeholder="Room Name" name="rName"><br>
+				<input type="number" min="1" max="25" placeholder="Floor" name="floor">
 				<input type="hidden" name="type" value="modify">
 				<input type="hidden" name="bName" value="${fn:escapeXml(bName)}">
 				<input type="hidden" name="oName" value="${fn:escapeXml(room.name)}">
@@ -89,12 +87,10 @@
 <hr>
 <br>
 <div id="addRoom">
-	Add Room  <c:out value="${name}"/>
+	Add Room:  <c:out value="${name}"/>
 	<form action="room" method="POST">
-		<label><b>Room Name*</b></label>
-		<input type="text" placeholder="name" name="rName" required><br>
-		<label><b>Floor*</b></label>
-		<input type="number" min="1" max="25" placeholder="floor" name="floor" required>
+		<input type="text" placeholder="Room Name" name="rName" required><br>
+		<input type="number" min="1" max="25" placeholder="Floor" name="floor" required>
 		<input type="hidden" name="type" value="add">
 		<input type="hidden" name="bName" value="${fn:escapeXml(bName)}">
 		<input type="hidden" name="token" value="${fn:escapeXml(logged.token)}">
@@ -108,10 +104,8 @@
 <div id="modBuild">
 	Modify Building:
 	<form action="house" method="POST">
-		<label><b>Building Name</b></label>
-		<input type="text" placeholder="name" name="bName"><br>
-		<label><b>Building Location</b></label>
-		<input type="text" placeholder="location" name="location"><br>
+		<input type="text" placeholder="Building Name" name="bName"><br>
+		<input type="text" placeholder="Location" name="location"><br>
 		<input type="hidden" name="pName" value="${fn:escapeXml(bName)}">
 		<input type="hidden" name="token" value="${fn:escapeXml(logged.token)}">
 		<button type="submit">Modify</button>

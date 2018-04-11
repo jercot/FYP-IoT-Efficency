@@ -1,52 +1,46 @@
-html,body {
-    margin: 0;
-  	height: 100%;
+html, body {
+	margin: 0;
+	height: 100%;
 	background-color: #f5f5f5;
+	min-width: 400px;
 }
 
-div#left {
-	position: relative;
-	float: left;
-	min-height:100%;
-}
-
-div#right {
-	position: absolute;
-	left: 300px;
-	top: 0;
-    bottom: 0;
-    right: 0;
-    min-width: 980px;
-    overflow-x: hidden;
+div#sideBar {
+	width: 300px;
+	position: fixed;
+	height: 100%;
+	background-color: #aaaaaa;
 }
 
 div#logo {
-    height: 48px;
-    width: 300px;
-    background-color: #00438b;
-    color: #ffffff;
-    text-align: center;
-    line-height: 50px;
-    border-bottom: 2px solid #333333;
-}
-
-div#title {
-    right: 0;
-    min-width: inherit;
-	height: 48px;
-    text-align: left;
-    line-height: 50px;
-    border-bottom: 2px solid #333333;
+	height: 50px;
+	background-color: #00438b;
+	color: #ffffff;
+	text-align: center;
+	line-height: 50px;
+	width: 301px;
 }
 
 div#sideMenu {
-	position: absolute;
-	top: 50px;
-    bottom: 0;
-    width: 300px;
-    background-color: #aaaaaa;
-    overflow-x: hidden;
-    padding-top: 15px;
+	margin-top: 10px;
+}
+
+div#title {
+	height: 50px;
+	background-color: #00438b;
+	color: #ffffff;
+	text-align: center;
+	line-height: 50px;
+}
+
+div#content {
+	min-width: 980px;
+	padding-left: 300px;
+}
+
+div#main {
+	max-width: 980px;
+	margin: 0 auto;
 }
 
 #sideMenu a {
@@ -54,19 +48,10 @@ div#sideMenu {
 	color: #000000;
 }
 
-div#main {
-}
-
-
-div#scroll {
-	margin: auto;
-	width: 980px;
-}
-
 hr.left {
-	height:2px;
-	border:none;
-	background-color:#333333;
+	height: 2px;
+	border: none;
+	background-color: #333333;
 }
 
 div.menu {
@@ -83,55 +68,64 @@ div.menu:hover {
 	border-color: #0000002b;
 }
 
-div.menuYellow {
+div#menuYellow {
 	background-color: #ffff00;
 }
 
-div.menuGreen {
+div#menuGreen {
 	background-color: #00b100;
 }
 
-div.menuGreen:hover {
+div#menuGreen:hover {
 	border-color: #aaaaaa;
 	cursor: auto;
 }
 
-div.menuCyan {
+div#menuCyan {
 	background-color: #00ffff;
 }
 
-div.menuRed {
+div#menuRed {
 	background-color: #ff0000;
 }
 
-div.menuOrange {
+div#menuOrange {
 	background-color: #ffa500;
 }
 
-div.menuWhite {
+div#menuWhite {
 	background-color: #ffffff;
 }
 
 div.menuHouse {
 	margin-left: 30px;
-	background-color: pink;
+	background-color: #2196F3;
 }
 
 div#graph {
-	padding-top:30px;
+	padding-top: 30px;
 }
 
 hr {
-	clear:both;
+	clear: both;
 }
 
-div#roomList {
-	width: calc(100% - 80px);
+div#graph {
+	margin: 10px 0px;
+}
+
+div#roomList {	
 	padding-left: 40px;
+	padding-right: 40px;
+}
+
+span.roomTitle {
+	font-weight: bold;
+	font-size: 18px;
 }
 
 div.room {
-	border:1px solid black;
+	border: 1px solid #000000;
 	clear: both;
 	text-align: center;
 	overflow: auto;
@@ -173,12 +167,12 @@ div.lumens {
 	margin-right: 100px;
 }
 
-div.tIcon{
+div.tIcon {
 	padding-left: 50px;
 	float: left;
 }
 
-div.tText{
+div.tText {
 	line-height: 100px;
 }
 
@@ -212,9 +206,193 @@ div.tText{
 }
 
 div#addRoom {
-	padding-left: 40px;
+	margin: 0 auto;
+	max-width: 400px;
+	width: 80%;
 }
 
 div#modBuild {
-	padding-left: 40px;
+	margin: 0 auto;
+	max-width: 400px;
+	width: 80%;
+}
+
+input[type=text], input[type=number] {
+    width: 100%;
+    padding: 02px 0px 2px 20px;
+    margin: 2px 0px 2px ;
+    display: inline-block;
+    border: 1px solid #cccccc;
+    box-sizing: border-box;
+}
+
+button {
+    background-color: #00438b;
+    color: white;
+    padding: 4px;
+    border: none;
+    cursor: pointer;
+    width: 50%;
+    margin: 3px 25% 3px 25%;
+}
+
+button:hover {
+    opacity: 0.8;
+}
+
+@media screen and (max-width: 1000px) {
+	div#sideBar {
+		width: 100%;
+		position: relative;
+		height:50px;
+		background-color: #aaaaaa;
+	}
+	div#logo {
+		height: 30px;
+		background-color: #00438b;
+		color: #ffffff;
+		text-align: center;
+		line-height: 30px;
+		width: 100%;
+	}
+	div#sideMenu {
+		height: calc(100% - 30px);
+		margin-top: 0px;
+		position: relative;
+	}
+	div#title {
+		height: 30px;
+		background-color: #00438b;
+		color: #ffffff;
+		text-align: center;
+		line-height: 30px;
+	}
+	div#content {
+		min-width: auto;
+		padding-left: 0px;
+	}
+	div.menu {
+		float: left;
+		margin-left: 5px;
+		width: 80px;
+		height: 100%;
+		line-height: 20px;
+		border: none;
+	}
+	div.houseMargin {
+		float: left; 
+		width: 200px;
+		margin-left: 0;
+	}
+	hr.left {
+		display: none;
+	}
+	div#houses {
+		float: left;
+		position: relative;
+		display: inline-block;
+	}
+	div#houseList {
+		top: 20px;
+		left: 5px;
+		display: none;
+		position: absolute;
+		background-color: #f1f1f1;
+		box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+		z-index: 1;
+	}
+	#houseList a:hover {
+		color: #aaaaaa;
+	}
+	#houses:hover #houseList {
+		display: block;
+	}
+	div.thermo {
+		width: 150px;
+		float: left;
+		margin-right: 100px;
+	}
+	div.lumens {
+		width: 150px;
+		float: left;
+		margin-right: 100px;
+	}
+	div.room {
+		width: auto;
+	}
+	div#graph {
+		display: none;
+	}
+}
+
+@media screen and (max-width: 850px) {
+	div.thermo {
+		width: 150px;
+		float: left;
+		margin-right: 50px;
+	}
+	div.lumens {
+		width: 150px;
+		float: left;
+		margin-right: 50px;
+	}
+}
+
+@media screen and (max-width: 750px) {
+	div.thermo {
+		width: 150px;
+		float: left;
+		margin-right: 0px;
+	}
+	div.lumens {
+		width: 150px;
+		float: left;
+		margin-right: 0px;
+	}
+}
+@media screen and (max-width: 750px) {
+	div.thermo {
+		width: 150px;
+		float: left;
+		margin-right: 10px;
+	}
+	div.edit{
+		margin-left: 10px;
+		clear:both;
+	}
+}
+
+@media screen and (max-width: 530px) {
+	div.fillingMargin {
+		float: left; 
+		width: 200px;
+		margin-left: 0;
+	}
+	div#burger {
+		padding-left: 5px;
+		position: relative;
+		display: inline-block;
+	}
+	div#filling {
+		display: none;
+		position: absolute;
+		top: 20px;
+		right: 0px;
+		background-color: #f1f1f1;
+		min-width: 80px;
+		box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+		z-index: 1;
+	}
+	#filling a:hover {
+		color: #aaaaaa;
+	}
+	#burger:hover #filling {
+		display: block;
+	}
+	.slice {
+		width: 25px;
+    	height: 3px;
+    	background-color: #000000;
+    	margin: 3px 0;
+	}
 }

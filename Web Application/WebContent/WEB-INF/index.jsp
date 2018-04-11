@@ -12,86 +12,93 @@
 		<link rel="stylesheet" type="text/css" href="css/layout.css"/>
 	</head>
 	<body>
-		<div id="left">
+		<div id="sideBar">
 			<div id="logo">
 				IoT Efficiency
 			</div>
 			<div id="sideMenu">
 				<a href="<c:url value="/" />">
-					<div class="menu menuYellow">
+					<div class="menu" id="menuYellow">
 						Dashboard <br>
 					</div>
 				</a>
 				<hr class="left">
-				<div class="houses">
-					<div class="menu menuGreen">
+				<div id="houses">
+					<div class="menu" id="menuGreen">
 						Houses <br>
 					</div>
-					<c:forEach items="${logged.buildings}" var="house">
+					<div id="houseList">
+						<c:forEach items="${logged.buildings}" var="house">
 						<a href="house?bName=<c:out value="${house}"/>">
-							<div class="menu menuHouse">
+							<div class="menu menuHouse houseMargin">
 								${fn:escapeXml(house)}
 							</div>
 						</a>
-					</c:forEach>
+						</c:forEach>
+					</div>
 				</div>
 				<a href="building">
-					<div class="menu menuCyan">
+					<div class="menu" id="menuCyan">
 						Add House <br>
 					</div>
 				</a>
 				<hr class="left">
 				<a href="compare">
-					<div class="menu menuRed">
+					<div class="menu" id="menuRed">
 						Compare <br>
 					</div>
 				</a>
 				<hr class="left">
-				<a href="settings">
-					<div class="menu menuOrange">
-						Settings <br>
+				<div id="burger">
+					<div id="filling">
+						<a href="settings">
+							<div class="menu fillingMargin" id="menuOrange">
+								Settings <br>
+							</div>
+						</a>
+						<hr class="left">
+						<a href="logout">
+							<div class="menu fillingMargin" id="menuWhite">
+								Log Out
+							</div>
+						</a>
 					</div>
-				</a>
-				<hr class="left">
-				<a href="logout">
-					<div class="menu menuWhite">
-						Log Out
-					</div>
-				</a>
+					<div class="slice"></div>
+					<div class="slice"></div>
+					<div class="slice"></div>
+				</div>
 			</div>
 		</div>
-		<div id="right">
+		<div id="content">
 			<div id="title">
 				${fn:escapeXml(logged.title)} - ${fn:escapeXml(subtitle)}
 			</div>
 			<div id="main" class="main">
-				<div id="scroll">
-					<c:choose>
-						<c:when test="${main == 'main'}">
-							<%@ include file="main.jsp" %>
-						</c:when>
-					</c:choose>
-					<c:choose>
-						<c:when test="${main == 'building'}">
-							<%@ include file="building.jsp" %>
-						</c:when>
-					</c:choose>
-					<c:choose>
-						<c:when test="${main == 'settings'}">
-							<%@ include file="settings.jsp" %>
-						</c:when>
-					</c:choose>
-					<c:choose>
-						<c:when test="${main == 'compare'}">
-							<%@ include file="compare.jsp" %>
-						</c:when>
-					</c:choose>
-					<c:choose>
-						<c:when test="${main == 'house'}">
-							<%@ include file="house.jsp" %>
-						</c:when>
-					</c:choose>
-				</div>
+				<c:choose>
+				<c:when test="${main == 'main'}">
+				<%@ include file="main.jsp" %>
+				</c:when>
+				</c:choose>
+				<c:choose>
+				<c:when test="${main == 'building'}">
+				<%@ include file="building.jsp" %>
+				</c:when>
+				</c:choose>
+				<c:choose>
+				<c:when test="${main == 'settings'}">
+				<%@ include file="settings.jsp" %>
+				</c:when>
+				</c:choose>
+				<c:choose>
+				<c:when test="${main == 'compare'}">
+				<%@ include file="compare.jsp" %>
+				</c:when>
+				</c:choose>
+				<c:choose>
+				<c:when test="${main == 'house'}">
+				<%@ include file="house.jsp" %>
+				</c:when>
+				</c:choose>
 			</div>
 		</div>
 	</body>

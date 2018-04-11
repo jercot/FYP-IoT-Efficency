@@ -48,11 +48,14 @@ public class Room extends HttpServlet {
 		Logged log = (Logged)request.getSession().getAttribute("logged");
 		if(log!=null&&log.compare(request.getParameter("token"))) {
 			int floor=-1;
-			if(!request.getParameter("floor").equals(""))
+			try {
 				floor = Integer.parseInt(request.getParameter("floor"));
+			} catch (NumberFormatException e) {
+				e.printStackTrace();
+			}
 			if(request.getParameter("type").equals("add")) {
 				String sql = "INSERT INTO FYP.Room (buildingid, name, floor) " + 
-						"SELECT id, ?, ?, ? " + 
+						"SELECT id, ?, ? " + 
 						"FROM FYP.building " + 
 						"WHERE name = ?;";
 				Object val[] = {request.getParameter("rName"), floor, request.getParameter("bName")};
