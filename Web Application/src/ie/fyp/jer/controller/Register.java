@@ -58,7 +58,7 @@ public class Register extends HttpServlet {
 			if(params[i].equals("date"))
 				values[i] = currentTime;
 			else if(params[i].equals("pass"))
-				values[i] = BCrypt.hashpw(params[i], BCrypt.gensalt());
+				values[i] = BCrypt.hashpw(request.getParameter(params[i]), BCrypt.gensalt());
 		}
 		String sql = "START TRANSACTION;" + 
 				"INSERT INTO FYP.Account (fname, lname, email, phone, street, town, county, regdate) VALUES (?, ?, ?, ?, ?, ?, ?, ?);" + 
@@ -67,6 +67,7 @@ public class Register extends HttpServlet {
 		try (Connection con = dataSource.getConnection();
 				PreparedStatement ptst = prepare(con, sql, values)) {
 			ptst.executeUpdate();
+			registered = true;
 		}
 		catch (SQLException e) {
 			e.printStackTrace();
