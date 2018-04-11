@@ -89,11 +89,11 @@ public class Main extends HttpServlet {
 				request.setAttribute("street", street);
 				request.setAttribute("town", rs.getString(7));
 				request.setAttribute("county", rs.getString(8));
-				request.setAttribute("regDate", getDate("dd-MMM-yyyy", rs.getLong(9)));
+				request.setAttribute("regDate", getDate("dd-MMM-yyyy hh:mm:ss", rs.getLong(9)));
 				if(rs.getLong(9)==rs.getLong(10))
 					request.setAttribute("lastPas", "Password Never Changed");
 				else
-					request.setAttribute("lastPas", getDate("dd-MMM-yyyy", rs.getLong(10)));
+					request.setAttribute("lastPas", getDate("dd-MMM-yyyy hh:mm:ss", rs.getLong(10)));
 				request.setAttribute("houses", rs.getInt(11));
 			}
 		} catch (SQLException e) {

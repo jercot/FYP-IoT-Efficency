@@ -66,6 +66,7 @@ div.menu {
 
 div.menu:hover {
 	border-color: #0000002b;
+	opacity: 0.6;
 }
 
 div#menuYellow {
@@ -79,6 +80,7 @@ div#menuGreen {
 div#menuGreen:hover {
 	border-color: #aaaaaa;
 	cursor: auto;
+	opacity: 1;
 }
 
 div#menuCyan {
@@ -102,8 +104,110 @@ div.menuHouse {
 	background-color: #2196F3;
 }
 
+div#dash {
+}
+
+div#dash h1 {
+	text-align: center;
+}
+
 div#graph {
 	padding-top: 30px;
+}
+
+table.dashTable {
+    border-collapse: collapse;
+    width: 80%;
+    min-width: 394px;
+	margin: 0 auto;
+    border: 1px solid #dddddd;
+}
+
+table.dashTable td, .dashTable th {
+    padding: 8px;
+}
+
+table.dashTable tr:nth-child(even){
+	background-color: #e2e2e2;
+}
+
+table.dashTable tr:hover {
+	background-color: #c1c1c1;
+}
+
+table.dashTable th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #00438b;
+    color: white;
+}
+
+a#dashSet {
+	display: block;
+	color: #000000;
+	width: 80%;
+    min-width: 394px;
+	margin: 0 auto;
+	text-align: center;
+	background-color: #00438b;
+	color: white;
+}
+
+div#previous {
+	border: 1px solid #dddddd;
+	text-align: center;
+	width: 80%;
+    min-width: 394px;
+	margin: 0 auto;
+	height: 50px;
+	line-height: 50px;
+}
+
+div.house {
+	border: 1px solid #dddddd;
+	width: 80%;
+    min-width: 394px;
+	margin: 0 auto;
+	margin-bottom: 10px;
+
+}
+
+div.dashTitle {
+	background-color: #00328b;
+	color: white;
+	font-weight: bold;
+	text-align: center;
+}
+
+div.dashLoc {
+	background-color: #e2e2e2;
+	text-align: center;
+}
+
+div.dashLoc a {
+	margin-left: 15px;
+}
+
+div.dashRoom {
+	line-height: 40px;
+	height: 80px;
+	width: 194px;
+	float: left;
+	text-align: center;
+	border: 1px solid #000000;
+}
+
+div.roomColor0 {
+
+}
+
+div.roomColor1 {
+	background-color: #e2e2e2;
+}
+
+div.clear {
+	clear: both;
 }
 
 hr {
@@ -215,6 +319,13 @@ div#modBuild {
 	margin: 0 auto;
 	max-width: 400px;
 	width: 80%;
+}
+
+div#addBuilding {
+	width: 80%;
+	margin: 0 auto;
+	min-width: 400px;
+	text-align: center;
 }
 
 input[type=text], input[type=number] {

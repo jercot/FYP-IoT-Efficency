@@ -99,10 +99,10 @@ public class Login extends HttpServlet {
 						}
 						String  browserDetails = request.getHeader("User-Agent");
 						Object val3[] = {log.getId(), System.currentTimeMillis(), location, browserDetails};
-						//sql = "INSERT INTO FYP.Login(accountid, datetime, location, osbrowser)VALUES (?, ?, ?, ?);";
-						//try (PreparedStatement ptst1 = prepare(con, sql, val3)) {
-						//	ptst1.executeUpdate();
-						//}
+						sql = "INSERT INTO FYP.Login(accountid, datetime, location, osbrowser)VALUES (?, ?, ?, ?);";
+						try (PreparedStatement ptst1 = prepare(con, sql, val3)) {
+							ptst1.executeUpdate();
+						}
 					}
 					else {
 						request.setAttribute("message", "Password or Email incorrect");

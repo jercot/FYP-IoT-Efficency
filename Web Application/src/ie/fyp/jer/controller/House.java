@@ -26,7 +26,7 @@ public class House extends HttpServlet {
 	private static final long serialVersionUID = 4L;
 	@Resource(name="jdbc/aws-rds")
 	private DataSource dataSource;
-	
+
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
@@ -51,19 +51,23 @@ public class House extends HttpServlet {
 					"WHERE ro.buildingId IN (SELECT id FROM FYP.building WHERE accountId=? AND name=?) " + 
 					"ORDER BY ro.id, re.time DESC;";
 			try (Connection con = dataSource.getConnection();
-				PreparedStatement ptst = prepare(con, sql, values);
-				ResultSet rs = ptst.executeQuery()) {
-				while(rs.next()) {
-					rooms.add(new HouseData(rs.getString(1), rs.getInt(2), rs.getInt(3), rs.getInt(4), rs.getFloat(5)));
+					PreparedStatement ptst = prepare(con, sql, values);
+					ResultSet rs = ptst.executeQuery()) {
+				if(rs.next()) {
+					do {
+						rooms.add(new HouseData(rs.getString(1), rs.getInt(2), rs.getInt(3), rs.getInt(4), rs.getFloat(5)));
+					} while(rs.next());
+					request.setAttribute("rooms", rooms);
+					request.setAttribute("bName", request.getParameter("bName"));
+					request.setAttribute("main", "house");
+					request.setAttribute("subtitle", request.getParameter("bName"));
+					request.getRequestDispatcher("/WEB-INF/index.jsp").forward(request, response);
 				}
-				request.setAttribute("rooms", rooms);
+				else
+					response.sendRedirect("");
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-			request.setAttribute("bName", request.getParameter("bName"));
-			request.setAttribute("main", "house");
-			request.setAttribute("subtitle", request.getParameter("bName"));
-			request.getRequestDispatcher("/WEB-INF/index.jsp").forward(request, response);
 		}
 		else
 			response.sendRedirect("");
@@ -86,7 +90,7 @@ public class House extends HttpServlet {
 			String sql = "UPDATE fyp.building SET name=COALESCE(?, name), location = COALESCE(?, location) WHERE name=? AND accountId=?;";
 			Object values[] = {bName, location, pName, id};
 			try (Connection con = dataSource.getConnection();
-				PreparedStatement ptst = prepare(con, sql, values)) {
+					PreparedStatement ptst = prepare(con, sql, values)) {
 				ptst.executeUpdate();
 				if(bName!=null)
 					log.editBuilding(pName, bName);
