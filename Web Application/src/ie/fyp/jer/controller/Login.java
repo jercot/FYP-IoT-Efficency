@@ -93,16 +93,16 @@ public class Login extends HttpServlet {
 							location = (object.get("city").getAsString() + " " + object.get("countryCode").getAsString());
 							EntityUtils.consume(entity1);
 						} catch (Exception e) {
-							e.printStackTrace();
+							System.out.println("GSON error occured in login controller - IP is probably incorrect.");
 						} finally {
 						    response1.close();
 						}
 						String  browserDetails = request.getHeader("User-Agent");
 						Object val3[] = {log.getId(), System.currentTimeMillis(), location, browserDetails};
-						sql = "INSERT INTO FYP.Login(accountid, datetime, location, osbrowser)VALUES (?, ?, ?, ?);";
-						try (PreparedStatement ptst1 = prepare(con, sql, val3)) {
-							ptst1.executeUpdate();
-						}
+						//sql = "INSERT INTO FYP.Login(accountid, datetime, location, osbrowser)VALUES (?, ?, ?, ?);";
+						//try (PreparedStatement ptst1 = prepare(con, sql, val3)) {
+						//	ptst1.executeUpdate();
+						//}
 					}
 					else {
 						request.setAttribute("message", "Password or Email incorrect");
