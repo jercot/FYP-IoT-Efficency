@@ -43,7 +43,7 @@ public class Building extends HttpServlet {
 		}
 		else {
 			added = false;
-			response.sendRedirect(request.getContextPath());
+			response.sendRedirect("");
 		}
 	}
 

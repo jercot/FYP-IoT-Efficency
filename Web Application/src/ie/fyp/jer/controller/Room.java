@@ -38,7 +38,7 @@ public class Room extends HttpServlet {
 		if(request.getSession().getAttribute("logged")!=null) {
 			response.sendRedirect("house?bName="+request.getParameter("bName"));}
 		else
-			response.sendRedirect(request.getContextPath());
+			response.sendRedirect("");
 	}
 
 	/**

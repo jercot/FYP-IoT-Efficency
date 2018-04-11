@@ -280,9 +280,9 @@ button:hover {
 		border: none;
 	}
 	div.houseMargin {
-		float: left; 
 		width: 200px;
 		margin-left: 0;
+		margin-top: 1px;
 	}
 	hr.left {
 		display: none;
@@ -301,10 +301,13 @@ button:hover {
 		box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
 		z-index: 1;
 	}
-	#houseList a:hover {
-		color: #aaaaaa;
+	div#houseList a:hover {
+		color: #ffffff;
 	}
-	#houses:hover #houseList {
+	div.houseMargin:hover {
+		background-color: #000000;
+	}
+	div#houses:hover div#houseList {
 		display: block;
 	}
 	div.thermo {
@@ -364,9 +367,12 @@ button:hover {
 
 @media screen and (max-width: 530px) {
 	div.fillingMargin {
-		float: left; 
 		width: 200px;
 		margin-left: 0;
+		margin-top: 1px;
+	}
+	div.fillingMargin:hover {
+		background-color: #000000!important;
 	}
 	div#burger {
 		padding-left: 5px;
@@ -383,13 +389,13 @@ button:hover {
 		box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
 		z-index: 1;
 	}
-	#filling a:hover {
-		color: #aaaaaa;
+	div#filling a:hover {
+		color: #ffffff;
 	}
-	#burger:hover #filling {
+	div#burger:hover #filling {
 		display: block;
 	}
-	.slice {
+	div.slice {
 		width: 25px;
     	height: 3px;
     	background-color: #000000;

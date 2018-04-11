@@ -58,7 +58,8 @@ CREATE TABLE FYP.Login
     id serial NOT NULL,
     accountId integer NOT NULL,
     dateTime bigint NOT NULL,
-    location text COLLATE pg_catalog."default" NOT NULL,
+    location text COLLATE pg_catalog."default",
+    osBrowser text COLLATE pg_catalog."default",
     CONSTRAINT "Login_pkey" PRIMARY KEY (id),
     CONSTRAINT "loginAccountId" FOREIGN KEY (accountId)
         REFERENCES FYP.Account (id) MATCH SIMPLE

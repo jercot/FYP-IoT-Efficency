@@ -52,13 +52,13 @@
 				<div id="burger">
 					<div id="filling">
 						<a href="settings">
-							<div class="menu fillingMargin" id="menuOrange">
+							<div id="menuOrange" class="menu fillingMargin">
 								Settings <br>
 							</div>
 						</a>
 						<hr class="left">
 						<a href="logout">
-							<div class="menu fillingMargin" id="menuWhite">
+							<div id="menuWhite" class="menu fillingMargin">
 								Log Out
 							</div>
 						</a>
