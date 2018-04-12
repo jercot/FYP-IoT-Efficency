@@ -41,7 +41,7 @@ public class House extends HttpServlet {
 		Logged log = (Logged)request.getSession().getAttribute("logged");
 		if(request.getQueryString()==null)
 			response.sendRedirect("house?bName=" + request.getParameter("bName"));
-		else if(log!=null) {
+		else if(log!=null&&log.houseExists(request.getParameter("bName"))) {
 			Object values[] = {log.getId(), request.getParameter("bName")};
 			ArrayList<HouseData> rooms = new ArrayList<>();
 			String sql = "SELECT DISTINCT ON (ro.id) " + 
@@ -53,18 +53,14 @@ public class House extends HttpServlet {
 			try (Connection con = dataSource.getConnection();
 					PreparedStatement ptst = prepare(con, sql, values);
 					ResultSet rs = ptst.executeQuery()) {
-				if(rs.next()) {
-					do {
-						rooms.add(new HouseData(rs.getString(1), rs.getInt(2), rs.getInt(3), rs.getInt(4), rs.getFloat(5)));
-					} while(rs.next());
-					request.setAttribute("rooms", rooms);
-					request.setAttribute("bName", request.getParameter("bName"));
-					request.setAttribute("main", "house");
-					request.setAttribute("subtitle", request.getParameter("bName"));
-					request.getRequestDispatcher("/WEB-INF/index.jsp").forward(request, response);
+				while(rs.next())  {
+					rooms.add(new HouseData(rs.getString(1), rs.getInt(2), rs.getInt(3), rs.getInt(4), rs.getFloat(5)));
 				}
-				else
-					response.sendRedirect("");
+				request.setAttribute("rooms", rooms);
+				request.setAttribute("bName", request.getParameter("bName"));
+				request.setAttribute("main", "house");
+				request.setAttribute("subtitle", request.getParameter("bName"));
+				request.getRequestDispatcher("/WEB-INF/index.jsp").forward(request, response);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}

@@ -83,7 +83,7 @@ public class Login extends HttpServlet {
 							request.getSession().setAttribute("logged", log);
 						}
 						CloseableHttpClient httpclient = HttpClients.createDefault();
-						HttpGet httpGet = new HttpGet("http://ip-api.com/json" + request.getRemoteAddr());
+						HttpGet httpGet = new HttpGet("http://ip-api.com/json/" + request.getRemoteAddr());
 						CloseableHttpResponse response1 = httpclient.execute(httpGet);
 						try {
 							HttpEntity entity1 = response1.getEntity();

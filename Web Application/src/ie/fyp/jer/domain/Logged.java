@@ -71,4 +71,11 @@ public class Logged {
 				buildings.set(i, bName);
 		}
 	}
+	
+	public boolean houseExists(String house) {
+		for(String s:  buildings)
+			if(s.equals(house))
+				return true;
+		return false;
+	}
 }

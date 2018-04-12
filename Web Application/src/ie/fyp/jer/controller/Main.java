@@ -63,9 +63,9 @@ public class Main extends HttpServlet {
 	}
 
 	private void setAccount(int log, HttpServletRequest request) {
-		String sql ="SELECT a.*, p.date, COUNT(b.name) AS buildings " + 
+		String sql ="SELECT a.*, p.date, COUNT(b.name) " + 
 				"FROM FYP.Account a " + 
-				"JOIN FYP.Building b ON b.accountId = a.id " + 
+				"LEFT JOIN FYP.Building b ON b.accountId = a.id " + 
 				"JOIN FYP.Password p ON p.accountId = a.id " +
 				"WHERE a.id = ? " + 
 				"GROUP BY a.id, p.date " + 

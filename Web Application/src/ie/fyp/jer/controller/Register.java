@@ -38,8 +38,10 @@ public class Register extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		request.setAttribute("website", "IoT Efficiency");
 		String forward = "/WEB-INF/register.jsp";
-		if(registered)
+		if(registered) {
+			registered = false;
 			forward = "/WEB-INF/registered.jsp";
+		}
 		if(request.getSession().getAttribute("logged")==null)
 			request.getRequestDispatcher(forward).forward(request, response);
 		else
