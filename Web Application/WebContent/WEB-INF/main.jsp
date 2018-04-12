@@ -83,9 +83,9 @@
 	<h1>House List:</h1>
 	<c:forEach items="${houseDash}" var="house">
 	<div class="house">
-		<div class="dashTitle">${house.name}</div>
+		<div class="dashTitle">House: ${house.name}</div>
 		<div class="dashLoc">
-			${house.location}
+			Location: ${house.location}
 			<a href="house?bName=${house.name}">
 				Go to:
 			</a>

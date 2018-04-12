@@ -18,7 +18,7 @@ div#logo {
 	color: #ffffff;
 	text-align: center;
 	line-height: 50px;
-	width: 301px;
+	width: 300px;
 }
 
 div#sideMenu {
@@ -34,7 +34,6 @@ div#title {
 }
 
 div#content {
-	min-width: 980px;
 	margin-left: 300px;
 }
 
@@ -46,6 +45,8 @@ div#main {
 #sideMenu a {
 	text-decoration: none;
 	color: #000000;
+	display: block;
+	width: 0px;
 }
 
 hr.left {
@@ -111,10 +112,6 @@ div#dash h1 {
 	text-align: center;
 }
 
-div#graph {
-	margin-top: 30px;
-}
-
 table.dashTable {
     border-collapse: collapse;
     width: 80%;
@@ -145,7 +142,6 @@ table.dashTable th {
 
 a#dashSet {
 	display: block;
-	color: #000000;
 	width: 80%;
     min-width: 394px;
 	margin: 0 auto;
@@ -190,12 +186,16 @@ div.dashLoc a {
 }
 
 div.dashRoom {
-	line-height: 40px;
-	height: 80px;
+	line-height: 50px;
+	height: 100px;
 	width: 194px;
 	float: left;
 	text-align: center;
 	border: 1px solid #000000;
+}
+
+div.dashRoom:hover {
+	background-color: #c1c1c1;
 }
 
 div.roomColor0 {
@@ -210,17 +210,13 @@ div.clear {
 	clear: both;
 }
 
-hr {
-	clear: both;
-}
 
 div#graph {
-	margin: 10px 0px;
+	margin-top: 30px;
 }
 
 div#roomList {	
-	margin-left: 40px;
-	margin-right: 40px;
+	margin: 0 40px;
 }
 
 span.roomTitle {
@@ -230,15 +226,24 @@ span.roomTitle {
 
 div.room {
 	border: 1px solid #000000;
-	clear: both;
 	text-align: center;
+	margin: 10px 0;
 	overflow: auto;
 }
 
 div.thermo {
-	width: 150px;
+	width: 100px;
 	float: left;
-	margin-right: 150px;
+	margin-left: 9%;
+	margin-right: 9%;
+}
+
+div.tIcon {
+	float: left;
+}
+
+div.tText {
+	line-height: 124px;
 }
 
 .temp0 {
@@ -266,18 +271,11 @@ div.thermo {
 }
 
 div.lumens {
-	width: 150px;
+	height: 124px;
+	width: 100px;
 	float: left;
-	margin-right: 150px;
-}
-
-div.tIcon {
-	margin-left: 50px;
-	float: left;
-}
-
-div.tText {
-	line-height: 100px;
+	margin-left: 9%;
+	margin-right: 9%;
 }
 
 .light0 {
@@ -305,6 +303,7 @@ div.tText {
 }
 
 .edit {
+	margin-left: 9%;
 	line-height: 25px;
 	float: left;
 }
@@ -332,11 +331,14 @@ div#settings {
 	width: 80%;
 	margin: 0 auto;
 	min width: 400px;
-	text-align: center;
+}
+
+div#settings h1 {
+	text-align
 }
 
 input[type=text], input[type=number], input[type=email], input[type=password] {
-    width: 100%;
+    width: calc(100% - 68px);
     padding: 2px 0px 2px 20px;
     margin: 2px 0px 2px ;
     display: inline-block;
@@ -350,8 +352,10 @@ button {
     padding: 4px;
     border: none;
     cursor: pointer;
-    width: 50%;
-    margin: 3px 25% 3px 25%;
+    display: block;
+    width: 150px;
+    margin: 0 auto;
+    margin-top: 10px;
 }
 
 button:hover {
@@ -359,6 +363,9 @@ button:hover {
 }
 
 @media screen and (max-width: 1280px) {
+	#sideMenu a {
+		display: initial;
+	}
 	div#sideBar {
 		width: 100%;
 		position: relative;
@@ -428,58 +435,18 @@ button:hover {
 	div#houses:hover div#houseList {
 		display: block;
 	}
-	div.thermo {
-		width: 150px;
-		float: left;
-		margin-right: 100px;
-	}
-	div.lumens {
-		width: 150px;
-		float: left;
-		margin-right: 100px;
-	}
 	div.room {
 		width: auto;
 	}
 }
 
-@media screen and (max-width: 1000px) {
+@media screen and (max-width: 980px) {
 	div#graph {
 		display: none;
 	}
 }
 
-@media screen and (max-width: 850px) {
-	div.thermo {
-		width: 150px;
-		float: left;
-		margin-right: 50px;
-	}
-	div.lumens {
-		width: 150px;
-		float: left;
-		margin-right: 50px;
-	}
-}
-
-@media screen and (max-width: 750px) {
-	div.thermo {
-		width: 150px;
-		float: left;
-		margin-right: 0px;
-	}
-	div.lumens {
-		width: 150px;
-		float: left;
-		margin-right: 0px;
-	}
-	div.edit{
-		margin-left: 60px;
-		clear:both;
-	}
-}
-
-@media screen and (max-width: 450px) {
+@media screen and (max-width: 600px) {
 	div.fillingMargin {
 		width: 200px;
 		margin-left: 0;

@@ -2,12 +2,12 @@ html,body {
     margin: 0;
   	height: 100%;
 	background-color: #f5f5f5;
+	min-width: 400px;
 }
 
 div#title {
 	background-color: #00438b;
 	border-bottom: 5px solid black;
-	min-width: 430px;
 }
 
 div#home {
@@ -30,15 +30,18 @@ div#content {
 	border: 2px solid #9E9E9E;
 	text-align: center;
 	max-width: 1100px;
-	min-width: 420px;
+	width: 95%;
 	margin: 10px auto;
 }
 
 div#register {
-	text-align: center;
-	width: 400px;
+	text-align: start;
+}
+
+div#input {
+	width: 360px;
+	margin-left: 10px;
 	float: left;
-	padding: 10px;
 }
 
 div#clear {
@@ -46,41 +49,25 @@ div#clear {
 }
 
 div#terms {
+	text-align: center;
 	width: 500px;
 	float: right;
 	margin: 20px 30px;
 }
 
 div#tText {
-  overflow-y: scroll;
-  height: 300px;
-  width: 98%;
-  border: 1px solid #DDD;
-  padding: 10px;
-
-}
-
-@media screen and (max-width: 1000px) { 
-	div#register {
-		margin: 0px 0px;
-		width: 95%;
-		min-width: 400px;
-	}
-
-	div#terms {
-		margin: 20px 10px;
-		float:left;
-		width: 95%;
-		min-width: 400px;
-	}
+	overflow-y: scroll;
+	height: 300px;
+	width: 95%;
+	border: 1px solid #DDD;
+	padding: 10px;
 }
 
 input[type=text], [type=email], input[type=password] {
-    width: 96%;
+    width: 75%;
     padding: 12px 20px;
     margin: 8px 0;
-    display: inline-block;
-    border: 1px solid #ccc;
+    border: 1px solid #dadada;
     box-sizing: border-box;
 }
 
@@ -90,10 +77,20 @@ button {
     padding: 14px 20px;
     border: none;
     cursor: pointer;
-    width: 50%;
-    margin: 30px 25% 5px 25%;
+    width: 150px;
+    display: block;
+    margin: 0 auto;
 }
 
 button:hover {
     opacity: 0.8;
+}
+
+@media screen and (max-width: 1000px) { 
+
+	div#terms {
+		margin: 0 0 20px;
+		float:left;
+		width: 98%;
+	}
 }

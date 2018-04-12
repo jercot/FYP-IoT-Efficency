@@ -42,8 +42,8 @@
 						Add House <br>
 					</div>
 				</a>
-				<hr class="left">
-				<!--<a href="compare">
+				<!--<hr class="left">
+				<a href="compare">
 					<div class="menu" id="menuRed">
 						Compare <br>
 					</div>

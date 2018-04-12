@@ -16,7 +16,7 @@ div#icon {
 }
 
 div#content {
-	max-width: 1080px;
+	max-width: 980px;
 	width: 98%;
 	margin: 0 auto;
 }
@@ -46,6 +46,10 @@ input[type=email], input[type=password] {
     display: inline-block;
     border: 1px solid #ccc;
     box-sizing: border-box;
+}
+
+p#message {
+	height: 0px;
 }
 
 button {
@@ -114,13 +118,13 @@ div#what {
 	margin-right: 10px;
 	margin-bottom: 10px;
 	float: right;
-	margin-left: 6px;
+	margin-left: 10px;
 }
 
 div#mobile {
 	background-color: #dadada;
 	float: left;
-	margin-left: 50px;
+	margin-left: 30px;
 	padding: 10px;
 	width: 220px;
 }
@@ -149,21 +153,15 @@ img#apple {
 		width: 90%;
 		margin-left: 4%;
 	}
-	div#login {
-		margin-left: 10px;
-	}
 	div#register {
 		width: 90%;
-		margin-left: 10px;
 		float: left;
 	}
 	div#why {
 		width: 90%;
-		margin-left: 10px;
 	}
 	div#what {
 		width: 90%;
-		margin-left: 10px;
 		float: left;
 	}
 }
