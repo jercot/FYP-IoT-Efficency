@@ -107,7 +107,9 @@ public class Main extends HttpServlet {
 				"WHERE dateTime < (SELECT MAX(dateTime) " + 
 				"					FROM FYP.Login) " + 
 				"AND accountId = ? " + 
-				"GROUP BY location, osBrowser;";
+				"GROUP BY location, osBrowser " +
+				"ORDER BY max " +
+				"LIMIT 1;";
 		Object val[] = {log};
 		try (Connection con = dataSource.getConnection();
 				PreparedStatement ptst = prepare(con, sql, val);
