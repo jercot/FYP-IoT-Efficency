@@ -35,7 +35,7 @@ div#title {
 
 div#content {
 	min-width: 980px;
-	padding-left: 300px;
+	margin-left: 300px;
 }
 
 div#main {
@@ -112,7 +112,7 @@ div#dash h1 {
 }
 
 div#graph {
-	padding-top: 30px;
+	margin-top: 30px;
 }
 
 table.dashTable {
@@ -219,8 +219,8 @@ div#graph {
 }
 
 div#roomList {	
-	padding-left: 40px;
-	padding-right: 40px;
+	margin-left: 40px;
+	margin-right: 40px;
 }
 
 span.roomTitle {
@@ -272,7 +272,7 @@ div.lumens {
 }
 
 div.tIcon {
-	padding-left: 50px;
+	margin-left: 50px;
 	float: left;
 }
 
@@ -387,7 +387,7 @@ button:hover {
 	}
 	div#content {
 		min-width: auto;
-		padding-left: 0px;
+		margin-left: 0px;
 	}
 	div.menu {
 		float: left;
@@ -479,7 +479,7 @@ button:hover {
 	}
 }
 
-@media screen and (max-width: 530px) {
+@media screen and (max-width: 450px) {
 	div.fillingMargin {
 		width: 200px;
 		margin-left: 0;
@@ -489,7 +489,8 @@ button:hover {
 		background-color: #000000!important;
 	}
 	div#burger {
-		padding-left: 5px;
+		float: right;
+		margin-right: 5px;
 		position: relative;
 		display: inline-block;
 	}

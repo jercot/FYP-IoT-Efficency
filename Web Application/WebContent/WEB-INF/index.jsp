@@ -43,11 +43,11 @@
 					</div>
 				</a>
 				<hr class="left">
-				<a href="compare">
+				<!--<a href="compare">
 					<div class="menu" id="menuRed">
 						Compare <br>
 					</div>
-				</a>
+				</a>-->
 				<hr class="left">
 				<div id="burger">
 					<div id="filling">

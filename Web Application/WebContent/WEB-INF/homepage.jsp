@@ -34,31 +34,58 @@
 			</div>
 		</div> 
 		<div id="content">
+			<div id="account">
+				<div id="login">
+					<form action="login" method="POST">
+						<h3>Sign In</h3><br>
+						To existing account
+					    <input type="email" placeholder="Enter Email" name="email" required><br>
+					    <input type="password" placeholder="Enter Password" name="pass" required><br>
+						<a href="">Forgot Password?</a>
+					    <button type="submit">Login</button>
+					    ${message}
+					</form>
+				</div>
+				<div id="hl"></div>
+				<div id="register">
+					<h3>Register</h3><br>
+					A new account<br><br>
+					It's free to join, easy to set up. One account works with the website and mobile application.
+					<a id="register" href="register">Register</a>
+					<div id="mobile">
+						<img src="images/google.png" id="google"/>
+						<img src="images/apple.png" id="apple"/>
+					</div>
+				</div>
+				<div id="vl"></div>
+			</div>
 			<div id="info">
-				<h1>Welcome</h1>
-				Lorem ipsum dolor sit amet, dicunt nusquam oportere te pro, et causae theophrastus sit. Vix etiam perpetua voluptatum cu. Ex adipiscing reformidans interpretaris quo, ad sea dicta iuvaret veritus. Id eam nibh timeam reprimique, sed nihil suscipit singulis in, case tation facilis no eos. Ea tota putent vix. At posse impetus alienum pri, menandri mandamus id his, probo ipsum reprehendunt eu vel.
-				<br><br>
-				Est ea equidem commune. In eum voluptua placerat ponderum. Et elit iriure iisque nam, eos eu modus novum vulputate, possim vidisse adversarium duo ut. Homero democritum sea ei, ad has quando intellegebat. His ex omnes putant, harum sapientem no mel.
-				<br><br>
-				In lucilius detraxit voluptatum nam, diceret iudicabit ad sea, ea mel brute percipit omittantur. Tacimates rationibus ea sit, ei sed autem invidunt. Et usu summo philosophia, ut vel quando possim omittantur. Ut usu facer legere omittam, id minimum quaestio vel. Liber dolor at vel, qui duis mollis fierent et. Vim atomorum electram urbanitas an.
-				<br><br>
-				Ad est quem agam malorum. Vel at lorem audire maluisset. Te aliquip voluptaria duo, quot voluptatum persequeris quo id. Duo placerat adversarium no, eos ad munere luptatum deseruisse, vim impedit reprimique eu. Cum ea liber fabulas, doming repudiandae nam id. Mea prima reque qualisque et, ad per adipisci conceptam.
-				<br><br>
-				Te graeci euismod sit, decore accumsan definiebas vis in, cu consul urbanitas vis. Ad quas mucius vel, te accusam accusamus mel. Eam ut posse impedit. An porro saepe detraxit eam, cu vim diceret iracundia. Ridens nusquam inciderint per ex, vidit invidunt apeirian ius ut. Qualisque scripserit id vim, consul vivendum id quo. Labores gubergren nec ei, liber vituperata et nam.
-			</div>
-			<div id="login">
-				<form action="login" method="POST">
-					<h1>Log In</h1>
-				    <input type="email" placeholder="Enter Email" name="email" required><br>
-				    <input type="password" placeholder="Enter Password" name="pass" required><br>
-					<a href="register">Register</a> - <a href="">Forgot Password?</a>
-				    <button type="submit">Login</button>
-				    ${message}
-				</form>
-			</div>
-			<div id="mobile">
-				<img src="images/google.png" id="google"/>
-				<img src="images/apple.png" id="apple"/>
+				<div id="why">
+					<h3>Why sign up?</h3>
+					<ul>
+						<li>Easy tracking of house statistics</li>
+						<li>Quickly add houses to the system</li>
+						<li>View visualisation of data collected</li>
+					</ul>
+				</div>
+				<div id="hl"></div>
+				<div id="what">
+					<h3>Requirements</h3>
+					<ul>
+						<li>Arduino</li>
+						<ul>
+							<li>Ethernet Shield</li>
+							<li>Photocell</li>
+							<li>Temperature Sensor</li>
+							<li>Humidity Sensor(DHT11)</li>
+							<li>Ultrasonic Sensor(HC-SR04)</li>
+						</ul>
+						<li>Android Mobile</li>
+						<li>Internet Connection</li>
+						<li>Link to Schematics/Setup to be linked here</li>
+					</ul>
+				</div>
+				<div id="vl"></div>
 			</div>
 		</div>
 	</body>
