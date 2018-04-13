@@ -25,11 +25,13 @@ int hum[READINGS];
 int ult[READINGS];
 float temp[READINGS];
 int light[READINGS];
-byte mac[] = {0xDE, 0xAD, 0xDC, 0xEF, 0xFE, 0xED};
+byte mac[] = {0xDE, 0xAD, 0xDC, 0xAF, 0xFE, 0xED};
 char webServer[] = "fyp-iot-efficiency.eu-west-1.elasticbeanstalk.com"; // set up with mobile?
 char bucket[21];
 char token[21];
 byte start;
+long timeL;
+long mill = long(MINUTES)*60*1000;
 EthernetClient client;
 EthernetServer arduinoServer(32109);
 
@@ -46,25 +48,29 @@ void setup() {
   arduinoServer.begin();
   Serial.println(Ethernet.localIP());
   start = readBucket();
-  Serial.println(bucket);
+  timeL = millis();
 }
 
 void loop() {
+  int loopCount = (MINUTES*60)/READINGS;
+  long loopTime = (long)count * loopCount * 1000;
   if(start) {
     incr();
     digitalWrite(GREEN, LOW);
-    if(count==READINGS) {
+    if(count==READINGS||(millis()-timeL)/mill!=0) {
       createRequest();
-      Serial.println();
+      timeL += mill;
       count=0;
+    }
+    else {
+      flash(loopCount, timeL + loopTime);
     }
   }
   else
     start = readBucket();
-  flash((MINUTES*60)/READINGS);
 }
 
-void flash(int c) {
+void flash(int c, long start) {
   server();
   int pin = YELLOW;
   if(!start)
@@ -73,14 +79,13 @@ void flash(int c) {
   delay(500);
   digitalWrite(pin, LOW);
   delay(500);
-  if(c>=0)
-    flash(c-1);
+  if(c>=0&&(millis()-start)/60000==0)
+    flash(c-1, start);
 }
 
 byte readBucket() {
   for(int i=0; i<20; i++) {
     bucket[i] = EEPROM.read(i);
-    Serial.print(bucket[i]);
     if(!isDigit(bucket[i])&&!isAlpha(bucket[i]))
       return 0;
   }
@@ -99,7 +104,7 @@ int server() {
       client.print("{\"code\":");
       char req[42];
       int i = 0;
-      while (client.available() && i < sizeof(req)) {
+      while (client.available()&&i < sizeof(req)) {
         char c = client.read();
         Serial.print(c);
         req[i] = c;
@@ -222,17 +227,17 @@ byte upload(char *serv, char *param, int attempt) {
 
 int calcAve(int arr[]) {
   int total = 0;
-  for(int i=0; i<READINGS; i++) {
+  for(int i=0; i<count; i++) {
     total += arr[i];
   }
-  return(total/READINGS);
+  return(total/count);
 }
 
 int calcMed(int arr[], int* minT, int* maxT) {
-  quickSort(arr, 0, READINGS-1);
+  quickSort(arr, 0, count-1);
   *minT = arr[0];
-  *maxT = arr[READINGS-1];
-  return ((arr[READINGS/2-1]+arr[READINGS/2])/2);
+  *maxT = arr[count-1];
+  return ((arr[count/2-1]+arr[count/2])/2);
 }
 
 void swap(int* a, int* b) {
@@ -255,7 +260,7 @@ int partition (int arr[], int low, int high) {
 }
 
 void quickSort(int arr[], int low, int high) {
-    if (low < high) {
+    if (low<high) {
         int pi = partition(arr, low, high);
         quickSort(arr, low, pi - 1);
         quickSort(arr, pi + 1, high);
@@ -264,17 +269,17 @@ void quickSort(int arr[], int low, int high) {
 
 float calcAveF(float arr[]) {
   float total = 0;
-  for(int i=0; i<READINGS; i++) {
+  for(int i=0; i<count; i++) {
     total += arr[i];
   }
-  return(total/READINGS);
+  return(total/count);
 }
 
 float calcMedF(float arr[], float* minF, float* maxF) {
-  quickSortF(arr, 0, READINGS-1);
+  quickSortF(arr, 0, count-1);
   *minF = arr[0];
-  *maxF = arr[READINGS-1];
-  return ((arr[READINGS/2-1]+arr[READINGS/2])/2);
+  *maxF = arr[count-1];
+  return ((arr[count/2-1]+arr[count/2])/2);
 }
 
 void swapF(float* a, float* b) {
@@ -285,8 +290,8 @@ void swapF(float* a, float* b) {
 
 int partitionF(float arr[], int low, int high) {
     float pivot = arr[high];
-    int i = (low - 1);
-    for (int j = low; j <= high- 1; j++) {
+    int i = (low-1);
+    for (int j=low; j <= high-1; j++) {
         if (arr[j] <= pivot) {
             i++;
             swapF(&arr[i], &arr[j]);
@@ -297,18 +302,18 @@ int partitionF(float arr[], int low, int high) {
 }
 
 void quickSortF(float arr[], int low, int high) {
-    if (low < high) {
+    if (low<high) {
         int pi = partitionF(arr, low, high);
-        quickSortF(arr, low, pi - 1);
-        quickSortF(arr, pi + 1, high);
+        quickSortF(arr, low, pi-1);
+        quickSortF(arr, pi+1, high);
     }
 }
 
 int calcMov(int arr[]) {
-  for (int i=0; i<READINGS; i++) {
+  for (int i=0; i<count; i++) {
     int curr = arr[i];
-    if(curr>=prev+VARIANCE || curr<=prev-VARIANCE) {
-      prev = arr[READINGS-1];
+    if(curr>=prev+VARIANCE||curr<=prev-VARIANCE) {
+      prev = arr[count-1];
       return 1;
     }
     prev = curr;
@@ -321,9 +326,9 @@ void incr() {
   hum[count] = DHT.humidity;
   ult[count] = sr04.Distance();
   int tempReading = analogRead(TEMP_PIN);
-  double tempK = log(10000.0 * ((1024.0 / tempReading - 1)));
-  tempK = 1 / (0.001129148 + (0.000234125 + (0.0000000876741 * tempK * tempK )) * tempK );
-  temp[count] = tempK - 273.15;
+  double tempK = log(10000.0*((1024.0/tempReading-1)));
+  tempK = 1/(0.001129148+(0.000234125+(0.0000000876741*tempK*tempK))*tempK);
+  temp[count] = tempK-273.15;
   light[count] = analogRead(LIGHT_PIN);
-  count += 1;
+  count ++;
 }
