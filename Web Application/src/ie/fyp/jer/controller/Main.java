@@ -108,7 +108,7 @@ public class Main extends HttpServlet {
 				"					FROM FYP.Login) " + 
 				"AND accountId = ? " + 
 				"GROUP BY location, osBrowser " +
-				"ORDER BY max " +
+				"ORDER BY max DESC " +
 				"LIMIT 1;";
 		Object val[] = {log};
 		try (Connection con = dataSource.getConnection();
