@@ -27,9 +27,11 @@ float temp[READINGS];
 int light[READINGS];
 byte mac[] = {0xDE, 0xAD, 0xDC, 0xAF, 0xFE, 0xED};
 char webServer[] = "fyp-iot-efficiency.eu-west-1.elasticbeanstalk.com"; // set up with mobile?
+IPAddress serverIp(192,168,1,6); // change for local
 char bucket[21];
 char token[21];
 byte start;
+char siteBucket;
 long timeL;
 long mill = long(MINUTES)*60*1000;
 EthernetClient client;
@@ -42,45 +44,53 @@ void setup() {
   pinMode(YELLOW, OUTPUT);
   pinMode(RED, OUTPUT);
   digitalWrite(RED, HIGH);
-  if(Ethernet.begin(mac)!=0) {
+  if(Ethernet.begin(mac)!=0)
     digitalWrite(RED, LOW);
-  }
   arduinoServer.begin();
-  Serial.println(Ethernet.localIP());
+  Serial.println(Ethernet.localIP()[3]);
   start = readBucket();
+  char tokenReq[50];
+  sprintf(tokenReq,"/token?bucket=%s&", bucket);
+
+  digitalWrite(YELLOW, HIGH);
+  if(sendRequest(tokenReq, 3))
+    digitalWrite(YELLOW, LOW);
   timeL = millis();
 }
 
 void loop() {
+  Ethernet.maintain();
   int loopCount = (MINUTES*60)/READINGS;
-  long loopTime = (long)count * loopCount * 1000;
+  long loopTime = (long)(count+1) * loopCount * 1000;
+  Serial.print(count);
   if(start) {
-    incr();
-    digitalWrite(GREEN, LOW);
-    if(count==READINGS||(millis()-timeL)/mill!=0) {
+    if(count==READINGS||millis()>(timeL+mill)) {
       createRequest();
       timeL += mill;
       count=0;
     }
     else {
-      flash(loopCount, timeL + loopTime);
+      flash(loopCount+5, timeL+loopTime);
+      incr();
     }
   }
   else
     start = readBucket();
 }
 
-void flash(int c, long start) {
+void flash(int c, long endT) {
   server();
-  int pin = YELLOW;
-  if(!start)
+  int pin = GREEN;
+  if(token[0]!='1')
+    pin = YELLOW;
+  else if(!start)
     pin = RED;
     digitalWrite(pin, HIGH);
   delay(500);
   digitalWrite(pin, LOW);
   delay(500);
-  if(c>=0&&(millis()-start)/60000==0)
-    flash(c-1, start);
+  if(c>=0&&millis()<endT)
+    flash(c-1, endT);
 }
 
 byte readBucket() {
@@ -95,49 +105,53 @@ byte readBucket() {
 int server() {
   client = arduinoServer.available();
   if (client) {
-    Serial.println("here");
     if (client.connected()) {
-      client.println("HTTP/1.1 200 OK");
-      client.println("Content-Type: application/json");
-      client.println("Connection: close");
+      client.println(F("HTTP/1.1 200 OK"));
+      client.println(F("Content-Type: application/json"));
+      client.println(F("Connection: close"));
       client.println();
-      client.print("{\"code\":");
-      char req[42];
+      client.print(F("{\"code\":"));
+      char req[70];
+      char toke[40] = "token=";
+      for(int i=2; i<sizeof(token); i++)
+        toke[i+4]=token[i];
       int i = 0;
-      while (client.available()&&i < sizeof(req)) {
+      while (client.available()&&i<sizeof(req)) {
         char c = client.read();
-        Serial.print(c);
         req[i] = c;
         i++;
       }
-      char set[] = "settings", var[] = "bucket";
-      if (request('/', req, set)) {
-        if (!request('?', req, var)) {
+      byte tokenCheck = 1;
+        tokenCheck=request('&', req, toke)||request('?', req, toke)||token[0]!='1';
+      char set[] = "settings", var[] = "bucket=";
+      if(request('/', req, set)&&tokenCheck) {
+        if(!request('?', req, var)&&!request('&', req, var)) {
           if(bucket[0]!='\0') {
-            client.print("1, \"bucket\":\"");
+            client.print(F("1, \"bucket\":\""));
             client.print(bucket);
-            client.print("\"}");
+            client.print(F("\"}"));
           }
           else {
-            client.print("2, \"bucket\":\"");
-            client.print("No Bucket Set");
-            client.print("\"}");
+            client.print(F("2, \"bucket\":\""));
+            client.print(F("No Bucket Set"));
+            client.print(F("\"}"));
           }
         }
         else {
           if(updateBucket(req)) {
-            client.print("3, \"bucket\":\"");
+            client.print(F("3, \"bucket\":\""));
             client.print(bucket);
-            client.print("\"}");
+            client.print(F("\"}"));
           }
           else {
-            client.print("4}");
+            client.print(F("4}"));
           }
         }
       }
-      else {
-        client.print("0}");
-      }
+      else if(!tokenCheck)
+        client.print(F("-1}"));
+      else
+        client.print(F("0}"));
     }
     client.stop();
   }
@@ -161,7 +175,7 @@ byte request(char start, char *req, char *check) {
 
 byte updateBucket(char *req) {
   int j=0, i=0, k=0;
-  while(req[j]!='\0'&&req[j-1]!='=') {
+  while(req[j]!='\0'&&(req[j-1]!='='||req[j-2]!='t')) {
     j++;
   }
   while(req[j+k]!='\0'&&req[j+k-1]!=' '&&k<20) {
@@ -170,7 +184,7 @@ byte updateBucket(char *req) {
     k++;
   }
   while(req[j]!='\0'&&req[j-1]!=' '&&i<20) {
-    EEPROM.write(i, req[j]);
+   // EEPROM.write(i, req[j]);
     bucket[i] = req[j];
     i++;
     j++;
@@ -197,33 +211,41 @@ void createRequest() {
   dtostrf(maxF, 4, 2, maxS);
   sprintf(tempS, "&tAve=%s&tMed=%s&tMin=%s&tMax=%s", aveF, medF, minS, maxS);
   sprintf(str, "/upload?mvmt=%d%s%s%s&bucket=%s", calcMov(ult), humS, lightS, tempS, bucket);
-  if(!upload(webServer, str, 3)) {
+  if(!sendRequest(str, 3)) {
     digitalWrite(RED, HIGH);
   }
   else {
     digitalWrite(RED, LOW);
   }
+  digitalWrite(GREEN, LOW);
 }
 
-byte upload(char *serv, char *param, int attempt) {
-  int inChar;
+byte sendRequest(char* param, int attempt) {
   char outBuf[200];
-  if(client.connect(serv,80)) {
+  //if(client.connect(serv,80)) {
+  if(client.connect(serverIp, 8080)) {
     sprintf(outBuf,"GET %s HTTP/1.0\r\n\r\n", param);
     client.write(outBuf);
   } 
   else {
-    if(attempt>3)
-      upload(serv, param, attempt-1);
+    if(attempt!=0)
+      return sendRequest(param, attempt-1);
     return 0;
   }
-  if(client.available()) {
+  delay(1000);
+  char status[32] = {0};
+  client.readBytesUntil('\r', status, sizeof(status));
+  char endOfHeaders[] = "\r\n\r\n";
+  client.find(endOfHeaders);
+  int i = 0;
+  while(client.available()) {
     char c = client.read();
-    Serial.print(c); // Change token here.
+    token[i++] = c;
   }
   client.stop();
   return 1;
 }
+
 
 int calcAve(int arr[]) {
   int total = 0;
