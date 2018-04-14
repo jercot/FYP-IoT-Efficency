@@ -184,7 +184,7 @@ byte updateBucket(char *req) {
     k++;
   }
   while(req[j]!='\0'&&req[j-1]!=' '&&i<20) {
-   // EEPROM.write(i, req[j]);
+    EEPROM.write(i, req[j]);
     bucket[i] = req[j];
     i++;
     j++;
