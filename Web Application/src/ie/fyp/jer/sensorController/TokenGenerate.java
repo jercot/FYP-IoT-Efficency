@@ -13,23 +13,21 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
-import org.mindrot.jbcrypt.BCrypt;
-
 import ie.fyp.jer.config.Token;
 
 /**
- * Servlet implementation class TempUp
+ * Servlet implementation class TokenTest
  */
-@WebServlet("/upload")
-public class Upload extends HttpServlet {
-	private static final long serialVersionUID = 12L;
+@WebServlet("/token")
+public class TokenGenerate extends HttpServlet {
+	private static final long serialVersionUID = 13L;
 	@Resource(name="jdbc/aws-rds")
 	private DataSource dataSource; 
-	int c = 0;
+	private int c = 0;
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
-	public Upload() {
+	public TokenGenerate() {
 		super();
 	}
 
@@ -37,33 +35,9 @@ public class Upload extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String params[] = {"mvmt", "hAve", "hMed", "hMin", "hMax", "lAve", "lMed", "lMin", "lMax", "tAve", "tMin", "tMax", "time", "bucket"};
-		Object[] values = new Object[params.length];
-		long time = System.currentTimeMillis();
-		for(int i=0; i<params.length; i++) {
-			if(params[i].equals("time")) {
-				int interval = 900000;
-				values[i] = ((time%interval<interval/2) ? time-time%interval : time+interval-time%interval);
-			}
-			else
-				values[i] = request.getParameter(params[i]);
-		}
-		String sql = "INSERT INTO FYP.Recording(roomid, movement, humidave, humidmed, humidmin, "
-				+ "humidmax, lightave, lightmed, lightmin, lightmax, tempave, tempmed, tempmin, tempmax, time) " + 
-				"SELECT id, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? " + 
-				"FROM FYP.room " + 
-				"WHERE bucket = ?";
-		try(Connection con = dataSource.getConnection();
-				PreparedStatement ptst = prepare(con, sql, values)) {
-			
-		} catch (NumberFormatException e) {
-			e.printStackTrace();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
 		String token = Token.generate();
 		Object val[] = {token, request.getParameter("bucket")};
-		sql = "UPDATE FYP.Room SET token=? WHERE bucket=?";
+		String sql = "UPDATE FYP.Room SET token=? WHERE bucket=?";
 		try(Connection con = dataSource.getConnection();
 				PreparedStatement ptst = prepare(con, sql, val)) {
 			// Tried to return json but arduino json caused too many hangs
@@ -71,10 +45,8 @@ public class Upload extends HttpServlet {
 			response.getWriter().write(r);
 		} catch (SQLException e) {
 			e.printStackTrace();
-		} finally {
-			System.out.println("Uploa: " + token + " - " + c++  + " +=+ " + request.getQueryString());
-			request.getRequestDispatcher("tempup?"+request.getQueryString()).forward(request, response);
 		}
+		System.out.println("Gener: " + token + " - " + c++ + " +=+ " + request.getQueryString());
 	}
 
 	/**
@@ -92,5 +64,3 @@ public class Upload extends HttpServlet {
 		return ptst;
 	}
 }
-
-
