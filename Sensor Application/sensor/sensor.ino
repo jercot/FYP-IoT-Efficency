@@ -51,7 +51,6 @@ void setup() {
   start = readBucket();
   char tokenReq[50];
   sprintf(tokenReq,"/token?bucket=%s&", bucket);
-
   digitalWrite(YELLOW, HIGH);
   if(sendRequest(tokenReq, 3))
     digitalWrite(YELLOW, LOW);
@@ -65,6 +64,7 @@ void loop() {
   Serial.print(count);
   if(start) {
     if(count==READINGS||millis()>(timeL+mill)) {
+      Serial.println();
       createRequest();
       timeL += mill;
       count=0;

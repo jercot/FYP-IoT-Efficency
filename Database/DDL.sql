@@ -102,8 +102,10 @@ CREATE TABLE FYP.Room
     id serial NOT NULL,
     buildingId integer NOT NULL,
     name text COLLATE pg_catalog."default" NOT NULL,
-    bucket text COLLATE pg_catalog."default" NOT NULL,
-    floor integer,
+    bucket text COLLATE pg_catalog."default",
+    token text COLLATE pg_catalog."default",
+    floor integer NOT NULL,
+    notification integer NOT NULL,
 	UNIQUE (buildingId, name),
     CONSTRAINT "Room_pkey" PRIMARY KEY (id),
     CONSTRAINT "roomBuildingId" FOREIGN KEY (buildingId)
