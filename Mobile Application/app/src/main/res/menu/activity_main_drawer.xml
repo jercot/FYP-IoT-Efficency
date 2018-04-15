@@ -9,8 +9,8 @@
             android:id="@+id/nav_oc"
             android:title="Local" />
     </group>
-    <group android:checkableBehavior="single"
-        android:id="@+id/group_site">
+    <group android:id="@+id/group_site"
+        android:checkableBehavior="single">
         <item
             android:id="@+id/nav_dash"
             android:icon="@drawable/ic_menu_camera"

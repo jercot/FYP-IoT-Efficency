@@ -49,6 +49,7 @@ import java.util.Map;
 import javax.net.ssl.HttpsURLConnection;
 
 import ie.fyp.jer.config.Session;
+import ie.fyp.jer.config.Website;
 import ie.fyp.jer.domain.Response;
 
 import static android.Manifest.permission.READ_CONTACTS;
@@ -276,7 +277,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
-                URL url = new URL(Temp.url + "mobileLogin");
+                URL url = new URL(Website.url + "mobileLogin");
 
                 JSONObject postDataParams = new JSONObject();
                 postDataParams.put("email", mEmail);
@@ -384,7 +385,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     HttpCookie temp = HttpCookie.parse(cookie).get(0);
                     Log.v("Cookie", temp.toString());
                     cookieManager.getCookieStore().add(null, temp);
-                    android.webkit.CookieManager.getInstance().setCookie(Temp.url, temp.toString());
+                    android.webkit.CookieManager.getInstance().setCookie(Website.url, temp.toString());
                 }
             }
         }

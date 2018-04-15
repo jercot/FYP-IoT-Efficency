@@ -25,7 +25,7 @@ int hum[READINGS];
 int ult[READINGS];
 float temp[READINGS];
 int light[READINGS];
-byte mac[] = {0xDE, 0xAD, 0xDC, 0xAF, 0xFE, 0xED};
+byte mac[] = {0xDE, 0xAD, 0xDC, 0xEF, 0xFE, 0xED};
 char webServer[] = "fyp-iot-efficiency.eu-west-1.elasticbeanstalk.com"; // set up with mobile?
 IPAddress serverIp(192,168,1,6); // change for local
 char bucket[21];
@@ -227,8 +227,8 @@ void createRequest() {
 
 byte sendRequest(char* param, int attempt) {
   char outBuf[200];
-  //if(client.connect(serv,80)) {
-  if(client.connect(serverIp, 8080)) {
+  if(client.connect(webServer,80)) {
+  //if(client.connect(serverIp, 8080)) {
     sprintf(outBuf,"GET %s HTTP/1.0\r\n\r\n", param);
     client.write(outBuf);
   } 

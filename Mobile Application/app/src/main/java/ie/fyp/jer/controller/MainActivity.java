@@ -15,6 +15,8 @@ import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import ie.fyp.jer.config.Website;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -25,7 +27,7 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         webView = findViewById(R.id.webView);
         webView.setWebViewClient(new WebViewClient());
-        webView.loadUrl(Temp.url);
+        webView.loadUrl(Website.url);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -105,22 +107,22 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void setDash() {
-        webView.loadUrl(Temp.url);
+        webView.loadUrl(Website.url);
         setTitle("DASH");
     }
 
     public void setBuilding() {
-        webView.loadUrl(Temp.url + "/building");
+        webView.loadUrl(Website.url + "/building");
         setTitle("BUILDING");
     }
 
     public void setSettings() {
-        webView.loadUrl(Temp.url + "/settings");
+        webView.loadUrl(Website.url + "/settings");
         setTitle("SETTINGS");
     }
 
     public void setLog() {
-        webView.loadUrl(Temp.url + "/logout");
+        webView.loadUrl(Website.url + "/logout");
         finish();
     }
 }
