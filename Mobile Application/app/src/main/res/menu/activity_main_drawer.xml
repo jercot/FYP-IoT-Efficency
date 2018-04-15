@@ -3,22 +3,32 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
-    <group android:checkableBehavior="single">
+    <group android:id="@+id/group_local"
+        android:checkableBehavior="single">
         <item
-            android:id="@+id/navDash"
+            android:id="@+id/nav_oc"
+            android:title="Local" />
+    </group>
+    <group android:checkableBehavior="single"
+        android:id="@+id/group_site">
+        <item
+            android:id="@+id/nav_dash"
             android:icon="@drawable/ic_menu_camera"
             android:title="Dashboard" />
         <item
-            android:id="@+id/navHouse"
+            android:id="@+id/nav_house"
             android:title="Houses" />
         <item
-            android:id="@+id/navBuilding"
+            android:id="@+id/nav_building"
             android:title="AddBuilding" />
+    </group>
+    <group android:id="@+id/group_other"
+        android:checkableBehavior="single">
         <item
-            android:id="@+id/navSettings"
+            android:id="@+id/nav_settings"
             android:title="Settings" />
         <item
-            android:id="@+id/navLog"
+            android:id="@+id/nav_log"
             android:title="Log Out" />
     </group>
 

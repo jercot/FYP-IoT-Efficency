@@ -384,7 +384,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     HttpCookie temp = HttpCookie.parse(cookie).get(0);
                     Log.v("Cookie", temp.toString());
                     cookieManager.getCookieStore().add(null, temp);
-                    //android.webkit.CookieManager.getInstance().setCookie(Temp.url, temp.toString());
+                    android.webkit.CookieManager.getInstance().setCookie(Temp.url, temp.toString());
                 }
             }
         }

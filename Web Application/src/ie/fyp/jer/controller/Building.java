@@ -36,7 +36,6 @@ public class Building extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		System.out.print("Building");
 		if(request.getSession().getAttribute("logged")!=null&&!added) {
 			request.setAttribute("main", "building");
 			request.setAttribute("subtitle", "Add House to System");

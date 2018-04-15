@@ -86,38 +86,41 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-        if (id == R.id.navDash) {
-            setDash();
-        } else if (id == R.id.navBuilding) {
-            setBuilding();
-        } else if (id == R.id.navSettings) {
-            setSettings();
-        } else if (id == R.id.navLog) {
-            setLog();
-        }
+        if(id!=R.id.nav_house) {
+            if (id == R.id.nav_dash) {
+                setDash();
+            } else if (id == R.id.nav_building) {
+                setBuilding();
+            } else if (id == R.id.nav_settings) {
+                setSettings();
+            } else if (id == R.id.nav_log) {
+                setLog();
+            }
 
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
+            DrawerLayout drawer = findViewById(R.id.drawer_layout);
+            drawer.closeDrawer(GravityCompat.START);
+            return true;
+        }
+        return false;
     }
 
     public void setDash() {
-        webView.loadUrl("fyp-iot-efficiency.eu-west-1.elasticbeanstalk.com/");
+        webView.loadUrl(Temp.url);
         setTitle("DASH");
     }
 
     public void setBuilding() {
-        webView.loadUrl("fyp-iot-efficiency.eu-west-1.elasticbeanstalk.com/building");
+        webView.loadUrl(Temp.url + "/building");
         setTitle("BUILDING");
     }
 
     public void setSettings() {
-        webView.loadUrl("fyp-iot-efficiency.eu-west-1.elasticbeanstalk.com/settings");
+        webView.loadUrl(Temp.url + "/settings");
         setTitle("SETTINGS");
     }
 
     public void setLog() {
-        webView.loadUrl("fyp-iot-efficiency.eu-west-1.elasticbeanstalk.com/logout");
-        setTitle("DASH");
+        webView.loadUrl(Temp.url + "/logout");
+        finish();
     }
 }
