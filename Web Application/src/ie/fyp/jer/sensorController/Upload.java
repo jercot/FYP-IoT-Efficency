@@ -13,8 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
-import org.mindrot.jbcrypt.BCrypt;
-
 import ie.fyp.jer.config.Token;
 
 /**
@@ -37,7 +35,7 @@ public class Upload extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String params[] = {"mvmt", "hAve", "hMed", "hMin", "hMax", "lAve", "lMed", "lMin", "lMax", "tAve", "tMin", "tMax", "time", "bucket"};
+		String params[] = {"mvmt", "hAve", "hMed", "hMin", "hMax", "lAve", "lMed", "lMin", "lMax", "tAve", "tMed", "tMin", "tMax", "time", "bucket"};
 		Object[] values = new Object[params.length];
 		long time = System.currentTimeMillis();
 		for(int i=0; i<params.length; i++) {
@@ -45,8 +43,17 @@ public class Upload extends HttpServlet {
 				int interval = 900000;
 				values[i] = ((time%interval<interval/2) ? time-time%interval : time+interval-time%interval);
 			}
-			else
-				values[i] = request.getParameter(params[i]);
+			else {
+				try {
+					values[i] = Integer.parseInt(request.getParameter(params[i]));
+				} catch (NumberFormatException e) {
+					try {
+						values[i] = Float.parseFloat(request.getParameter(params[i]));
+					} catch (NumberFormatException e1) {
+						values[i] = request.getParameter(params[i]);
+					}
+				}
+			}
 		}
 		String sql = "INSERT INTO FYP.Recording(roomid, movement, humidave, humidmed, humidmin, "
 				+ "humidmax, lightave, lightmed, lightmin, lightmax, tempave, tempmed, tempmin, tempmax, time) " + 
@@ -55,9 +62,7 @@ public class Upload extends HttpServlet {
 				"WHERE bucket = ?";
 		try(Connection con = dataSource.getConnection();
 				PreparedStatement ptst = prepare(con, sql, values)) {
-			
-		} catch (NumberFormatException e) {
-			e.printStackTrace();
+			System.out.println(ptst.executeUpdate());
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -92,5 +97,3 @@ public class Upload extends HttpServlet {
 		return ptst;
 	}
 }
-
-

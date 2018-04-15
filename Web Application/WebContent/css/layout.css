@@ -212,6 +212,8 @@ div.clear {
 
 
 div#graph {
+	width: 100%;
+	display: table;
 	margin-top: 30px;
 }
 
@@ -339,6 +341,7 @@ div#settings h1 {
 
 input[type=text], input[type=number], input[type=email], input[type=password] {
     width: calc(100% - 68px);
+    min-width: 150px;
     padding: 2px 0px 2px 20px;
     margin: 2px 0px 2px ;
     display: inline-block;
@@ -356,6 +359,7 @@ button {
     width: 150px;
     margin: 0 auto;
     margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 button:hover {

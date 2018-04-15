@@ -62,6 +62,8 @@ public class Login extends HttpServlet {
 		String password = request.getParameter("pass");
 		String ip = request.getRemoteAddr();
 		String user = request.getHeader("User-Agent");
+		String type = request.getParameter("type");
+		System.out.println(type);
 		request.getSession().setAttribute("logged", login(email, password, ip, user));
 		if(request.getSession().getAttribute("logged")==null)
 			request.setAttribute("message", "Password or Email incorrect");

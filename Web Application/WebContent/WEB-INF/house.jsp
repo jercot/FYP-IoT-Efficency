@@ -6,7 +6,8 @@
 	</c:when>
 </c:choose>
 <div id="graph">
-	<div id="lineChart"></div>
+	<div id="roomChart"></div>
+	<div id="readingChart"></div>
 </div>
 
 <div id="roomList">

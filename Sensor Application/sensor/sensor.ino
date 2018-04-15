@@ -32,8 +32,8 @@ char bucket[21];
 char token[21];
 byte start;
 char siteBucket;
-long timeL;
-long mill = long(MINUTES)*60*1000;
+unsigned long timeL;
+unsigned long mill = long(MINUTES)*60*1000;
 EthernetClient client;
 EthernetServer arduinoServer(32109);
 
@@ -61,9 +61,14 @@ void loop() {
   Ethernet.maintain();
   int loopCount = (MINUTES*60)/READINGS;
   long loopTime = (long)(count+1) * loopCount * 1000;
-  Serial.print(count);
   if(start) {
-    if(count==READINGS||millis()>(timeL+mill)) {
+    if(count==READINGS||(unsigned long)millis()>(timeL+mill)) {
+      Serial.print("Start: ");
+      Serial.print(timeL);
+      Serial.print(" - End: ");
+      Serial.print(millis());
+      Serial.print(" - Next");
+      Serial.print(timeL+mill);
       Serial.println();
       createRequest();
       timeL += mill;
