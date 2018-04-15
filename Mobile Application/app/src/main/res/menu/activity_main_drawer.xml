@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/navDash"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="Dashboard" />
+        <item
+            android:id="@+id/navHouse"
+            android:title="Houses" />
+        <item
+            android:id="@+id/navBuilding"
+            android:title="AddBuilding" />
+        <item
+            android:id="@+id/navSettings"
+            android:title="Settings" />
+        <item
+            android:id="@+id/navLog"
+            android:title="Log Out" />
+    </group>
+
+</menu>

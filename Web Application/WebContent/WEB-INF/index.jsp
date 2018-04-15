@@ -12,6 +12,8 @@
 		<link rel="stylesheet" type="text/css" href="css/layout.css"/>
 	</head>
 	<body>
+		<c:choose>
+		<c:when test="${type != 'mobile'}">
 		<div id="sideBar">
 			<div id="logo">
 				IoT Efficiency
@@ -69,10 +71,16 @@
 				</div>
 			</div>
 		</div>
+		</c:when>
+		</c:choose>
 		<div id="content">
+			<c:choose>
+			<c:when test="${type != 'mobile'}">
 			<div id="title">
 				${fn:escapeXml(logged.title)} - ${fn:escapeXml(subtitle)}
 			</div>
+			</c:when>
+			</c:choose>
 			<div id="main" class="main">
 				<c:choose>
 				<c:when test="${main == 'main'}">

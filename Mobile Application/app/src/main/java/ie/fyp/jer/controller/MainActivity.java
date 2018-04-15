@@ -1,92 +1,124 @@
 package ie.fyp.jer.controller;
 
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.view.View;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
+//import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
+public class MainActivity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener {
 
-public class MainActivity extends AppCompatActivity {
-
-    private ArrayList<String> sensorIps;
+   // private WebView webView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        sensorIps = new ArrayList<>();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        new GetLocalIps().execute();
-    }
 
-    private class GetLocalIps extends AsyncTask<Void, String, Void> {
+        //webView = findViewById(R.id.webView);
+        //webView.setWebViewClient(new WebViewClient());
+        //webView.loadUrl(Temp.url);
 
-        @Override
-        protected Void doInBackground(Void... voids) {
-            try {
-                BufferedReader br = new BufferedReader(new FileReader(new File("/proc/net/arp")));
-                String total = "";
-                String line;
-                while ((line = br.readLine()) != null) {
-                    System.out.println(line);
-                    //if (line.contains(":") && line.contains(".") && !line.contains("00:00:00:00:00:00")) {
-                        String ip[] = line.split(" ");
-                        if(ip[0].charAt(ip[0].length()-1)!='1') {
-                            total += ip[0] + " ";
-                        }
-                    //}
-                }
-                String request[] = {"http://", total, ":32109/settings"};
-                //new SendHttpRequest().execute(request);
-            } catch (IOException e) {
-                e.printStackTrace();
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
             }
-            return null;
+        });
+
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+    }
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
         }
     }
 
-    private class SendHttpRequest extends AsyncTask<String, Void, Void> {
-
-        @Override
-        protected Void doInBackground(String... params) {
-            String urls[] = params[1].split(" ");
-            HttpURLConnection urlConnection = null;
-            for(int i=0;i<urls.length;i++) {
-                String rStr = "";
-                try {
-                    URL url = new URL(params[0] + urls[i] + params[2]);
-                    urlConnection = (HttpURLConnection) url.openConnection();
-                    urlConnection.setConnectTimeout(10000);
-                    InputStream in = new BufferedInputStream(urlConnection.getInputStream());
-                    rStr = readStream(in);
-                } catch (IOException e) {
-                } finally {
-                    if (urlConnection != null)
-                        urlConnection.disconnect();
-                }
-                if(rStr.contains("\"code\":\"1\"")) {
-                    System.out.println("Connected to " + params[0] + urls[i] + params[2]);
-                    sensorIps.add(params[0] + urls[i] + params[2]);
-                }
-            }
-            return null;
-        }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
     }
 
-    private String readStream(InputStream in) throws IOException {
-        BufferedReader r = new BufferedReader(new InputStreamReader(in));
-        String total = "START";
-        String line;
-        while ((line = r.readLine()) != null) {
-            total += line;
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
         }
-        return total;
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+        if (id == R.id.navDash) {
+            setDash();
+        } else if (id == R.id.navBuilding) {
+            setBuilding();
+        } else if (id == R.id.navSettings) {
+            setSettings();
+        } else if (id == R.id.navLog) {
+            setLog();
+        }
+
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+    public void setDash() {
+       // webView.loadUrl("fyp-iot-efficiency.eu-west-1.elasticbeanstalk.com/");
+        setTitle("DASH");
+    }
+
+    public void setBuilding() {
+       // webView.loadUrl("fyp-iot-efficiency.eu-west-1.elasticbeanstalk.com/building");
+        setTitle("BUILDING");
+    }
+
+    public void setSettings() {
+       // webView.loadUrl("fyp-iot-efficiency.eu-west-1.elasticbeanstalk.com/settings");
+        setTitle("SETTINGS");
+    }
+
+    public void setLog() {
+      //  webView.loadUrl("fyp-iot-efficiency.eu-west-1.elasticbeanstalk.com/logout");
+        setTitle("DASH");
     }
 }
