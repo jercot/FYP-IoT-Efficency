@@ -60,6 +60,8 @@ CREATE TABLE FYP.Login
     dateTime bigint NOT NULL,
     location text COLLATE pg_catalog."default",
     osBrowser text COLLATE pg_catalog."default",
+    device text COLLATE pg_catalog."default",
+    cookie text COLLATE pg_catalog."default",
     CONSTRAINT "Login_pkey" PRIMARY KEY (id),
     CONSTRAINT "loginAccountId" FOREIGN KEY (accountId)
         REFERENCES FYP.Account (id) MATCH SIMPLE
