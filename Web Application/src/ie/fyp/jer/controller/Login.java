@@ -114,24 +114,24 @@ public class Login extends HttpServlet {
 		}
 		return log;
 	}
-	
+
 	private void setLogin(Connection con, String ip, String type, int id, String user, HttpServletResponse httpResponse) throws ClientProtocolException, IOException, SQLException {
 		CloseableHttpClient httpclient = HttpClients.createDefault();
 		HttpGet httpGet = new HttpGet("http://ip-api.com/json/" + ip);
 		CloseableHttpResponse response = httpclient.execute(httpGet);
 		String location = "Unknown";
+
+		HttpEntity entity = response.getEntity();
+		String gson = EntityUtils.toString(entity);
+		JsonParser parse = new JsonParser();
+		JsonObject object = parse.parse(gson).getAsJsonObject();
 		try {
-			HttpEntity entity = response.getEntity();
-			String gson = EntityUtils.toString(entity);
-			JsonParser parse = new JsonParser();
-			JsonObject object = parse.parse(gson).getAsJsonObject();
 			location = (object.get("city").getAsString() + " " + object.get("countryCode").getAsString());
-			EntityUtils.consume(entity);
 		} catch (Exception e) {
 			System.out.println("GSON error occured in login controller - IP is likely local.");
-		} finally {
-			response.close();
 		}
+		response.close();
+		EntityUtils.consume(entity);
 		Long expire = System.currentTimeMillis() + ((long)1000 * 60 * 60 * 24 * 30);
 		String device = type;
 		String cookie = LogCookie.generate();
@@ -143,13 +143,13 @@ public class Login extends HttpServlet {
 				httpResponse.addCookie(createCookie("login", cookie, 60*60*24*30));
 		}
 	}
-	
+
 	private Cookie createCookie(String name, String details, int life) {
 		Cookie temp = new Cookie(name, details);
 		temp.setMaxAge(life);
 		return temp;
 	}
-	
+
 	private ArrayList<String> setHouses(Connection con, int id) throws SQLException {
 		ArrayList<String> houses = new ArrayList<>();
 		String sql = "SELECT name FROM FYP.building WHERE accountId = ?";

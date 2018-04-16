@@ -26,11 +26,13 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import eu.bitwalker.useragentutils.UserAgent;
 import ie.fyp.jer.domain.Logged;
+import ie.fyp.jer.domain.MobileResponse;
 import ie.fyp.jer.config.LogCookie;
 import ie.fyp.jer.domain.HouseDash;
 
@@ -72,7 +74,14 @@ public class Main extends HttpServlet {
 			Logged log = LoginCookies(cookie, ip, user, response);
 			if(log!=null) {
 				request.getSession().setAttribute("logged", log);
-				response.sendRedirect("");
+				if(log.getType().equals("mobile")) {
+					int code = request.getSession().getAttribute("logged")!=null ? 1 : 0;
+					MobileResponse mResponse = new MobileResponse(log, code);
+					response.getWriter().write(new Gson().toJson(mResponse));
+				}
+				else {
+					response.sendRedirect("");
+				}
 			}
 			else
 				request.getRequestDispatcher("/WEB-INF/homepage.jsp").forward(request, response); 
@@ -133,8 +142,11 @@ public class Main extends HttpServlet {
 		String gson = EntityUtils.toString(entity);
 		JsonParser parse = new JsonParser();
 		JsonObject object = parse.parse(gson).getAsJsonObject();
-		if(object!=null)
+		try {
 			location = (object.get("city").getAsString() + " " + object.get("countryCode").getAsString());
+		} catch(NullPointerException e) {
+			System.out.println("GSON error occured in login controller - IP is likely local.");
+		}
 		EntityUtils.consume(entity);
 		Long expire = System.currentTimeMillis() + ((long)1000 * 60 * 60 * 24 * 30);
 		String device = type;
