@@ -54,11 +54,11 @@ public class Room extends HttpServlet {
 				e.printStackTrace();
 			}
 			if(request.getParameter("type").equals("add")) {
-				String sql = "INSERT INTO FYP.Room (buildingid, name, floor) " + 
-						"SELECT id, ?, ? " + 
+				String sql = "INSERT INTO FYP.Room (buildingid, name, floor, notification) " + 
+						"SELECT id, ?, ?, ? " + 
 						"FROM FYP.building " + 
 						"WHERE name = ?;";
-				Object val[] = {request.getParameter("rName"), floor, request.getParameter("bName")};
+				Object val[] = {request.getParameter("rName"), floor, 0, request.getParameter("bName")};
 				try (Connection con = dataSource.getConnection();
 						PreparedStatement ptst = prepare(con, sql, val)) {
 					ptst.executeUpdate();

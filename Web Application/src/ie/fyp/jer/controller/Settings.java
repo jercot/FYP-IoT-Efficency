@@ -54,7 +54,7 @@ public class Settings extends HttpServlet {
 			Logged log = (Logged)request.getSession().getAttribute("logged");
 			String type = request.getParameter("type");
 			if(!type.equals("pass")) {
-				log.setTitle(updateAccount(request, log.getId()));
+				log.setEmail(updateAccount(request, log.getId()));
 				request.getSession().setAttribute("logged", log);				
 			}
 			else

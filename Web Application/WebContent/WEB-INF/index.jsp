@@ -13,7 +13,7 @@
 	</head>
 	<body>
 		<c:choose>
-		<c:when test="${type != 'mobile'}">
+		<c:when test="${logged.type != 'mobile'}">
 		<div id="sideBar">
 			<div id="logo">
 				IoT Efficiency
@@ -75,9 +75,9 @@
 		</c:choose>
 		<div id="content">
 			<c:choose>
-			<c:when test="${type != 'mobile'}">
+			<c:when test="${logged.type != 'mobile'}">
 			<div id="title">
-				${fn:escapeXml(logged.title)} - ${fn:escapeXml(subtitle)}
+				${fn:escapeXml(logged.email)} - ${fn:escapeXml(subtitle)}
 			</div>
 			</c:when>
 			</c:choose>

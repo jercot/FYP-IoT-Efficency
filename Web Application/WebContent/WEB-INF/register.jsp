@@ -27,7 +27,6 @@
 				<form action="register" method="POST">
 					<div id="input">
 					    <input type="text" placeholder="First Name" name="fName" required> (required) <br>
-					    <input type="text" placeholder="First Name" name="fName" required><br>
 					    <input type="text" placeholder="Last Name" name="lName" required> (required)<br>
 					    <input type="email" placeholder="Email" name="email" required> (required)<br>
 					    <input type="password" placeholder="Password" name="pass" required> (required)<br>
