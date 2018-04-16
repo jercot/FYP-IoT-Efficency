@@ -7,29 +7,35 @@
         android:checkableBehavior="single">
         <item
             android:id="@+id/nav_oc"
+            android:icon="@drawable/ic_menu_local"
             android:title="Local" />
     </group>
     <group android:id="@+id/group_site"
         android:checkableBehavior="single">
         <item
             android:id="@+id/nav_dash"
-            android:icon="@drawable/ic_menu_camera"
+            android:icon="@drawable/ic_menu_dashboard"
             android:title="Dashboard" />
         <item
             android:id="@+id/nav_house"
-            android:title="Houses" />
+            android:icon="@drawable/ic_menu_house"
+            android:title="Houses">
+        </item>
         <item
             android:id="@+id/nav_building"
+            android:icon="@drawable/ic_menu_add"
             android:title="AddBuilding" />
     </group>
     <group android:id="@+id/group_other"
         android:checkableBehavior="single">
         <item
             android:id="@+id/nav_settings"
+            android:icon="@drawable/ic_menu_manage"
             android:title="Settings" />
         <item
             android:id="@+id/nav_log"
-            android:title="Log Out" />
+            android:title="Log Out"
+            android:icon="@drawable/ic_menu_logout"/>
     </group>
 
 </menu>

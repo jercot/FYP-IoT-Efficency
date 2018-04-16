@@ -77,6 +77,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         // Set up the login form.
@@ -105,6 +106,24 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+
+        checkCookies();
+    }
+
+    @Override
+    public void onStart() {
+        checkCookies();
+        super.onStart();
+    }
+
+    private void checkCookies() {
+        String cookies = android.webkit.CookieManager.getInstance().getCookie(Website.url);
+        if (cookies != null) {
+            String cookie[] = cookies.split(";");
+            for (String c: cookie)
+                if (c.contains("login"))
+                    new UserSessionTask(c).execute();
+        }
     }
 
     private void populateAutoComplete() {
@@ -263,7 +282,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
+    private class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
 
         private final String mEmail;
         private final String mPassword;
@@ -277,33 +296,32 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
-                URL url = new URL(Website.url + "mobileLogin");
-
+                URL url = new URL(Website.url + "login");
                 JSONObject postDataParams = new JSONObject();
                 postDataParams.put("email", mEmail);
                 postDataParams.put("pass", mPassword);
                 postDataParams.put("type", "mobile");
-                response = new Req().send(url, postDataParams);
+                response = new Req().send(url, "POST", postDataParams, "JSESSIONID", Session.generate());
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            if(response!=null)
-                return true;
-            return false;
+            return response != null;
         }
 
         @Override
         protected void onPostExecute(final Boolean success) {
             mAuthTask = null;
-            showProgress(false);
-            if (success&&response.getCode()==1) {
+            if (success && response.getCode() == 1) {
                 Intent i = new Intent(LoginActivity.this, MainActivity.class);
                 Log.v("login", response.getCode() + "");
                 startActivity(i);
-            } else {
+            } else if (success && response.getCode() == 0) {
                 mPasswordView.setError(getString(R.string.error_login));
                 mPasswordView.requestFocus();
+            } else {
+                Log.v("Server", "Server Down");
             }
+            showProgress(false);
         }
 
         @Override
@@ -313,17 +331,53 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
     }
 
-    public class Req {
-        public Response send(URL url, JSONObject postDataParams) throws Exception {
+    private class UserSessionTask extends AsyncTask<Void, Void, Boolean> {
+
+        final private String cookie;
+        private Response response;
+
+        UserSessionTask(String cookie) {
+            this.cookie = cookie;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            try {
+                URL url = new URL(Website.url);
+                JSONObject postDataParams = new JSONObject();
+                String cookieValues[] = cookie.split("=");
+                response = new Req().send(url, "GET", postDataParams, cookieValues[0], cookieValues[1]);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return response != null;
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            mAuthTask = null;
+            if (success && response.getCode() == 1) {
+                Intent i = new Intent(LoginActivity.this, MainActivity.class);
+                Log.v("login", response.getCode() + "");
+                startActivity(i);
+            } else {
+                Log.v("Server", "Server Down");
+            }
+            showProgress(false);
+        }
+    }
+
+    private class Req {
+        public Response send(URL url, String method, JSONObject postDataParams, String name, String value) throws Exception {
             Log.e("params", postDataParams.toString());
 
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setReadTimeout(15000);
             conn.setConnectTimeout(15000);
-            conn.setRequestMethod("POST");
+            conn.setRequestMethod(method);
             conn.setDoInput(true);
             conn.setDoOutput(true);
-            checkCookies(conn);
+            checkCookies(conn, name, value);
             OutputStream os = conn.getOutputStream();
             BufferedWriter writer = new BufferedWriter(
                     new OutputStreamWriter(os, "UTF-8"));
@@ -343,6 +397,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 if ((line = in.readLine()) != null) {
                     parseCookies(conn);
                     in.close();
+                    Log.v("Line", line);
                     return new Gson().fromJson(line, Response.class);
                 }
                 in.close();
@@ -368,15 +423,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             return result.toString();
         }
 
-        private void checkCookies(HttpURLConnection conn) {
+        private void checkCookies(HttpURLConnection conn, String name, String value) {
             CookieManager cookieManager = new CookieManager();
-            cookieManager.getCookieStore().add(null, new HttpCookie("JSESSIONID", Session.generate()));
+            cookieManager.getCookieStore().add(null, new HttpCookie(name, value));
             conn.setRequestProperty("Cookie", TextUtils.join(";", cookieManager.getCookieStore().getCookies()));
         }
 
         private void parseCookies(HttpURLConnection conn) {
-            android.webkit.CookieManager.getInstance().setAcceptCookie(true);
-            CookieManager cookieManager =  new CookieManager();
+            CookieManager cookieManager = new CookieManager();
             cookieManager.getCookieStore().removeAll();
             Map<String, List<String>> headerFields = conn.getHeaderFields();
             List<String> cookiesHeader = headerFields.get("Set-Cookie");

@@ -4,22 +4,22 @@ import java.util.ArrayList;
 
 public class Logged {
     private int id;
-    private String title, token;
+    private String email;
     private ArrayList<String> buildings;
 
     public Logged(String title, int id) {
         super();
-        this.title = title;
+        this.email = title;
         this.id = id;
         buildings = new ArrayList<>();
     }
 
-    public String getTitle() {
-        return title;
+    public String getEmail() {
+        return email;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setEmail(String title) {
+        this.email = title;
     }
 
     public int getId() {
@@ -28,14 +28,6 @@ public class Logged {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
     }
 
     public ArrayList<String> getBuildings() {

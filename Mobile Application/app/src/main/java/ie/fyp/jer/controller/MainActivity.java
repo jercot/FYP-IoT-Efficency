@@ -12,21 +12,36 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.CookieManager;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
+
+import java.util.Stack;
 
 import ie.fyp.jer.config.Website;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private WebView webView;
+    private Stack<String> titles;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        webView = findViewById(R.id.webView);
-        webView.setWebViewClient(new WebViewClient());
+        WebView webView = findViewById(R.id.webView);
+        CookieManager.getInstance().setAcceptThirdPartyCookies(webView, true);
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                return false;
+            }
+            @Override
+            public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+                Toast.makeText(getApplicationContext(), "Oh no! " + description, Toast.LENGTH_SHORT).show();
+            }
+        });
         webView.loadUrl(Website.url);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -49,13 +64,19 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        titles = new Stack<>();
     }
 
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        WebView webView = findViewById(R.id.webView);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
+        } else if(webView.canGoBack()) {
+            setTitle(titles.pop());
+            webView.goBack();
         } else {
             super.onBackPressed();
         }
@@ -98,7 +119,6 @@ public class MainActivity extends AppCompatActivity
             } else if (id == R.id.nav_log) {
                 setLog();
             }
-
             DrawerLayout drawer = findViewById(R.id.drawer_layout);
             drawer.closeDrawer(GravityCompat.START);
             return true;
@@ -107,21 +127,28 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void setDash() {
+        WebView webView = findViewById(R.id.webView);
         webView.loadUrl(Website.url);
-        setTitle("DASH");
+        titles.push("Dashboard");
+        setTitle(titles.peek());
     }
 
     public void setBuilding() {
+        WebView webView = findViewById(R.id.webView);
         webView.loadUrl(Website.url + "/building");
-        setTitle("BUILDING");
+        titles.push("Building");
+        setTitle(titles.peek());
     }
 
     public void setSettings() {
+        WebView webView = findViewById(R.id.webView);
         webView.loadUrl(Website.url + "/settings");
-        setTitle("SETTINGS");
+        titles.push("Settings");
+        setTitle(titles.peek());
     }
 
     public void setLog() {
+        WebView webView = findViewById(R.id.webView);
         webView.loadUrl(Website.url + "/logout");
         finish();
     }
