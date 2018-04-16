@@ -129,18 +129,13 @@ public class Main extends HttpServlet {
 		HttpGet httpGet = new HttpGet("http://ip-api.com/json/" + ip);
 		CloseableHttpResponse response = httpclient.execute(httpGet);
 		String location = "Unknown";
-		try {
-			HttpEntity entity = response.getEntity();
-			String gson = EntityUtils.toString(entity);
-			JsonParser parse = new JsonParser();
-			JsonObject object = parse.parse(gson).getAsJsonObject();
+		HttpEntity entity = response.getEntity();
+		String gson = EntityUtils.toString(entity);
+		JsonParser parse = new JsonParser();
+		JsonObject object = parse.parse(gson).getAsJsonObject();
+		if(object!=null)
 			location = (object.get("city").getAsString() + " " + object.get("countryCode").getAsString());
-			EntityUtils.consume(entity);
-		} catch (Exception e) {
-			System.out.println("GSON error occured in login controller - IP is likely local.");
-		} finally {
-			response.close();
-		}
+		EntityUtils.consume(entity);
 		Long expire = System.currentTimeMillis() + ((long)1000 * 60 * 60 * 24 * 30);
 		String device = type;
 		String cookie = LogCookie.generate();
@@ -278,12 +273,12 @@ public class Main extends HttpServlet {
 	private String getSystem(String details) {
 		return getOS(details) + " - " + getBrowser(details);
 	}
-	
+
 	private String getOS(String details) {
 		UserAgent user = UserAgent.parseUserAgentString(details);
 		return user.getOperatingSystem().getName();
 	}
-	
+
 	private String getBrowser(String details) {
 		UserAgent user = UserAgent.parseUserAgentString(details);
 		return user.getBrowser().getName();
