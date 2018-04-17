@@ -126,8 +126,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 if (c.contains("login")) {
                     showProgress(true);
                     String cook[] = c.split("=");
-                    String params[] = {""};
-                    String values[] = {""};
+                    String params[] = {"startup"};
+                    String values[] = {"mobile"};
                     UserLoginTask sAuthTask = new UserLoginTask(Website.url, "GET", params, values, cook[0], cook[1]);
                     sAuthTask.execute((Void) null);
                 }
@@ -327,7 +327,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             if (success && response.getCode() == 1) {
                 Intent i = new Intent(LoginActivity.this, MainActivity.class);
                 i.putExtra("response", response);
-                Log.v("login", response.getCode() + "");
                 cookieLog = true;
                 startActivity(i);
             } else if (success && response.getCode() == 0) {

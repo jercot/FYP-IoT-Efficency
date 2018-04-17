@@ -2,14 +2,13 @@ package ie.fyp.jer.controller;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -39,15 +38,6 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -71,6 +61,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
         webView.loadUrl(Website.url);
+        webView.getSettings().setJavaScriptEnabled(true);
 
         Bundle data = getIntent().getExtras();
         Logged acc = ((Response) data.getParcelable("response")).getLog();
@@ -88,10 +79,11 @@ public class MainActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else if (webView.canGoBack()) {
-            setTitle(titles.pop());
+            //setTitle(titles.pop());
             webView.goBack();
         } else {
-            super.onBackPressed();
+            moveTaskToBack(true);
+            //super.onBackPressed();
         }
     }
 
@@ -110,7 +102,10 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_refresh) {
+            WebView webView = findViewById(R.id.webView);
+            Log.v("Refresh", webView.getUrl());
+            webView.loadUrl(webView.getUrl());
             return true;
         }
 
@@ -135,28 +130,23 @@ public class MainActivity extends AppCompatActivity
             drawer.closeDrawer(GravityCompat.START);
             return true;
         }
+        item.expandActionView();
         return false;
     }
 
     public void setDash() {
         WebView webView = findViewById(R.id.webView);
         webView.loadUrl(Website.url);
-        titles.push(getTitle().toString());
-        setTitle("Dashboard");
     }
 
     public void setBuilding() {
         WebView webView = findViewById(R.id.webView);
         webView.loadUrl(Website.url + "/building");
-        titles.push(getTitle().toString());
-        setTitle("Building");
     }
 
     public void setSettings() {
         WebView webView = findViewById(R.id.webView);
         webView.loadUrl(Website.url + "/settings");
-        titles.push(getTitle().toString());
-        setTitle("Building");
     }
 
     public void setLog() {

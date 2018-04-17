@@ -9,7 +9,7 @@
         <item
             android:id="@+id/nav_oc"
             android:icon="@drawable/ic_menu_local"
-            android:title="Local" />
+            android:title="@string/nav_local" />
     </group>
     <group
         android:id="@+id/group_site"
@@ -17,15 +17,15 @@
         <item
             android:id="@+id/nav_dash"
             android:icon="@drawable/ic_menu_dashboard"
-            android:title="Dashboard" />
+            android:title="@string/nav_dash" />
         <item
             android:id="@+id/nav_house"
             android:icon="@drawable/ic_menu_house"
-            android:title="Houses"></item>
+            android:title="@string/nav_house" />
         <item
             android:id="@+id/nav_building"
             android:icon="@drawable/ic_menu_add"
-            android:title="AddBuilding" />
+            android:title="@string/nav_build" />
     </group>
     <group
         android:id="@+id/group_other"
@@ -33,11 +33,11 @@
         <item
             android:id="@+id/nav_settings"
             android:icon="@drawable/ic_menu_manage"
-            android:title="Settings" />
+            android:title="@string/nav_settings" />
         <item
             android:id="@+id/nav_log"
             android:icon="@drawable/ic_menu_logout"
-            android:title="Log Out" />
+            android:title="@string/nav_log" />
     </group>
 
 </menu>
