@@ -62,7 +62,7 @@ public class Main extends HttpServlet {
 			Logged log = LoginCookies(cookie, ip, user);
 			if(log!=null) {
 				request.getSession().setAttribute("logged", log);
-				if(log.getType().equals("mobile")) {
+				if(request.getParameter("startup")!=null) {
 					int code = request.getSession().getAttribute("logged")!=null ? 1 : 0;
 					MobileResponse mResponse = new MobileResponse(log, code);
 					response.getWriter().write(new Gson().toJson(mResponse));
