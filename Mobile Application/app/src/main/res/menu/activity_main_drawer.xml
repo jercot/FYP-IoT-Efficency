@@ -3,14 +3,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
-    <group android:id="@+id/group_local"
+    <group
+        android:id="@+id/group_local"
         android:checkableBehavior="single">
         <item
             android:id="@+id/nav_oc"
             android:icon="@drawable/ic_menu_local"
             android:title="Local" />
     </group>
-    <group android:id="@+id/group_site"
+    <group
+        android:id="@+id/group_site"
         android:checkableBehavior="single">
         <item
             android:id="@+id/nav_dash"
@@ -19,14 +21,14 @@
         <item
             android:id="@+id/nav_house"
             android:icon="@drawable/ic_menu_house"
-            android:title="Houses">
-        </item>
+            android:title="Houses"></item>
         <item
             android:id="@+id/nav_building"
             android:icon="@drawable/ic_menu_add"
             android:title="AddBuilding" />
     </group>
-    <group android:id="@+id/group_other"
+    <group
+        android:id="@+id/group_other"
         android:checkableBehavior="single">
         <item
             android:id="@+id/nav_settings"
@@ -34,8 +36,8 @@
             android:title="Settings" />
         <item
             android:id="@+id/nav_log"
-            android:title="Log Out"
-            android:icon="@drawable/ic_menu_logout"/>
+            android:icon="@drawable/ic_menu_logout"
+            android:title="Log Out" />
     </group>
 
 </menu>

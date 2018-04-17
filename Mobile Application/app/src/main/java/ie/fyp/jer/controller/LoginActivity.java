@@ -50,7 +50,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 import ie.fyp.jer.config.Session;
 import ie.fyp.jer.config.Website;
-import ie.fyp.jer.domain.Response;
+import ie.fyp.jer.model.Response;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -74,6 +74,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
+    private boolean cookieLog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,13 +107,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
-
-        checkCookies();
     }
 
     @Override
     public void onStart() {
-        checkCookies();
+        if (!cookieLog)
+            checkCookies();
+        else
+            showProgress(false);
         super.onStart();
     }
 
@@ -120,9 +122,15 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         String cookies = android.webkit.CookieManager.getInstance().getCookie(Website.url);
         if (cookies != null) {
             String cookie[] = cookies.split(";");
-            for (String c: cookie)
-                if (c.contains("login"))
-                    new UserSessionTask(c).execute();
+            for (String c : cookie)
+                if (c.contains("login")) {
+                    showProgress(true);
+                    String cook[] = c.split("=");
+                    String params[] = {""};
+                    String values[] = {""};
+                    UserLoginTask sAuthTask = new UserLoginTask(Website.url, "GET", params, values, cook[0], cook[1]);
+                    sAuthTask.execute((Void) null);
+                }
         }
     }
 
@@ -211,7 +219,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(email, password);
+            String url = Website.url + "/login";
+            String params[] = {"email", "pass", "type"};
+            String values[] = {email, password, "mobile"};
+            mAuthTask = new UserLoginTask(url, "POST", params, values, "JSESSIONID", Session.generate());
             mAuthTask.execute((Void) null);
         }
     }
@@ -284,24 +295,26 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      */
     private class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
 
-        private final String mEmail;
-        private final String mPassword;
+        private final String mUrl, mMethod, mParams[], mValues[], mCookNam, mCookVal;
         private Response response;
 
-        UserLoginTask(String email, String password) {
-            mEmail = email;
-            mPassword = password;
+        UserLoginTask(String url, String method, String params[], String values[], String cookNam, String cookVal) {
+            mUrl = url;
+            mMethod = method;
+            mParams = params;
+            mValues = values;
+            mCookNam = cookNam;
+            mCookVal = cookVal;
         }
 
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
-                URL url = new URL(Website.url + "login");
-                JSONObject postDataParams = new JSONObject();
-                postDataParams.put("email", mEmail);
-                postDataParams.put("pass", mPassword);
-                postDataParams.put("type", "mobile");
-                response = new Req().send(url, "POST", postDataParams, "JSESSIONID", Session.generate());
+                URL url = new URL(mUrl);
+                JSONObject dataParams = new JSONObject();
+                for (int i = 0; i < mParams.length && i < mValues.length; i++)
+                    dataParams.put(mParams[i], mValues[i]);
+                response = new Req().send(url, mMethod, dataParams, mCookNam, mCookVal);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -313,56 +326,23 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             mAuthTask = null;
             if (success && response.getCode() == 1) {
                 Intent i = new Intent(LoginActivity.this, MainActivity.class);
+                i.putExtra("response", response);
                 Log.v("login", response.getCode() + "");
+                cookieLog = true;
                 startActivity(i);
             } else if (success && response.getCode() == 0) {
                 mPasswordView.setError(getString(R.string.error_login));
                 mPasswordView.requestFocus();
+                showProgress(false);
             } else {
                 Log.v("Server", "Server Down");
+                showProgress(false);
             }
-            showProgress(false);
         }
 
         @Override
         protected void onCancelled() {
             mAuthTask = null;
-            showProgress(false);
-        }
-    }
-
-    private class UserSessionTask extends AsyncTask<Void, Void, Boolean> {
-
-        final private String cookie;
-        private Response response;
-
-        UserSessionTask(String cookie) {
-            this.cookie = cookie;
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... voids) {
-            try {
-                URL url = new URL(Website.url);
-                JSONObject postDataParams = new JSONObject();
-                String cookieValues[] = cookie.split("=");
-                response = new Req().send(url, "GET", postDataParams, cookieValues[0], cookieValues[1]);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return response != null;
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            mAuthTask = null;
-            if (success && response.getCode() == 1) {
-                Intent i = new Intent(LoginActivity.this, MainActivity.class);
-                Log.v("login", response.getCode() + "");
-                startActivity(i);
-            } else {
-                Log.v("Server", "Server Down");
-            }
             showProgress(false);
         }
     }

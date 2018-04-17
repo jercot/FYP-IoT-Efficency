@@ -1,6 +1,7 @@
 package ie.fyp.jer.controller;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -16,33 +17,24 @@ import android.webkit.CookieManager;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.Stack;
 
 import ie.fyp.jer.config.Website;
+import ie.fyp.jer.model.Logged;
+import ie.fyp.jer.model.Response;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private Stack<String> titles;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        WebView webView = findViewById(R.id.webView);
-        CookieManager.getInstance().setAcceptThirdPartyCookies(webView, true);
-        webView.setWebViewClient(new WebViewClient() {
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-                return false;
-            }
-            @Override
-            public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-                Toast.makeText(getApplicationContext(), "Oh no! " + description, Toast.LENGTH_SHORT).show();
-            }
-        });
-        webView.loadUrl(Website.url);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -65,6 +57,27 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        WebView webView = findViewById(R.id.webView);
+        CookieManager.getInstance().setAcceptThirdPartyCookies(webView, true);
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                return false;
+            }
+
+            @Override
+            public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+                Toast.makeText(getApplicationContext(), "Oh no! " + description, Toast.LENGTH_SHORT).show();
+            }
+        });
+        webView.loadUrl(Website.url);
+
+        Bundle data = getIntent().getExtras();
+        Logged acc = ((Response) data.getParcelable("response")).getLog();
+        View headerView = navigationView.getHeaderView(0);
+        TextView emailView = headerView.findViewById(R.id.emailView);
+        emailView.setText(acc.getEmail());
+
         titles = new Stack<>();
     }
 
@@ -74,7 +87,7 @@ public class MainActivity extends AppCompatActivity
         WebView webView = findViewById(R.id.webView);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        } else if(webView.canGoBack()) {
+        } else if (webView.canGoBack()) {
             setTitle(titles.pop());
             webView.goBack();
         } else {
@@ -104,12 +117,11 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-        if(id!=R.id.nav_house) {
+        if (id != R.id.nav_house) {
             if (id == R.id.nav_dash) {
                 setDash();
             } else if (id == R.id.nav_building) {
@@ -129,22 +141,22 @@ public class MainActivity extends AppCompatActivity
     public void setDash() {
         WebView webView = findViewById(R.id.webView);
         webView.loadUrl(Website.url);
-        titles.push("Dashboard");
-        setTitle(titles.peek());
+        titles.push(getTitle().toString());
+        setTitle("Dashboard");
     }
 
     public void setBuilding() {
         WebView webView = findViewById(R.id.webView);
         webView.loadUrl(Website.url + "/building");
-        titles.push("Building");
-        setTitle(titles.peek());
+        titles.push(getTitle().toString());
+        setTitle("Building");
     }
 
     public void setSettings() {
         WebView webView = findViewById(R.id.webView);
         webView.loadUrl(Website.url + "/settings");
-        titles.push("Settings");
-        setTitle(titles.peek());
+        titles.push(getTitle().toString());
+        setTitle("Building");
     }
 
     public void setLog() {
