@@ -43,7 +43,7 @@ public class Settings extends HttpServlet {
 			request.getRequestDispatcher("/WEB-INF/index.jsp").forward(request, response);
 		}
 		else
-			response.sendRedirect("");
+			request.getRequestDispatcher("?path=/settings").forward(request, response);
 	}
 
 	/**

@@ -66,7 +66,7 @@ public class House extends HttpServlet {
 			}
 		}
 		else
-			response.sendRedirect("");
+			request.getRequestDispatcher("?path=/house?bName=" + request.getParameter("bName")).forward(request, response);
 	}
 
 	/**

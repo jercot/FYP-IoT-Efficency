@@ -1,24 +1,14 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 270">
 	<a id="hover" href="<c:url value="/" />">
-	<path d="M50,200 a40,40 0,1 1 0,-80 a10,10 0,1 1 50,-50 a60,60 0,1 1 130,40 a10,10 0,1 1 10,90 L50,200" fill="black" stroke="white" stroke-width="5px"/>
-	<path d="M95,120 M90,125 145,80 200,125 M195,120 195,200 95,200 95, 120" stroke="white" stroke-width="3px" fill="white"/>
-	<text x="5" y="250" font-weight="bold" font-size="42px" fill="white">IoT Efficiency</text>
-	<svg x="110" y="20" width="30" viewbox="0 0 200 300">
-		<path d="M60,210 60,270 a10,1 0 0,0 80,0 L140,210" stroke="black" fill="grey" stroke-width="6px"/>
-		<path d="M140,220 60,230 M140,240 60,250 M140,260 60,270" stroke="black" fill="grey" stroke-width="3px"/>
-		<path d="M20,140 a90,90 0 1,1 160,0 L140,210 a8,1 0 1,1 -80,0 L20,140" stroke="black" stroke-width="6px" fill="yellow"/>
-	</svg>
-		<svg x="150" y="10" width="25" viewbox="0 0 100 300">
-		<circle cx="50" cy="245" r="33" stroke="none" fill="blue" />
-		<rect x="30" y="190" width="40px" height="30px" fill="blue"/>
-		<path d="M34,40 34,223 a31,31 0 1,0 32,0 L66,40 a1,1 0 0,0 -32,0" 
-			fill="none" stroke="white" stroke-width="3px"/>
-			<path d="M30,40 30,220 a35,35 0 1,0 40,0 L70,40 a1,1 0 0,0 -40,0" 
-			fill="none" stroke="black" stroke-width="6px"/>
-		<path d="M70,200 55,200 M70,180 55,180 M70,160 55,160 
-			M70,140 55,140 M70,120 55,120 M70,100 55,100 
-			M70,80 55,80 M70,60 55,60" stroke="black" stroke-width="2px"/>
-	</svg>
+		<path d="M50,200 a40,40 0,1 1 0,-80 a10,10 0,1 1 50,-50 a60,60 0,1 1 130,40 a10,10 0,1 1 10,90 L50,200" fill="black" stroke="white" stroke-width="5px"/>
+		<path d="M95,120 M90,125 145,80 200,125 M195,120 195,200 95,200 95, 120" stroke="white" stroke-width="3px" fill="white"/>
+		<text x="5" y="250" font-weight="bold" font-size="42px" fill="white">IoT Efficiency</text>
+	    <path d="M119.3,164 119.5,173 a6,1 0 0,0 11.5,0 L130.7,164" stroke="black" fill="grey"/>
+	    <path d="M112.5,152 a13.3,13.3 0 1,1 25,0 L131,164 a5,1 0 1,1 -12,0 L112.5,152" stroke="black" fill="yellow"/>
+	    <path d="M130.7,165 119.3,167 M130.7,168 119.3,170 M130.7,171 119.3,173" stroke="black" fill="none" />
+	    <path d="M158,163 a8.5,8.5 0,1 0 9,0 L167,117 a1,1 0,0 0 -9,0 L158,163" stroke="black" fill="none" />
+	    <path d="M160,165 a5.5,5.5 0,1 0 5,0 L165,155 160,155" fill="#00FF65" />
+	    <path d="M167,123 164,123 M167,128 164,128 M167,133 164,133 M167,138 164,138 M167,143 164,143 M167,148 164,148 M167,153 164,153 M167,158 164,158 M167,163 164,163" stroke="black" stroke-width="0.5" />
 	</a>
-</svg>      
+</svg> 
