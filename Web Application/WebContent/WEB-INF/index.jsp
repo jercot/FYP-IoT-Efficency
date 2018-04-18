@@ -12,6 +12,7 @@
 		<link rel="stylesheet" type="text/css" href="css/layout.css"/>
 	</head>
 	<body>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 		<c:choose>
 		<c:when test="${logged.type != 'mobile'}">
 		<div id="sideBar">
@@ -109,5 +110,11 @@
 				</c:choose>
 			</div>
 		</div>
+		<script src="javascript/mobile-js.js"></script>
+		<c:choose>
+		<c:when test="${logged.type == 'mobile'}">
+			<script src="javascript/mobile-js.js"></script>
+		</c:when>
+		</c:choose>
 	</body>
 </html>

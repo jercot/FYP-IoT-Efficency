@@ -7,7 +7,7 @@
         android:id="@+id/group_local"
         android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_oc"
+            android:id="@+id/nav_local"
             android:icon="@drawable/ic_menu_local"
             android:title="@string/nav_local" />
     </group>
@@ -21,7 +21,10 @@
         <item
             android:id="@+id/nav_house"
             android:icon="@drawable/ic_menu_house"
-            android:title="@string/nav_house" />
+            android:title="@string/nav_house" >
+            <menu>
+            </menu>
+        </item>
         <item
             android:id="@+id/nav_building"
             android:icon="@drawable/ic_menu_add"
@@ -32,7 +35,7 @@
         android:checkableBehavior="single">
         <item
             android:id="@+id/nav_settings"
-            android:icon="@drawable/ic_menu_manage"
+            android:icon="@drawable/ic_menu_settings"
             android:title="@string/nav_settings" />
         <item
             android:id="@+id/nav_log"

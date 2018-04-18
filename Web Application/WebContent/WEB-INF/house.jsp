@@ -113,7 +113,6 @@
 	</form>
 </div>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="javascript/d3.js"></script>
 <script src="javascript/crossfilter.js"></script>
 <script src="javascript/dc.js"></script>

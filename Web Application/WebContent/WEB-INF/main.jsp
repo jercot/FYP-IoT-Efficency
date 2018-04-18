@@ -86,7 +86,7 @@
 		<div class="dashTitle">House: ${house.name}</div>
 		<div class="dashLoc">
 			Location: ${house.location}
-			<a href="house?bName=${house.name}">
+			<a class="dashHou" href="house?bName=${house.name}">
 				Go to:
 			</a>
 		</div>

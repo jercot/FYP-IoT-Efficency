@@ -81,7 +81,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        // Set up the login form.
         mEmailView = findViewById(R.id.email);
         populateAutoComplete();
 
@@ -347,8 +346,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     private class Req {
-        public Response send(URL url, String method, JSONObject postDataParams, String name, String value) throws Exception {
-            Log.e("params", postDataParams.toString());
+        public Response send(URL url, String method, JSONObject dataParams, String name, String value) throws Exception {
+            Log.e("params", dataParams.toString());
 
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setReadTimeout(15000);
@@ -360,7 +359,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             OutputStream os = conn.getOutputStream();
             BufferedWriter writer = new BufferedWriter(
                     new OutputStreamWriter(os, "UTF-8"));
-            writer.write(getPostDataString(postDataParams));
+            writer.write(getDataString(dataParams));
 
             writer.flush();
             writer.close();
@@ -384,7 +383,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             return null;
         }
 
-        private String getPostDataString(JSONObject params) throws Exception {
+        private String getDataString(JSONObject params) throws Exception {
             StringBuilder result = new StringBuilder();
             boolean first = true;
             Iterator<String> itr = params.keys();
