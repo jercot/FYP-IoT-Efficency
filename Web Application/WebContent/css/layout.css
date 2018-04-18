@@ -211,13 +211,38 @@ div.clear {
 }
 
 
-div#graph {
-	width: 100%;
-	display: table;
-	margin-top: 30px;
+div#graph{
+	margin: 20px 0 30px 20px;
 }
 
-div#roomList {	
+div#topCharts {
+	float: left;
+	display: table;
+}
+
+div#chartSwitch {
+	width: 90%;
+	float: left;
+}
+
+svg#switchThermo:hover, svg#switchBulb:hover {
+	cursor: pointer;
+}
+
+svg#switchThermo {
+	float: left;
+	width: 60px;
+	margin: 0 0 0 30px;
+}
+
+svg#switchBulb {
+	float: right;
+	margin: 30px 0px 0 0;
+	width: 80px;
+}
+
+div#roomList {
+	clear:left;
 	margin: 0 40px;
 }
 
@@ -448,9 +473,23 @@ button:hover {
 	}
 }
 
-@media screen and (max-width: 980px) {
-	div#graph {
-		display: none;
+@media screen and (max-width: 910px) {
+	div#chartSwitch {
+		width: 90%;
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	div#topCharts {
+		
+	}
+}
+
+@media screen and (max-width: 700px) {
+	div#topCharts {
+		display: table;
+		float: none;
+		margin: 0 auto;
 	}
 }
 
@@ -490,5 +529,26 @@ button:hover {
     	height: 3px;
     	background-color: #000000;
     	margin: 3px 0;
+	}
+}
+
+@media screen and (max-width: 560px) {
+	div#chartSwitch {
+		width: 90%;
+	}
+	div#topCharts {
+		float: left;
+		margin-top: -90px;
+		margin-left: 35px;
+	}
+	
+	svg#switchThermo {
+		position: relative;
+		z-index: 10000;
+	}
+
+	svg#switchBulb {
+		position: relative;
+		z-index: 10000;
 	}
 }
