@@ -22,8 +22,8 @@
 					<form action="login" method="POST">
 						<h3>Sign In</h3><br>
 						To existing account
-					    <input type="email" placeholder="Enter Email" name="email" required><br>
-					    <input type="password" placeholder="Enter Password" name="pass" required><br>
+					    <input class="required" type="email" placeholder="Enter Email" name="email" required><br>
+					    <input class="required" type="password" placeholder="Enter Password" name="pass" required><br>
 						<a href="">Forgot Password?</a>
 						<p id="message">${message}</p>
 					    <button type="submit">Login</button>

@@ -339,14 +339,18 @@ div#settings h1 {
 	text-align
 }
 
-input[type=text], input[type=number], input[type=email], input[type=password] {
-    width: calc(100% - 68px);
+input {
+    width: calc(100%);
     min-width: 150px;
     padding: 2px 0px 2px 20px;
     margin: 2px 0px 2px ;
     display: inline-block;
     border: 1px solid #cccccc;
     box-sizing: border-box;
+}
+
+input.required {
+	width: calc(100% - 68px);
 }
 
 button {

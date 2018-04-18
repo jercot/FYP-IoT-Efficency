@@ -110,7 +110,6 @@
 				</c:choose>
 			</div>
 		</div>
-		<script src="javascript/mobile-js.js"></script>
 		<c:choose>
 		<c:when test="${logged.type == 'mobile'}">
 			<script src="javascript/mobile-js.js"></script>

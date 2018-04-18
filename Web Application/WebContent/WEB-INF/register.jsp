@@ -26,13 +26,13 @@
 			<div id="register">
 				<form action="register" method="POST">
 					<div id="input">
-					    <input type="text" placeholder="First Name" name="fName" required> (required) <br>
-					    <input type="text" placeholder="Last Name" name="lName" required> (required)<br>
-					    <input type="email" placeholder="Email" name="email" required> (required)<br>
-					    <input type="password" placeholder="Password" name="pass" required> (required)<br>
+					    <input class="required" type="text" placeholder="First Name" name="fName" required> (required) <br>
+					    <input class="required" type="text" placeholder="Last Name" name="lName" required> (required)<br>
+					    <input class="required" type="email" placeholder="Email" name="email" required> (required)<br>
+					    <input class="required" type="password" placeholder="Password" name="pass" required> (required)<br>
 					    <input type="text" placeholder="Street" name="street"><br>
-					    <input type="text" placeholder="Town" name="town" required> (required)<br>
-					    <input type="text" placeholder="County" name="county" required> (required)<br>
+					    <input class="required" type="text" placeholder="Town" name="town" required> (required)<br>
+					    <input class="required" type="text" placeholder="County" name="county" required> (required)<br>
 					    <input type="text" placeholder="Phone Number" name="phone"><br><br>
 				    </div>
 				    <div id="terms">

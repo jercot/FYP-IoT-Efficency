@@ -22,9 +22,9 @@
 	<h1>Password:</h1>
 	<form action="Settings" method="POST">
 	    <input type="hidden" name="type" value="pass">
-	    <input type="password" placeholder="Previous Password" name="pPass" required> (required)<br>
-	    <input type="password" placeholder="New Password" name="nPass1" required> (required)<br>
-	    <input type="password" placeholder="New Password" name="nPass2" required> (required)<br>
+	    <input class="required" type="password" placeholder="Previous Password" name="pPass" required> (required)<br>
+	    <input class="required" type="password" placeholder="New Password" name="nPass1" required> (required)<br>
+	    <input class="required" type="password" placeholder="New Password" name="nPass2" required> (required)<br>
 	    <button type="submit">Register</button>
 	</form>
 	
