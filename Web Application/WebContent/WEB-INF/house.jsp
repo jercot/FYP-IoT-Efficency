@@ -29,6 +29,7 @@
 	</div>
 	<div id="readingChart"></div>
 	<div id="dragChart"></div>
+	<div class="clear"></div>
 </div>
 
 <div id="roomList">
@@ -141,6 +142,5 @@
 <script>
 	$(document).ready(function() {
 		startVisual("${bName}");
-		console.log("starting JS");
 	});
 </script>

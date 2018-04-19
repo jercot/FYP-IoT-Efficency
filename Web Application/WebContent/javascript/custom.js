@@ -11,6 +11,7 @@ var filter;
 
 function startVisual(house) {
 	$.post("data", {bName: house},function(data) {
+		$("#graph").css({display: "block"});
 		console.log("Post Request Success");
 		switchStatement(data);
 	},"json")
@@ -86,7 +87,7 @@ function createGraph() {
 	.height(200)
 	.transitionDuration(1000)
 	.rangeChart(dragChart)
-	.margins({top: 0, right: 50, bottom: 25, left: 40})
+	.margins({top: 0, right: 30, bottom: 25, left: 30})
 	.dimension(readingDimension)
 	.x(d3.time.scale().domain(graphScale))
 	.round(d3.time.month.round)
@@ -124,6 +125,7 @@ function createGraph() {
 	.elasticX(true)
 	.controlsUseVisibility(true)
 	.margins({top: 0, right: 5, bottom: -1, left: 0})
+	.colors(d3.scale.category10())
 	.valueAccessor(function(p) {
 		return 1;
 	})
@@ -143,7 +145,7 @@ function createGraph() {
 	dragChart
 	.height(60)
     .width($("#graph").width())
-    .margins({top: 0, right: 50, bottom: 20, left: 50})
+    .margins({top: 0, right: 30, bottom: 20, left: 30})
     .dimension(readingDimension)
     .group(dragGroup)
     .valueAccessor(function(p) {
