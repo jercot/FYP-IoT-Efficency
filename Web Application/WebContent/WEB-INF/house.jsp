@@ -9,6 +9,7 @@
 	<div id="chartSwitch">
 		<svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 100 300" id="switchThermo">
 			<circle cx="50" cy="245" r="33" stroke="none" />
+			<rect x="30" y="130" width="40px" height="90px" />
 			<path d="M34,40 34,223 a31,31 0 1,0 32,0 L66,40 a1,1 0 0,0 -32,0" 
 			 fill="none" stroke="white" stroke-width="3px"/>
 			<path d="M30,40 30,220 a35,35 0 1,0 40,0 L70,40 a1,1 0 0,0 -40,0" 

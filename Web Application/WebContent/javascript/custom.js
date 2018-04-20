@@ -5,9 +5,10 @@ var dragChart = dc.barChart("#dragChart");
 var switchThermo = $("#switchThermo");
 var switchBulb = $("#switchBulb");
 var sensor = 0;
-var saveData = null;
 var color = ["#8abee2", "#3cbe98", "#f99e18", "#fe2918", "#fcd812", "#c7d892"];
 var filter;
+var max = 0, min = 9223372036854775807;
+var resizeId;
 
 function startVisual(house) {
 	$.post("data", {bName: house},function(data) {
@@ -23,7 +24,6 @@ function startVisual(house) {
 function switchStatement(data) {
 	switch(data.code) {
 	case 1:
-		saveData = data.records;
 		setStats(data.records);
 		break;
 	}
@@ -34,12 +34,9 @@ function setStats(data) {
 		var date = new Date(+d.ti);
 		var formatTime = d3.time.format("%A");
 		d.day = formatTime(date);
-		d.month = d3.time.month(date);
-		d.hour = d3.time.hour(date);
-		d.min = d3.time.minute.range(d.hour, date, 15);
-		d.min = d.min[d.min.length-1]
+		d.min = d3.time.minute(date);
 	});
-	graphScale = [new Date(+data[0].ti-9000000), new Date(+data[data.length-1].ti+9000000)];
+	graphScale = [new Date(+data[0].ti), new Date(+data[data.length-1].ti)];
 	filter = crossfilter(data),
 	roomDimension = filter.dimension(function (d) {
 		return d.na;
@@ -48,7 +45,7 @@ function setStats(data) {
 		return 1;
 	}),
 	readingDimension = filter.dimension(function (d) {
-		return d.min;
+		return new Date(+d.ti);
 	}),
 	readingGroup = readingDimension.group().reduce(reduceAdd, reduceRemove, reduceInitial),
 	dayDimension = filter.dimension(function(d) {
@@ -57,9 +54,14 @@ function setStats(data) {
 	dayGroup = dayDimension.group().reduceSum(function(d) {
 		return 1;
 	}),
+	dragDimension = filter.dimension(function(d) {
+		return d.ti;
+	}),
 	dragGroup = readingDimension.group().reduceSum(function(d) {
 		return 1;
 	});
+	readingGroup = removeEmptyReadingBins(readingGroup);
+	dragGroup = removeEmptyDragBins(dragGroup);
 	function reduceAdd(p, v) {
 		++p.count;
 		p.temp += v.te;
@@ -86,16 +88,17 @@ function createGraph() {
 	.width($("#graph").width())
 	.height(200)
 	.transitionDuration(1000)
-	.rangeChart(dragChart)
-	.margins({top: 0, right: 30, bottom: 25, left: 30})
+	.margins({top: 0, right: 30, bottom: 55, left: 30})
 	.dimension(readingDimension)
-	.x(d3.time.scale().domain(graphScale))
+	.group(readingGroup)
+	//.rangeChart(dragChart)
+	.x(d3.scale.linear())
+	.elasticX(true)
 	.round(d3.time.month.round)
 	.xUnits(d3.time.months)
 	.elasticY(true)
 	.brushOn(false)
 	.renderHorizontalGridLines(true)
-	.group(readingGroup)
 	.valueAccessor(function(p) {
 		if(sensor===0)
 			return p.value.count > 0 ? p.value.temp / p.value.count : 0; 
@@ -104,8 +107,17 @@ function createGraph() {
 	.title(function(p) {
 		var formatTime = d3.time.format("%a %d %b - %H:%M");
 		if(sensor===0)
-			return "Temp level: " + numberFormat(p.value.count > 0 ? p.value.temp / p.value.count : 0) + " \u00B0C\nDate: " + formatTime(p.key);
-		return "Light level: " + (p.value.count > 0 ? p.value.light / p.value.count : 0) + " lux\nDate: " + formatTime(p.key);
+			return (p.value.count > 0 ? "Temp level: " + numberFormat(p.value.temp / p.value.count) + "\u00B0C" : "No Reading")
+			 + "\nDate: " + formatTime(new Date(+p.key));
+		return (p.value.count > 0 ? "Light level: " + p.value.light / p.value.count +" lux": "No Reading")
+		 + "\nDate: " + formatTime(new Date(+p.key));
+	});
+	readingChart
+	.xAxis()
+	.orient("bottom").ticks(10)
+	.tickFormat(function(d,v,p,a,c){
+		var formatTime = d3.time.format("%b %d - %H:%M");
+		return formatTime(new Date(+d));
 	});
 
 	roomChart
@@ -117,12 +129,14 @@ function createGraph() {
 	})
 	.valueAccessor(function(p) {
 		return 1;
+	})
+	.on("filtered", function() {
+		dc.redrawAll();
 	});
 
 	dayChart
 	.dimension(dayDimension)
 	.group(dayGroup)
-	.elasticX(true)
 	.controlsUseVisibility(true)
 	.margins({top: 0, right: 5, bottom: -1, left: 0})
 	.colors(d3.scale.category10())
@@ -141,25 +155,26 @@ function createGraph() {
 		else if(d.key === "Saturday") return 5;
 		else if(d.key === "Sunday") return 6;
 	});
-	
+
 	dragChart
 	.height(60)
-    .width($("#graph").width())
-    .margins({top: 0, right: 30, bottom: 20, left: 30})
-    .dimension(readingDimension)
-    .group(dragGroup)
-    .valueAccessor(function(p) {
-		return 1;
+	.width($("#graph").width())
+	.dimension(dragDimension)
+	.group(dragGroup)
+	.margins({top: 0, right: 30, bottom: 20, left: 30})
+	.valueAccessor(function(p) {
+		if(p.value>0)
+			return 1;
+		return 0;
 	})
-    .centerBar(true)
-    .gap(7)
-    .x(d3.time.scale().domain(graphScale))
-    .round(d3.time.minute.round)
-    .alwaysUseRounding(true)
-    .xUnits(d3.time.hours)
-    .xAxisLabel("Drag for Timeline")
-    .yAxis().ticks(0);
-    dragChart.xAxis().tickValues([]);
+	.gap(7)
+	.x(d3.scale.linear().domain(graphScale))
+	.round(d3.time.minute.round)
+	.alwaysUseRounding(true)
+	.xUnits(d3.time.hours)
+	.xAxisLabel("Drag for Timeline")
+	.yAxis().ticks(0);
+	dragChart.xAxis().tickValues([]);
 
 	switchThermo.css({fill: "orange"});
 	switchBulb.css({fill: "none"});
@@ -167,28 +182,30 @@ function createGraph() {
 	dc.renderAll();
 }
 
-function save_first_order() {
-	var original_value = {}; // 1
-	return function(chart) {
-		chart.group().all().forEach(function(kv) { // 2
-			original_value[kv.key] = kv.value;
-		});
-		chart.ordering(function(kv) { // 3
-			return -original_value[kv.key];
-		});
-	};
+function removeEmptyDragBins(source) {
+    return {
+        all: function () {
+            return source.all().filter(function (d) {
+                return d.value>0;
+            });
+        }
+    };
+}
+
+function removeEmptyReadingBins(source) {
+    return {
+        all: function () {
+            return source.all().filter(function (d) {
+                return d.value.count>0;
+            });
+        }
+    };
 }
 
 $(document).ready(function() {
-	$(window).on("resize", function() {
-		readingChart
-		.width($("#graph").width())
-		.rescale();
-		dragChart
-		.width($("#graph").width())
-		.rescale();
-
-		dc.redrawAll();
+	$(window).resize(function() {
+	    clearTimeout(resizeId);
+	    resizeId = setTimeout(doneResizing, 500);
 	});
 
 	switchThermo.on("click", function() {
@@ -209,3 +226,14 @@ $(document).ready(function() {
 		}
 	});
 });
+
+function doneResizing(){
+	readingChart
+	.width($("#graph").width())
+	.rescale();
+	dragChart
+	.width($("#graph").width())
+	.rescale();
+
+	dc.redrawAll();
+}
