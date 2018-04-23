@@ -60,8 +60,6 @@ function setStats(data) {
 	dragGroup = readingDimension.group().reduceSum(function(d) {
 		return 1;
 	});
-	readingGroup = removeEmptyReadingBins(readingGroup);
-	dragGroup = removeEmptyDragBins(dragGroup);
 	function reduceAdd(p, v) {
 		++p.count;
 		p.temp += v.te;
@@ -91,9 +89,8 @@ function createGraph() {
 	.margins({top: 0, right: 30, bottom: 55, left: 30})
 	.dimension(readingDimension)
 	.group(readingGroup)
-	//.rangeChart(dragChart)
-	.x(d3.scale.linear())
-	.elasticX(true)
+	.rangeChart(dragChart)
+	.x(d3.time.scale().domain(graphScale))
 	.round(d3.time.month.round)
 	.xUnits(d3.time.months)
 	.elasticY(true)
@@ -108,16 +105,9 @@ function createGraph() {
 		var formatTime = d3.time.format("%a %d %b - %H:%M");
 		if(sensor===0)
 			return (p.value.count > 0 ? "Temp level: " + numberFormat(p.value.temp / p.value.count) + "\u00B0C" : "No Reading")
-			 + "\nDate: " + formatTime(new Date(+p.key));
+			+ "\nDate: " + formatTime(new Date(+p.key));
 		return (p.value.count > 0 ? "Light level: " + p.value.light / p.value.count +" lux": "No Reading")
-		 + "\nDate: " + formatTime(new Date(+p.key));
-	});
-	readingChart
-	.xAxis()
-	.orient("bottom").ticks(10)
-	.tickFormat(function(d,v,p,a,c){
-		var formatTime = d3.time.format("%b %d - %H:%M");
-		return formatTime(new Date(+d));
+		+ "\nDate: " + formatTime(new Date(+p.key));
 	});
 
 	roomChart
@@ -129,9 +119,6 @@ function createGraph() {
 	})
 	.valueAccessor(function(p) {
 		return 1;
-	})
-	.on("filtered", function() {
-		dc.redrawAll();
 	});
 
 	dayChart
@@ -182,30 +169,10 @@ function createGraph() {
 	dc.renderAll();
 }
 
-function removeEmptyDragBins(source) {
-    return {
-        all: function () {
-            return source.all().filter(function (d) {
-                return d.value>0;
-            });
-        }
-    };
-}
-
-function removeEmptyReadingBins(source) {
-    return {
-        all: function () {
-            return source.all().filter(function (d) {
-                return d.value.count>0;
-            });
-        }
-    };
-}
-
 $(document).ready(function() {
 	$(window).resize(function() {
-	    clearTimeout(resizeId);
-	    resizeId = setTimeout(doneResizing, 500);
+		clearTimeout(resizeId);
+		resizeId = setTimeout(doneResizing, 500);
 	});
 
 	switchThermo.on("click", function() {
