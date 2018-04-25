@@ -68,24 +68,24 @@ public class Login extends HttpServlet {
 		String ip = request.getRemoteAddr();
 		String user = request.getHeader("User-Agent");
 		String type = request.getParameter("type");
-		if(type==null)
+		if(type==null||type.equals(""))
 			type = "browser";
-		request.getSession().setAttribute("logged", login(email, password, ip, user, type, response));
+		request.getSession().setAttribute("logged", login(email, password, ip, user, type, request, response));
 		if(type.equals("mobile")) {
 			int code = request.getSession().getAttribute("logged")!=null ? 1 : 0;
 			MobileResponse mResponse = new MobileResponse((Logged)request.getSession().getAttribute("logged"), code);
 			response.getWriter().write(new Gson().toJson(mResponse));
 		}
 		else {
-			if(request.getSession().getAttribute("logged")==null)
-				request.setAttribute("message", "Password or Email incorrect");
 			doGet(request, response);
 		}
 	}
 
-	private Logged login(String email, String password, String ip, String user, String type, HttpServletResponse response) {
+	private Logged login(String email, String password, String ip, String user, String type, HttpServletRequest request, HttpServletResponse response) {
 		Logged log = null;
-		if(email!=null&&password!=null) {
+		if(!checkAttempts(email))
+			request.setAttribute("message", "Too many attempts, Please try again later.");
+		else if(email!=null&&password!=null) {
 			String sql = "SELECT a.email, a.id, p.password, p.date " + 
 					"FROM FYP.Account a " + 
 					"LEFT JOIN FYP.Password p ON a.id = p.accountId " + 
@@ -101,7 +101,11 @@ public class Login extends HttpServlet {
 						log = new Logged(rs.getString(1), rs.getInt(2));
 						log.setType(type);
 						log.setBuildings(setHouses(con, log.getId()));
-						setLogin(con, ip, type, log.getId(), user, response);
+						setLogin(con, ip, type, log.getId(), user, "Login", response);
+					}
+					else {
+						request.setAttribute("message", "Password or Email incorrect");
+						setLogin(con, ip, type, rs.getInt(2), user, "Login Attempt", response);
 					}
 				}
 			} catch (SQLException e) {
@@ -115,7 +119,28 @@ public class Login extends HttpServlet {
 		return log;
 	}
 
-	private void setLogin(Connection con, String ip, String type, int id, String user, HttpServletResponse httpResponse) throws ClientProtocolException, IOException, SQLException {
+	private boolean checkAttempts(String email) {
+		String sql = "SELECT COUNT(*) " + 
+				"FROM FYP.Login " + 
+				"WHERE accountid IN(SELECT id " + 
+				"				FROM FYP.Account " + 
+				"				WHERE UPPER(email) = UPPER(?)) " + 
+				"				AND type = ? " + 
+				"				AND datetime > ?;";
+		Object val[] = {email, "Login Attempt", System.currentTimeMillis()-300000};
+		try(Connection con = dataSource.getConnection();
+				PreparedStatement ptst = prepare(con, sql, val);
+				ResultSet rs = ptst.executeQuery()) {
+			if(rs.next())
+				if(rs.getInt(1)<5)
+					return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	private void setLogin(Connection con, String ip, String type, int id, String user, String login, HttpServletResponse httpResponse) throws ClientProtocolException, IOException, SQLException {
 		CloseableHttpClient httpclient = HttpClients.createDefault();
 		HttpGet httpGet = new HttpGet("http://ip-api.com/json/" + ip);
 		CloseableHttpResponse response = httpclient.execute(httpGet);
@@ -134,12 +159,14 @@ public class Login extends HttpServlet {
 		EntityUtils.consume(entity);
 		Long expire = System.currentTimeMillis() + ((long)1000 * 60 * 60 * 24 * 30);
 		String device = type;
-		String cookie = LogCookie.generate();
-		Object val3[] = {id, System.currentTimeMillis(), location, user, device, cookie, expire};
+		String cookie = "None";
+		if(login.equals("Login"))
+			cookie = LogCookie.generate();
+		Object val3[] = {id, System.currentTimeMillis(), location, user, device, cookie, expire, login};
 		String sql = "INSERT INTO FYP.Login(accountid, datetime, location, osbrowser, device,"
-				+ "cookie, expire)VALUES (?, ?, ?, ?, ?, ?, ?);";
+				+ "cookie, expire, type)VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
 		try (PreparedStatement ptst = prepare(con, sql, val3)) {
-			if(ptst.executeUpdate()==1)
+			if(ptst.executeUpdate()==1&&login.equals("Login"))
 				httpResponse.addCookie(createCookie("login", cookie, 60*60*24*30));
 		}
 	}

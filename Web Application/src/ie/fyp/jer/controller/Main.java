@@ -171,15 +171,13 @@ public class Main extends HttpServlet {
 	}
 
 	private void setLastLog(int log, HttpServletRequest request) {
-		String sql = "SELECT MAX(dateTime), location, osBrowser, device " + 
+		String sql = "SELECT dateTime, location, osBrowser, device " + 
 				"FROM FYP.Login " + 
-				"WHERE dateTime < (SELECT MAX(dateTime) " + 
-				"					FROM FYP.Login) " + 
-				"AND accountId = ? " + 
-				"GROUP BY location, osBrowser, device " +
-				"ORDER BY max DESC " +
-				"LIMIT 1;";
-		Object val[] = {log};
+				"WHERE dateTime IN(SELECT MAX(dateTime) " + 
+				"				FROM FYP.Login " + 
+				"				WHERE accountId = ? " + 
+				"				AND type != ?);";
+		Object val[] = {log, "Login Attempt"};
 		try (Connection con = dataSource.getConnection();
 				PreparedStatement ptst = prepare(con, sql, val);
 				ResultSet rs = ptst.executeQuery()) {
