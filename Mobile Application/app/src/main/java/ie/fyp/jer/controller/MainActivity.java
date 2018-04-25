@@ -130,7 +130,8 @@ public class MainActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else if (webView.canGoBack()) {
-            //setTitle(titles.pop());
+            titles.pop();
+            setTitle(titles.peek());
             webView.goBack();
         } else {
             moveTaskToBack(true);
@@ -166,7 +167,7 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-        if (id == R.id.nav_local) {
+        if (id == R.id.nav_security) {
             setWeb("/getCode?twoStep=" + device, "Local Devices");
             //new ScanIpTask().execute((Void) null);
         } else if (id == R.id.nav_dash) {

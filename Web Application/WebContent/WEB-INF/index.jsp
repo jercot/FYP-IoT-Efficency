@@ -99,11 +99,6 @@
 				</c:when>
 				</c:choose>
 				<c:choose>
-				<c:when test="${main == 'compare'}">
-				<%@ include file="compare.jsp" %>
-				</c:when>
-				</c:choose>
-				<c:choose>
 				<c:when test="${main == 'house'}">
 				<%@ include file="house.jsp" %>
 				</c:when>

@@ -1,1 +1,0 @@
-compare building 1 with ${hello}

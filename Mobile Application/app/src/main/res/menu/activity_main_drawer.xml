@@ -7,9 +7,9 @@
         android:id="@+id/group_local"
         android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_local"
-            android:icon="@drawable/ic_menu_local"
-            android:title="@string/nav_local" />
+            android:id="@+id/nav_security"
+            android:icon="@drawable/ic_menu_two"
+            android:title="@string/nav_security" />
     </group>
     <group
         android:id="@+id/group_site"

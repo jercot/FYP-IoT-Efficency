@@ -17,13 +17,13 @@
 			</div>
 		</div> 
 		<div id="content">
-			<div id="account">
-				<div id="login">
+			<div id="outterAuth">
+				<div id="auth">
 					<form action="authenticate" method="POST">
 						<h3>Enter Code</h3><br>
-						Code has been sent to mobile
+						Code available on mobile application:<br>
 					    <input class="required" type="number" min="100000" max="999999" 
-					    placeholder="Enter Code" name="code" required><br>
+					    placeholder="Enter Code" name="code" autocomplete="off" required><br>
 						<p id="message">${message}</p>
 					    <button type="submit">Submit</button>
 					</form>

@@ -39,7 +39,7 @@ div#login {
 	float: left;
 }
 
-input[type=email], input[type=password] {
+input {
     width: 90%;
     padding: 12px 10px;
     margin: 8px 0;
@@ -136,6 +136,17 @@ img#google {
 img#apple {
 	width: 100px;
 	float: right;
+}
+
+div#outterAuth {
+	width: 60%;
+	background-color: #dadada;
+	margin: 0 auto;
+}
+
+div#auth {
+	width: 90%;
+	margin: 0 auto;
 }
 
 @media screen and (max-width: 700px) {

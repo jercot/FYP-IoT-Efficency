@@ -31,7 +31,6 @@ public class GetCode extends HttpServlet {
 	public GetCode() {
 		super();
 	}
-
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -44,10 +43,17 @@ public class GetCode extends HttpServlet {
 					"WHERE accountId IN(SELECT id " + 
 					"				FROM FYP.Account " + 
 					"				WHERE twoStep = ?) " + 
-					"AND expire > ?" +
-					"ORDER BY id DESC " +
-					"LIMIT 1;";
-			Object val[] = {twoStep, time};
+					"AND expire > ? " + 
+					"AND expire-300000 > (SELECT dateTime " + 
+					"					FROM FYP.Login " + 
+					"					WHERE accountId IN(SELECT id " + 
+					"									FROM FYP.Account " + 
+					"									WHERE twoStep = ?) " + 
+					"					AND type='Session' " + 
+					"					ORDER BY dateTime DESC " + 
+					"					LIMIT 1) " + 
+					"ORDER BY id DESC;";
+			Object val[] = {twoStep, time, twoStep};
 			try(Connection con = dataSource.getConnection();
 					PreparedStatement ptst = prepare(con, sql, val);
 					ResultSet rs = ptst.executeQuery()) {
