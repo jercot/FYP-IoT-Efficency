@@ -149,7 +149,7 @@ public class Main extends HttpServlet {
 			location = (object.get("city").getAsString() + " " + object.get("countryCode").getAsString());
 			EntityUtils.consume(entity);
 		} catch (Exception e) {
-			System.out.println("GSON error occured in login controller - IP is likely local.");
+			System.out.println("GSON error occured in session controller - IP is likely local.");
 		} finally {
 			response.close();
 		}

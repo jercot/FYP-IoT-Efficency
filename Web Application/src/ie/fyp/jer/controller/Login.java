@@ -5,7 +5,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletException;
@@ -25,13 +24,11 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.mindrot.jbcrypt.BCrypt;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import ie.fyp.jer.config.LogCookie;
-import ie.fyp.jer.domain.Logged;
-import ie.fyp.jer.domain.MobileResponse;
+import ie.fyp.jer.config.SecondFactor;
 
 /**
  * Servlet implementation class Login
@@ -53,7 +50,16 @@ public class Login extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		if(request.getSession().getAttribute("logged")!=null)
+		if(request.getSession().getAttribute("cookieS")!=null&&request.getAttribute("safety")!=null) {
+			request.getSession().setAttribute("code", SecondFactor.generate());
+			request.getSession().setAttribute("attempt", 0);
+			response.sendRedirect("authenticate");
+		}
+		else if (request.getSession().getAttribute("cookieS")!=null) {
+			response.addCookie(createCookie("login", (String)request.getSession().getAttribute("cookieS"), 60*60*24*30));
+			response.sendRedirect("");
+		}
+		else if(request.getSession().getAttribute("logged")!=null)
 			response.sendRedirect("");
 		else
 			request.getRequestDispatcher("/WEB-INF/homepage.jsp").forward(request, response);
@@ -70,23 +76,15 @@ public class Login extends HttpServlet {
 		String type = request.getParameter("type");
 		if(type==null||type.equals(""))
 			type = "browser";
-		request.getSession().setAttribute("logged", login(email, password, ip, user, type, request, response));
-		if(type.equals("mobile")) {
-			int code = request.getSession().getAttribute("logged")!=null ? 1 : 0;
-			MobileResponse mResponse = new MobileResponse((Logged)request.getSession().getAttribute("logged"), code);
-			response.getWriter().write(new Gson().toJson(mResponse));
-		}
-		else {
-			doGet(request, response);
-		}
+		request.getSession().setAttribute("cookieS", login(email, password, ip, user, type, request, response));
+		doGet(request, response);
 	}
 
-	private Logged login(String email, String password, String ip, String user, String type, HttpServletRequest request, HttpServletResponse response) {
-		Logged log = null;
+	private String login(String email, String password, String ip, String user, String type, HttpServletRequest request, HttpServletResponse response) {
 		if(!checkAttempts(email))
 			request.setAttribute("message", "Too many attempts, Please try again later.");
 		else if(email!=null&&password!=null) {
-			String sql = "SELECT a.email, a.id, p.password, p.date " + 
+			String sql = "SELECT a.email, a.id, a.twoStep, p.password, p.date " + 
 					"FROM FYP.Account a " + 
 					"LEFT JOIN FYP.Password p ON a.id = p.accountId " + 
 					"WHERE UPPER(a.email) = UPPER(?) " + 
@@ -97,15 +95,14 @@ public class Login extends HttpServlet {
 					PreparedStatement ptst = prepare(con, sql, val);
 					ResultSet rs = ptst.executeQuery()) {
 				if(rs.next()) {
-					if(BCrypt.checkpw(password, rs.getString(3))) {
-						log = new Logged(rs.getString(1), rs.getInt(2));
-						log.setType(type);
-						log.setBuildings(setHouses(con, log.getId()));
-						setLogin(con, ip, type, log.getId(), user, "Login", response);
+					if(BCrypt.checkpw(password, rs.getString(4))) {
+						if(rs.getString(3)!=null)
+							request.setAttribute("safety", "on");
+						return setLogin(con, ip, type, rs.getInt(2), user, "Login", response);
 					}
 					else {
 						request.setAttribute("message", "Password or Email incorrect");
-						setLogin(con, ip, type, rs.getInt(2), user, "Login Attempt", response);
+						return setLogin(con, ip, type, rs.getInt(2), user, "Login Attempt", response);
 					}
 				}
 			} catch (SQLException e) {
@@ -116,7 +113,7 @@ public class Login extends HttpServlet {
 				e.printStackTrace();
 			}
 		}
-		return log;
+		return null;
 	}
 
 	private boolean checkAttempts(String email) {
@@ -140,7 +137,7 @@ public class Login extends HttpServlet {
 		return false;
 	}
 
-	private void setLogin(Connection con, String ip, String type, int id, String user, String login, HttpServletResponse httpResponse) throws ClientProtocolException, IOException, SQLException {
+	private String setLogin(Connection con, String ip, String type, int id, String user, String login, HttpServletResponse httpResponse) throws ClientProtocolException, IOException, SQLException {
 		CloseableHttpClient httpclient = HttpClients.createDefault();
 		HttpGet httpGet = new HttpGet("http://ip-api.com/json/" + ip);
 		CloseableHttpResponse response = httpclient.execute(httpGet);
@@ -167,26 +164,15 @@ public class Login extends HttpServlet {
 				+ "cookie, expire, type)VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
 		try (PreparedStatement ptst = prepare(con, sql, val3)) {
 			if(ptst.executeUpdate()==1&&login.equals("Login"))
-				httpResponse.addCookie(createCookie("login", cookie, 60*60*24*30));
+				return cookie;
 		}
+		return null;
 	}
-
+	
 	private Cookie createCookie(String name, String details, int life) {
 		Cookie temp = new Cookie(name, details);
 		temp.setMaxAge(life);
 		return temp;
-	}
-
-	private ArrayList<String> setHouses(Connection con, int id) throws SQLException {
-		ArrayList<String> houses = new ArrayList<>();
-		String sql = "SELECT name FROM FYP.building WHERE accountId = ?";
-		Object val2[] = {id};
-		try (PreparedStatement ptst1 = prepare(con, sql, val2);
-				ResultSet rs1 = ptst1.executeQuery()) {
-			while(rs1.next())
-				houses.add(rs1.getString(1));
-		}
-		return houses;	
 	}
 
 	private PreparedStatement prepare(Connection con, String sql, Object values[]) throws SQLException {

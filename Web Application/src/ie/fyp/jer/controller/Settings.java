@@ -101,6 +101,10 @@ public class Settings extends HttpServlet {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	private void setAuth(HttpServletRequest request, int log) {
+		//UPDATE FYP.Account SET twoStep = 10 WHERE id = 1;
+	}
 
 	private PreparedStatement prepare(Connection con, String sql, Object... values) throws SQLException {
 		final PreparedStatement ptst = con.prepareStatement(sql);
