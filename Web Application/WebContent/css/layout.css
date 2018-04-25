@@ -378,7 +378,7 @@ input {
 }
 
 input.required {
-	width: calc(100% - 68px);
+	width: calc(100% - 80px);
 }
 
 button {
