@@ -1,3 +1,5 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <div id="settings">
 	${settings}
 	<h1>Profile:</h1>
@@ -20,14 +22,17 @@
 	</form>
 	
 	<h1>Password:</h1>
-	<form action="Settings" method="POST">
+	<form action="settings" method="POST">
 	    <input type="hidden" name="type" value="pass">
-	    <input class="required" type="password" placeholder="Previous Password" name="pPass" required> (required)<br>
+	    <input class="required" type="password" placeholder="Current Password" name="cPass" required> (required)<br>
 	    <input class="required" type="password" placeholder="New Password" name="nPass1" required> (required)<br>
 	    <input class="required" type="password" placeholder="New Password" name="nPass2" required> (required)<br>
 	    <button type="submit">Register</button>
 	</form>
-	
+	<c:choose>
+		<c:when test="${logged.type == 'mobile'}">
 	<h1>Security</h1>
 	-Add 2FA
+		</c:when>
+	</c:choose>
 </div>

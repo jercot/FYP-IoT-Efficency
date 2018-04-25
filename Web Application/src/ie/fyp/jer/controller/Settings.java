@@ -3,6 +3,7 @@ package ie.fyp.jer.controller;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import javax.annotation.Resource;
@@ -57,7 +58,7 @@ public class Settings extends HttpServlet {
 				log.setEmail(updateAccount(request, log.getId()));
 				request.getSession().setAttribute("logged", log);				
 			}
-			else
+			else if(type.equals("pass"))
 				updatePassword(request, log.getId());
 		}
 		doGet(request, response);
@@ -90,7 +91,7 @@ public class Settings extends HttpServlet {
 			request.setAttribute("settings", "Settings updated!");
 			if(values[0]!=null)
 				return values[0].toString();
-				
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -98,10 +99,38 @@ public class Settings extends HttpServlet {
 	}
 
 	private void updatePassword(HttpServletRequest request, int log) {
-		// TODO Auto-generated method stub
-		
+		String cPass = request.getParameter("cPass");
+		String nPass1 = request.getParameter("nPass1");
+		String nPass2 = request.getParameter("nPass2");
+		if(nPass1.equals(nPass2)) {
+			String sql = "SELECT password FROM FYP.Password " + 
+					"WHERE accountId IN (SELECT id " + 
+					"					FROM FYP.Account " + 
+					"					WHERE id = ?) " + 
+					"ORDER BY date DESC;";
+			Object val[] = {log};
+			try(Connection con = dataSource.getConnection();
+					PreparedStatement ptst = prepare(con, sql, val);
+					ResultSet rs = ptst.executeQuery()) {
+				if(rs.next())
+					if(BCrypt.checkpw(cPass, rs.getString(1))) {
+						sql = "INSERT INTO FYP.Password (accountid, password, date) VALUES (?, ?, ?);";
+						Object val2[] = {log, BCrypt.hashpw(nPass1, BCrypt.gensalt()), System.currentTimeMillis()};
+						try (PreparedStatement ptst2 = prepare(con, sql, val2)) {
+							ptst2.executeUpdate();
+							request.setAttribute("settings", "Password Updated!");
+						}
+					}
+					else
+						request.setAttribute("settings", "Current password incorrect!");
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		else
+			request.setAttribute("settings", "New passwords did not match!");
 	}
-	
+
 	private void setAuth(HttpServletRequest request, int log) {
 		//UPDATE FYP.Account SET twoStep = 10 WHERE id = 1;
 	}
