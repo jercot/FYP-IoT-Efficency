@@ -63,6 +63,7 @@ CREATE TABLE FYP.Login
     device text COLLATE pg_catalog."default" NOT NULL,
     cookie text COLLATE pg_catalog."default" NOT NULL,
     expire bigint NOT NULL,
+    type text COLLATE pg_catalog."default" NOT NULL,
     CONSTRAINT "Login_pkey" PRIMARY KEY (id),
     CONSTRAINT "loginAccountId" FOREIGN KEY (accountId)
         REFERENCES FYP.Account (id) MATCH SIMPLE
