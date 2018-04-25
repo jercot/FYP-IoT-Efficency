@@ -1,9 +1,6 @@
 package ie.fyp.jer.controller;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -31,7 +28,6 @@ public class Authentication extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		if(request.getSession().getAttribute("cookieS")!=null) {
-			System.out.println(request.getSession().getAttribute("code"));
 			request.getRequestDispatcher("/WEB-INF/auth.jsp").forward(request, response);
 		}
 		else if(request.getSession().getAttribute("checked")!=null)
@@ -50,7 +46,6 @@ public class Authentication extends HttpServlet {
 			if(att<5) {
 				request.getSession().setAttribute("attempt", att+1);
 				int code = Integer.parseInt(request.getParameter("code"));
-				System.out.println(request.getSession().getAttribute("code") + " - " + code);
 				check = code==(Integer)request.getSession().getAttribute("code");
 				if(check)		
 					response.addCookie(createCookie("login", (String)request.getSession().getAttribute("cookieS"), 60*60*24*30));
@@ -77,13 +72,5 @@ public class Authentication extends HttpServlet {
 		Cookie temp = new Cookie(name, details);
 		temp.setMaxAge(life);
 		return temp;
-	}
-	
-	private PreparedStatement prepare(Connection con, String sql, Object values[]) throws SQLException {
-		final PreparedStatement ptst = con.prepareStatement(sql);
-		for (int i = 0; i < values.length; i++) {
-			ptst.setObject(i+1, values[i]);
-		}
-		return ptst;
 	}
 }
