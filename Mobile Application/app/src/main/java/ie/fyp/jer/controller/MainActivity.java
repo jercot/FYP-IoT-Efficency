@@ -30,6 +30,11 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -37,6 +42,7 @@ import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.Buffer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Stack;
@@ -53,9 +59,11 @@ public class MainActivity extends AppCompatActivity
     private Stack<String> titles;
     private Logged acc;
     private WebView webView;
+    private String fileName = "device", device = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        titles = new Stack<>();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -84,6 +92,8 @@ public class MainActivity extends AppCompatActivity
                 Toast.makeText(getApplicationContext(), "Oh no! " + description, Toast.LENGTH_SHORT).show();
             }
         });
+        titles.add("Dashboard");
+        setTitle("Dashboard");
         webView.loadUrl(Website.url);
         webView.getSettings().setJavaScriptEnabled(true);
         webView.setWebContentsDebuggingEnabled(true);
@@ -96,8 +106,22 @@ public class MainActivity extends AppCompatActivity
         TextView emailView = headerView.findViewById(R.id.emailView);
         emailView.setText(acc.getEmail());
 
-        titles = new Stack<>();
         setHouses();
+        readFile();
+    }
+
+    public void readFile() {
+        File f = new File(getApplicationContext().getFilesDir(), fileName);
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(f));
+            String line;
+            if((line = br.readLine())!=null)
+                device = line;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -143,8 +167,8 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
         if (id == R.id.nav_local) {
-            setWeb("/local", "Local Devices");
-            new ScanIpTask().execute((Void) null);
+            setWeb("/getCode?twoStep=" + device, "Local Devices");
+            //new ScanIpTask().execute((Void) null);
         } else if (id == R.id.nav_dash) {
             setWeb("", "Dashboard");
         } else if (id == R.id.nav_building) {
@@ -161,6 +185,20 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         item.expandActionView();
         return true;
+    }
+
+    @JavascriptInterface
+    public void setDevice(final String device) {
+        this.device = device;
+        try {
+            FileOutputStream fOS = openFileOutput(fileName, getApplicationContext().MODE_PRIVATE);
+            fOS.write(device.getBytes());
+            fOS.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @JavascriptInterface

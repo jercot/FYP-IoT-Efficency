@@ -1,15 +1,23 @@
+
+
 $(document).ready(function(){
 
 	$("a#dashSet").click(function(e){
 		e.preventDefault();
-		Android.setWeb("/settings", "Settings")
+		Android.setWeb("/settings", "Settings");
 	});
 	
 	$("a.dashHou").click(function(e){
 		var href = $(this).attr('href').split('=');
 		e.preventDefault();
-		Android.setWeb("/" + href[0] + "=" + href[1] , href[1])
+		Android.setWeb("/" + href[0] + "=" + href[1] , href[1]);
 	});
+	
+	if(t!=null) {
+		Android.setDevice(t);
+	}
+	
+	
 
 });
 

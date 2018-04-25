@@ -51,13 +51,12 @@ public class Login extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		if(request.getSession().getAttribute("cookieS")!=null&&request.getAttribute("safety")!=null) {
-			request.getSession().setAttribute("code", SecondFactor.generate());
 			request.getSession().setAttribute("attempt", 0);
 			response.sendRedirect("authenticate");
 		}
 		else if (request.getSession().getAttribute("cookieS")!=null) {
-			response.addCookie(createCookie("login", (String)request.getSession().getAttribute("cookieS"), 60*60*24*30));
-			response.sendRedirect("");
+			request.setAttribute("cookie", createCookie("login", (String)request.getSession().getAttribute("cookieS"), 60*60*24*30));
+			request.getRequestDispatcher("/index.jsp").forward(request, response);
 		}
 		else if(request.getSession().getAttribute("logged")!=null)
 			response.sendRedirect("");
@@ -96,8 +95,10 @@ public class Login extends HttpServlet {
 					ResultSet rs = ptst.executeQuery()) {
 				if(rs.next()) {
 					if(BCrypt.checkpw(password, rs.getString(4))) {
-						if(rs.getString(3)!=null)
+						if(rs.getString(3)!=null&&!type.equals("mobile")) {
 							request.setAttribute("safety", "on");
+							request.getSession().setAttribute("code", setCode(rs.getInt(2)));
+						}
 						return setLogin(con, ip, type, rs.getInt(2), user, "Login", response);
 					}
 					else {
@@ -114,6 +115,19 @@ public class Login extends HttpServlet {
 			}
 		}
 		return null;
+	}
+
+	private int setCode(int log) {
+		int code = SecondFactor.generate();
+		String sql = "INSERT INTO FYP.Token(accountId, expire, code) VALUES (?, ?, ?)";
+		Object val[] = {log, System.currentTimeMillis()+300000, code};
+		try(Connection con = dataSource.getConnection();
+				PreparedStatement ptst = prepare(con, sql, val)) {
+			ptst.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return code;
 	}
 
 	private boolean checkAttempts(String email) {
@@ -168,7 +182,7 @@ public class Login extends HttpServlet {
 		}
 		return null;
 	}
-	
+
 	private Cookie createCookie(String name, String details, int life) {
 		Cookie temp = new Cookie(name, details);
 		temp.setMaxAge(life);

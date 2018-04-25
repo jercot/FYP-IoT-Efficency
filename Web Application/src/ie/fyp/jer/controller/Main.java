@@ -57,6 +57,8 @@ public class Main extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		Cookie cookie = checkCookie(request.getCookies());
+		if(cookie==null)
+			cookie = (Cookie) request.getAttribute("cookie");
 		if(request.getSession().getAttribute("logged")!=null) {
 			request.setAttribute("website", "IoT Efficiency");
 			request.setAttribute("main", "main");
@@ -71,9 +73,10 @@ public class Main extends HttpServlet {
 			String ip = request.getRemoteAddr();
 			String user = request.getHeader("User-Agent");
 			Logged log = LoginCookies(cookie, ip, user, response);
+			String type = request.getParameter("type");
 			if(log!=null) {
 				request.getSession().setAttribute("logged", log);
-				if(request.getParameter("startup")!=null) {
+				if(type!=null&&type.equals("mobile")) {
 					int code = request.getSession().getAttribute("logged")!=null ? 1 : 0;
 					MobileResponse mResponse = new MobileResponse(log, code);
 					response.getWriter().write(new Gson().toJson(mResponse));

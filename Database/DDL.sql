@@ -2,6 +2,7 @@ DROP TABLE IF EXISTS FYP.Recording;
 DROP TABLE IF EXISTS FYP.Room;
 DROP TABLE IF EXISTS FYP.Building;
 DROP TABLE IF EXISTS FYP.Login;
+DROP TABLE IF EXISTS FYP.Token;
 DROP TABLE IF EXISTS FYP.Password;
 DROP TABLE IF EXISTS FYP.Account;
 DROP SCHEMA IF EXISTS FYP;
@@ -77,6 +78,27 @@ WITH (
 TABLESPACE pg_default;
 
 ALTER TABLE FYP.Login
+    OWNER to "Jer";
+	
+	-- Table: FYP.Login
+CREATE TABLE FYP.Token
+(
+    id serial NOT NULL,
+    accountId integer NOT NULL,
+    expire bigint NOT NULL,
+    code int NOT NULL,
+    CONSTRAINT "Token_pkey" PRIMARY KEY (id),
+    CONSTRAINT "tokenAccountId" FOREIGN KEY (accountId)
+        REFERENCES FYP.Account (id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE FYP.Token
     OWNER to "Jer";
 	
 -- Table: FYP.Building

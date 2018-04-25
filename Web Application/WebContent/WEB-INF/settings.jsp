@@ -27,12 +27,17 @@
 	    <input class="required" type="password" placeholder="Current Password" name="cPass" required> (required)<br>
 	    <input class="required" type="password" placeholder="New Password" name="nPass1" required> (required)<br>
 	    <input class="required" type="password" placeholder="New Password" name="nPass2" required> (required)<br>
-	    <button type="submit">Register</button>
+	    <button type="submit">Update Password</button>
 	</form>
 	<c:choose>
 		<c:when test="${logged.type == 'mobile'}">
 	<h1>Security</h1>
-	-Add 2FA
-		</c:when>
+	<form id="secSet" action="settings" method="POST">
+	    <input type="hidden" name="type" value="2fa">
+	    Enable 2 factor authentication: <input class="2fa" type="checkbox" placeholder="Current Password" name="2fa"><br>
+	    <button type="submit">Update Security</button>
+	</form>
+	<script>var t = "${device!=null? device : 'null'}"</script>
+	</c:when>
 	</c:choose>
 </div>

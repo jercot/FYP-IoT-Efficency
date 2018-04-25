@@ -4,10 +4,6 @@
 	<h1>Account Details</h1>
 	<table class="dashTable">
 		<tr>
-			<th>Field:</th>
-			<th>Value:</th>
-		</tr>
-		<tr>
 			<td>First Name:</td>
 			<td>${firstName}</td>
 		</tr>

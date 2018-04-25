@@ -16,6 +16,7 @@ import javax.sql.DataSource;
 
 import org.mindrot.jbcrypt.BCrypt;
 
+import ie.fyp.jer.config.Device;
 import ie.fyp.jer.domain.Logged;
 
 /**
@@ -54,12 +55,14 @@ public class Settings extends HttpServlet {
 		if(request.getSession().getAttribute("logged")!=null) {
 			Logged log = (Logged)request.getSession().getAttribute("logged");
 			String type = request.getParameter("type");
-			if(!type.equals("pass")) {
+			if(!type.equals("pass")&&!type.equals("2fa")) {
 				log.setEmail(updateAccount(request, log.getId()));
 				request.getSession().setAttribute("logged", log);				
 			}
 			else if(type.equals("pass"))
 				updatePassword(request, log.getId());
+			else if(type.equals("2fa"))
+				updateSecurity(request, log.getId());
 		}
 		doGet(request, response);
 	}
@@ -131,8 +134,20 @@ public class Settings extends HttpServlet {
 			request.setAttribute("settings", "New passwords did not match!");
 	}
 
-	private void setAuth(HttpServletRequest request, int log) {
+	private void updateSecurity(HttpServletRequest request, int log) {
 		//UPDATE FYP.Account SET twoStep = 10 WHERE id = 1;
+		String device = Device.generate();
+		if(request.getParameter("2fa")==null)
+			device = null;
+		String sql = "UPDATE FYP.Account SET twoStep = ? WHERE id = ?;";
+		Object val[] = {device, log};
+		try (Connection con = dataSource.getConnection();
+				PreparedStatement ptst = prepare(con,sql, val)) {
+			ptst.executeUpdate();
+			request.setAttribute("device", device);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private PreparedStatement prepare(Connection con, String sql, Object... values) throws SQLException {
