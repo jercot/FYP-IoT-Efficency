@@ -18,11 +18,22 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
+
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import eu.bitwalker.useragentutils.UserAgent;
 import ie.fyp.jer.domain.Logged;
 import ie.fyp.jer.domain.MobileResponse;
+import ie.fyp.jer.config.LogCookie;
 import ie.fyp.jer.domain.HouseDash;
 
 /**
@@ -59,7 +70,7 @@ public class Main extends HttpServlet {
 		else if(cookie!=null) {
 			String ip = request.getRemoteAddr();
 			String user = request.getHeader("User-Agent");
-			Logged log = LoginCookies(cookie, ip, user);
+			Logged log = LoginCookies(cookie, ip, user, response);
 			if(log!=null) {
 				request.getSession().setAttribute("logged", log);
 				if(request.getParameter("startup")!=null) {
@@ -96,15 +107,16 @@ public class Main extends HttpServlet {
 		return null;
 	}
 
-	private Logged LoginCookies(Cookie cookie, String ip, String user) {
+	private Logged LoginCookies(Cookie cookie, String ip, String user, HttpServletResponse response) {
 		Logged log = null;
 		String sql = "SELECT a.email, a.id, l.device " + 
 				"FROM FYP.Account a " + 
 				"JOIN FYP.Login l " + 
 				"ON l.accountId = a.id " + 
 				"WHERE l.cookie = ? " + 
-				"AND l.expire > ?;";
-		Object val[] = {cookie.getValue(), System.currentTimeMillis()};
+				"AND l.expire > ?" +
+				"AND l.type != ?;";
+		Object val[] = {cookie.getValue(), System.currentTimeMillis(), "Login Attempt"};
 		try (Connection con = dataSource.getConnection();
 				PreparedStatement ptst = prepare(con, sql, val);
 				ResultSet rs = ptst.executeQuery()) {
@@ -112,11 +124,51 @@ public class Main extends HttpServlet {
 				log = new Logged(rs.getString(1), rs.getInt(2));
 				log.setBuildings(setHouses(con, log.getId()));
 				log.setType(rs.getString(3));
+				setLogin(con, ip, rs.getString(3), log.getId(), user, response);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} catch (ClientProtocolException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 		return log;
+	}
+	
+	private void setLogin(Connection con, String ip, String type, int id, String user, HttpServletResponse httpResponse) throws ClientProtocolException, IOException, SQLException {
+		CloseableHttpClient httpclient = HttpClients.createDefault();
+		HttpGet httpGet = new HttpGet("http://ip-api.com/json/" + ip);
+		CloseableHttpResponse response = httpclient.execute(httpGet);
+		String location = "Unknown";
+		try {
+			HttpEntity entity = response.getEntity();
+			String gson = EntityUtils.toString(entity);
+			JsonParser parse = new JsonParser();
+			JsonObject object = parse.parse(gson).getAsJsonObject();
+			location = (object.get("city").getAsString() + " " + object.get("countryCode").getAsString());
+			EntityUtils.consume(entity);
+		} catch (Exception e) {
+			System.out.println("GSON error occured in login controller - IP is likely local.");
+		} finally {
+			response.close();
+		}
+		Long expire = System.currentTimeMillis() + ((long)1000 * 60 * 60 * 24 * 30);
+		String device = type;
+		String cookie = LogCookie.generate();
+		Object val3[] = {id, System.currentTimeMillis(), location, user, device, cookie, expire, "Session"};
+		String sql = "INSERT INTO FYP.Login(accountid, datetime, location, osbrowser, device,"
+				+ "cookie, expire, type)VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
+		try (PreparedStatement ptst = prepare(con, sql, val3)) {
+			if(ptst.executeUpdate()==1)
+				httpResponse.addCookie(createCookie("login", cookie, 60*60*24*30));
+		}
+	}
+	
+	private Cookie createCookie(String name, String details, int life) {
+		Cookie temp = new Cookie(name, details);
+		temp.setMaxAge(life);
+		return temp;
 	}
 
 	private ArrayList<String> setHouses(Connection con, int id) throws SQLException {
@@ -159,11 +211,11 @@ public class Main extends HttpServlet {
 				request.setAttribute("town", rs.getString(7));
 				request.setAttribute("county", rs.getString(8));
 				request.setAttribute("regDate", getDate("dd-MMM-yyyy hh:mm:ss", rs.getLong(9)));
-				if(rs.getLong(9)==rs.getLong(10))
-					request.setAttribute("lastPas", "Password Never Changed");
+				if(rs.getLong(9)==rs.getLong(11))
+					request.setAttribute("lastPas", "Never Changed");
 				else
-					request.setAttribute("lastPas", getDate("dd-MMM-yyyy hh:mm:ss", rs.getLong(10)));
-				request.setAttribute("houses", rs.getInt(11));
+					request.setAttribute("lastPas", getDate("dd-MMM-yyyy hh:mm:ss", rs.getLong(11)));
+				request.setAttribute("houses", rs.getInt(12));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -176,8 +228,8 @@ public class Main extends HttpServlet {
 				"WHERE dateTime IN(SELECT MAX(dateTime) " + 
 				"				FROM FYP.Login " + 
 				"				WHERE accountId = ? " + 
-				"				AND type != ?);";
-		Object val[] = {log, "Login Attempt"};
+				"				AND type = ?);";
+		Object val[] = {log, "Login"};
 		try (Connection con = dataSource.getConnection();
 				PreparedStatement ptst = prepare(con, sql, val);
 				ResultSet rs = ptst.executeQuery()) {
