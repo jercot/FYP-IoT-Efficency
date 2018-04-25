@@ -219,8 +219,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // perform the user login attempt.
             showProgress(true);
             String url = Website.url + "/login";
-            String params[] = {"email", "pass", "type", "twoStep"};
-            String values[] = {email, password, "mobile", "10"};
+            String params[] = {"email", "pass", "type"};
+            String values[] = {email, password, "mobile"};
             mAuthTask = new UserLoginTask(url, "POST", params, values, "JSESSIONID", Session.generate());
             mAuthTask.execute((Void) null);
         }
