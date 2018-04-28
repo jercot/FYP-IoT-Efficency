@@ -3,7 +3,6 @@
 #include <Ethernet.h>
 #include <EEPROM.h>
 #include <SPI.h>
-#include <EEPROM.h>
 
 #define DHT11_PIN 7
 #define TRIG_PIN 6
