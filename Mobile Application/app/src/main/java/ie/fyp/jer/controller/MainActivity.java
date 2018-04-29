@@ -115,7 +115,8 @@ public class MainActivity extends AppCompatActivity
         try {
             BufferedReader br = new BufferedReader(new FileReader(f));
             String line;
-            if((line = br.readLine())!=null)
+            while((line = br.readLine())!=null)
+                Log.v("File line", line);
                 device = line;
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -168,7 +169,7 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
         if (id == R.id.nav_security) {
-            setWeb("/getCode?twoStep=" + device, "Local Devices");
+            setWeb("/getCode?twoStep=" + device, "Authentication");
             //new ScanIpTask().execute((Void) null);
         } else if (id == R.id.nav_dash) {
             setWeb("", "Dashboard");
