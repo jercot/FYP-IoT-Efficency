@@ -1,12 +1,13 @@
 package ie.fyp.jer.model;
 
 public class HouseData {
-	String name;
+	String name, token;
 	int floor, hum, light, heat, lum;
 	float temp;
 	
-	public HouseData(String name, int floor, int hum, int light, float temp) {
+	public HouseData(String name, String token, int floor, int hum, int light, float temp) {
 		super();
+		this.token = token;
 		this.name = name;
 		this.floor = floor;
 		this.hum = hum;
@@ -92,5 +93,13 @@ public class HouseData {
 
 	public void setTemp(float temp) {
 		this.temp = temp;
+	}
+	
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
 	}
 }

@@ -49,6 +49,7 @@ import javax.net.ssl.HttpsURLConnection;
 import ie.fyp.jer.config.Website;
 import ie.fyp.jer.model.Logged;
 import ie.fyp.jer.model.Response;
+import ie.fyp.jer.model.Sensor;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -226,6 +227,11 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
+    @JavascriptInterface
+    public void scanLocal(String tokens) {
+        new ScanIpTask(tokens).execute((Void) null);
+    }
+
     private void setHouses() {
         NavigationView navigationView = findViewById(R.id.nav_view);
         MenuItem house = navigationView.getMenu().findItem(R.id.nav_house);
@@ -236,8 +242,10 @@ public class MainActivity extends AppCompatActivity
     private class ScanIpTask extends AsyncTask<Void, String, Void> {
 
         ArrayList<String> ipList;
+        String tokens[];
 
-        public ScanIpTask() {
+        public ScanIpTask(String token) {
+            this.tokens = token.split(",");
             ipList = new ArrayList<>();
         }
 
@@ -256,7 +264,8 @@ public class MainActivity extends AppCompatActivity
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            webView.loadUrl("javascript:setLocal(" + new Gson().toJson(ipList) + ")");
+
+            //webView.loadUrl("javascript:setLocal(" + new Gson().toJson(ipList) + ")");
         }
 
         private String getLocalIp() {
@@ -274,13 +283,19 @@ public class MainActivity extends AppCompatActivity
             for (int i = 2; i <= 254; i++) {
                 try {
                     if (i != ownIp && InetAddress.getByName(subnet + i).isReachable(timeout)) {
-                        URL url = new URL("http://" + subnet + i + ":" + port);
-                        String method = "GET";
-                        JSONObject dataParams = new JSONObject();
-                        dataParams.put("", "");
-                        Log.v("Attempt: " + i, url.toString());
-                        new Req().send(url, method, dataParams);
-                        ipList.add(subnet + i);
+                        for(String t: tokens) {
+                            URL url = new URL("http://" + subnet + i + ":" + port + "/settings?token=" + t.substring(t.lastIndexOf(' ')+1, t.length()-1));
+                            String method = "GET";
+                            JSONObject dataParams = new JSONObject();
+                            dataParams.put("", "");
+                            Log.v("Attempt: " + i, url.toString());
+                            Sensor sensor = new Gson().fromJson(new Req().send(url, method, dataParams), Sensor.class);
+                            if(sensor.getCode()==1) {
+                                sensor.setSubnet(i);
+                                sensor.setRoom(t.substring(0, t.lastIndexOf(' ')-2));
+                                ipList.add(subnet + i);
+                            }
+                        }
                     }
                 } catch (Exception e) {
                     Log.v("Tried", subnet + i + " is not a valid sensor");
@@ -316,7 +331,6 @@ public class MainActivity extends AppCompatActivity
                 String line;
                 if ((line = in.readLine()) != null) {
                     in.close();
-                    Log.v("Line", line);
                     return line;
                 }
                 in.close();

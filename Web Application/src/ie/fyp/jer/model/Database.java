@@ -77,7 +77,7 @@ public class Database {
 				PreparedStatement ptst = prepare(con, sql, vals);
 				ResultSet rs = ptst.executeQuery()) {
 			while(rs.next()) 
-				rooms.add(new HouseData(rs.getString(1), rs.getInt(2), rs.getInt(3), rs.getInt(4), rs.getFloat(5)));
+				rooms.add(new HouseData(rs.getString(1), rs.getString(2), rs.getInt(3), rs.getInt(4), rs.getInt(5), rs.getFloat(6)));
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

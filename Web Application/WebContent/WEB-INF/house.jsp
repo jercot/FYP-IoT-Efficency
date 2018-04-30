@@ -140,6 +140,16 @@
 <script src="javascript/crossfilter.js"></script>
 <script src="javascript/dc.js"></script>
 <script src="javascript/custom.js"></script>
+<c:choose>
+<c:when test="${logged.type == 'mobile'}">
+<script>
+	Android.scanLocal("${buckets}")
+	console.log("${buckets}")
+	//scanWithTokens("${rooms}")
+</script>
+</c:when>
+</c:choose>
+asd
 <script>
 	$(document).ready(function() {
 		startVisual("${bName}");

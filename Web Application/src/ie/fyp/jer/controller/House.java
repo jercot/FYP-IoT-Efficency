@@ -42,7 +42,7 @@ public class House extends HttpServlet {
 			Object values[] = {log.getId(), request.getParameter("bName")};
 			ArrayList<HouseData> rooms = new ArrayList<>();
 			String sql = "SELECT DISTINCT ON (ro.id) " + 
-					"ro.name, ro.floor, COALESCE(re.humidAve, -1), COALESCE(re.lightAve, -1), COALESCE(re.tempAve, -1) " + 
+					"ro.name, ro.token, ro.floor, COALESCE(re.humidAve, -1), COALESCE(re.lightAve, -1), COALESCE(re.tempAve, -1) " + 
 					"FROM FYP.Recording re " + 
 					"FULL JOIN FYP.Room ro ON ro.id = re.roomId " +
 					"WHERE ro.buildingId IN (SELECT id FROM FYP.building WHERE accountId=? AND name=?) " + 
@@ -54,6 +54,7 @@ public class House extends HttpServlet {
 				request.setAttribute("bName", request.getParameter("bName"));
 				request.setAttribute("main", "house");
 				request.setAttribute("subtitle", request.getParameter("bName"));
+				request.setAttribute("buckets", setTokens(rooms));
 				request.getRequestDispatcher("/WEB-INF/index.jsp").forward(request, response);;
 			}
 		}
@@ -90,6 +91,14 @@ public class House extends HttpServlet {
 		else 
 			request.getSession().setAttribute("logged", null);
 		doGet(request, response);
+	}
+	
+	private ArrayList<String> setTokens(ArrayList<HouseData> rooms) {
+		ArrayList<String> tokens = new ArrayList<>();
+		for(HouseData h: rooms) {
+			tokens.add(h.getName() + " - " + h.getToken());
+		}
+		return tokens;
 	}
 
 	private String getName(HttpServletRequest request) {
