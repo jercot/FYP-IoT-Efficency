@@ -32,7 +32,6 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -42,10 +41,8 @@ import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.nio.Buffer;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Stack;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -56,14 +53,14 @@ import ie.fyp.jer.model.Response;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private Stack<String> titles;
+    private ArrayList<String> titles;
     private Logged acc;
     private WebView webView;
     private String fileName = "device", device = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        titles = new Stack<>();
+        titles = new ArrayList<>();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -96,7 +93,7 @@ public class MainActivity extends AppCompatActivity
         setTitle("Dashboard");
         webView.loadUrl(Website.url);
         webView.getSettings().setJavaScriptEnabled(true);
-        webView.setWebContentsDebuggingEnabled(true);
+        WebView.setWebContentsDebuggingEnabled(true);
         webView.addJavascriptInterface(this, "Android");
         webView.getSettings().setAppCacheEnabled(false);
 
@@ -115,9 +112,10 @@ public class MainActivity extends AppCompatActivity
         try {
             BufferedReader br = new BufferedReader(new FileReader(f));
             String line;
-            while((line = br.readLine())!=null)
+            while((line = br.readLine())!=null) {
                 Log.v("File line", line);
                 device = line;
+            }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -131,13 +129,25 @@ public class MainActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else if (webView.canGoBack()) {
-            titles.pop();
-            setTitle(titles.peek());
+            titles.remove(titles.size()-1);
+            setTitle(titles.get(titles.size()-1));
             webView.goBack();
         } else {
             moveTaskToBack(true);
             //super.onBackPressed();
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putStringArrayList("titles", titles);
+        // call superclass to save any view hierarchy
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        titles = savedInstanceState.getStringArrayList("titles");
     }
 
     @Override
@@ -179,6 +189,7 @@ public class MainActivity extends AppCompatActivity
             setWeb("/settings", "Settings");
         } else if (id == R.id.nav_log) {
             setWeb("/logout", "Log Out");
+            android.webkit.CookieManager.getInstance().removeAllCookies(null);
             finish();
         } else {
             setWeb("/house?bName=" + item.getTitle(), item.getTitle().toString());
@@ -192,14 +203,14 @@ public class MainActivity extends AppCompatActivity
     @JavascriptInterface
     public void setDevice(final String device) {
         this.device = device;
+        Context context = getApplicationContext();
         try {
-            FileOutputStream fOS = openFileOutput(fileName, getApplicationContext().MODE_PRIVATE);
-            fOS.write(device.getBytes());
-            fOS.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput(fileName, Context.MODE_PRIVATE));
+            outputStreamWriter.write(device);
+            outputStreamWriter.close();
+        }
+        catch (IOException e) {
+            Log.e("Exception", "File write failed: " + e.toString());
         }
     }
 

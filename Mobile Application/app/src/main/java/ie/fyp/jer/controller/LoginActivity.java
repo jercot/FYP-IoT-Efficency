@@ -33,6 +33,10 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -63,6 +67,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * Id to identity READ_CONTACTS permission request.
      */
     private static final int REQUEST_READ_CONTACTS = 0;
+    private String fileName = "device";
 
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
@@ -131,6 +136,19 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     sAuthTask.execute((Void) null);
                 }
         }
+    }
+
+    public String readFile() {
+        File f = new File(getApplicationContext().getFilesDir(), fileName);
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(f));
+            String line;
+            while ((line = br.readLine()) != null)
+                return line;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 
     private void populateAutoComplete() {
@@ -219,8 +237,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // perform the user login attempt.
             showProgress(true);
             String url = Website.url + "/login";
-            String params[] = {"email", "pass", "type"};
-            String values[] = {email, password, "mobile"};
+            String params[] = {"email", "pass", "type", "device"};
+            String values[] = {email, password, "mobile", readFile()};
             mAuthTask = new UserLoginTask(url, "POST", params, values, "JSESSIONID", Session.generate());
             mAuthTask.execute((Void) null);
         }
@@ -420,6 +438,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     cookieManager.getCookieStore().add(null, temp);
                     android.webkit.CookieManager.getInstance().setCookie(Website.url, temp.toString());
                 }
+                android.webkit.CookieManager.getInstance().flush();
             }
         }
     }

@@ -66,8 +66,8 @@ public class Register extends HttpServlet {
 				"INSERT INTO FYP.Password (accountid, password, date) VALUES (currval('FYP.Account_id_seq'), ?, ?);" + 
 				"COMMIT;";
 		Database db = new Database(dataSource);
-		if(db.execute(sql, values)==1)
-			registered = true;
+		db.execute(sql, values);
+		registered = true;
 		doGet(request, response);
 	}
 }

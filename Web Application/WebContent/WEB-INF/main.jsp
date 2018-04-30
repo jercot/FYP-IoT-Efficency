@@ -40,7 +40,7 @@
 			<td>${lastPas}</td>
 		</tr>
 		<tr>
-			<td>Number of houses in system:</td>
+			<td>Number of houses:</td>
 			<td>${houses}</td>
 		</tr>
 	</table>

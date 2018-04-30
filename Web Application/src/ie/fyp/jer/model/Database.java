@@ -149,11 +149,11 @@ public class Database {
 				details[4] = ((rs.getString(6)==null) ? "Not Set" : rs.getString(6));
 				details[5] = rs.getString(7);
 				details[6] = rs.getString(8);
-				details[7] = getDate("dd-MMM-yyyy hh:mm:ss", rs.getLong(9));
+				details[7] = getDate("dd-MMM-yyyy h:mm:ss a", rs.getLong(9));
 				if(rs.getLong(9)==rs.getLong(11))
 					details[8] = "Never Changed";
 				else
-					details[8] = getDate("dd-MMM-yyyy hh:mm:ss", rs.getLong(11));
+					details[8] = getDate("dd-MMM-yyyy h:mm:ss a", rs.getLong(11));
 				details[9] = rs.getInt(12) + "";
 			}
 		} catch (SQLException e) {
@@ -169,7 +169,7 @@ public class Database {
 				ResultSet rs = ptst.executeQuery()) {
 			if(rs.next()) {
 				details[0] = true + "";
-				details[1] = getDate("dd-MMM-yyyy hh:mm:ss", rs.getLong(1));
+				details[1] = getDate("dd-MMM-yyyy h:mm:ss a", rs.getLong(1));
 				details[2] = rs.getString(2);
 				details[3] = getSystem(rs.getString(3));
 				if(rs.getString(4).equals("mobile")) {

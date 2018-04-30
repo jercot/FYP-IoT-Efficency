@@ -196,10 +196,12 @@ public class Main extends HttpServlet {
 	private void setLastLog(int log, HttpServletRequest request) {
 		String sql = "SELECT dateTime, location, osBrowser, device " + 
 				"FROM FYP.Login " + 
-				"WHERE dateTime IN(SELECT MAX(dateTime) " + 
+				"WHERE dateTime IN(SELECT dateTime " + 
 				"				FROM FYP.Login " + 
 				"				WHERE accountId = ? " + 
-				"				AND type = ?);";
+				"				AND type = ?" +
+				"				ORDER BY dateTime DESC" +
+				"				LIMIT 1 OFFSET 1);";
 		Object values[] = {log, "Login"};
 		Database db = new Database(dataSource);
 		String details[] = db.getLastLog(sql, values);

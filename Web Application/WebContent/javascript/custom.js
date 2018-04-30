@@ -12,21 +12,13 @@ var resizeId;
 
 function startVisual(house) {
 	$.post("data", {bName: house},function(data) {
-		$("#graph").css({display: "block"});
 		console.log("Post Request Success");
-		switchStatement(data);
+		if(data.code==1)
+			setStats(data.records);
 	},"json")
 	.fail(function(d) {
 		console.log("Post Request Failed");
 	});
-}
-
-function switchStatement(data) {
-	switch(data.code) {
-	case 1:
-		setStats(data.records);
-		break;
-	}
 }
 
 function setStats(data) {
@@ -80,6 +72,7 @@ function setStats(data) {
 }
 
 function createGraph() {
+	$("#graph").css({display: "block"});
 	var numberFormat = d3.format('.2f');
 	readingChart
 	.renderArea(true)
