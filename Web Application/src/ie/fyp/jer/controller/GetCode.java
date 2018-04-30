@@ -1,10 +1,6 @@
 package ie.fyp.jer.controller;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletException;
@@ -14,7 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
-import ie.fyp.jer.domain.Logged;
+import ie.fyp.jer.model.Database;
+import ie.fyp.jer.model.Logged;
 
 /**
  * Servlet implementation class GetCode
@@ -54,16 +51,12 @@ public class GetCode extends HttpServlet {
 					"					LIMIT 1) " + 
 					"ORDER BY id DESC;";
 			Object val[] = {twoStep, time, twoStep};
-			try(Connection con = dataSource.getConnection();
-					PreparedStatement ptst = prepare(con, sql, val);
-					ResultSet rs = ptst.executeQuery()) {
-				if(rs.next())
-					request.setAttribute("code", rs.getInt(1));
-				else
-					request.setAttribute("code", "No recent login attempts");
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			Database db = new Database(dataSource);
+			int code = db.getCode(sql, val);
+			if(code!=-1)
+				request.setAttribute("code", code);
+			else
+				request.setAttribute("code", "No recent login attempts");
 		}
 		else
 			request.setAttribute("code", "2 Step Verification must be enabled in settings first");
@@ -83,13 +76,5 @@ public class GetCode extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doGet(request, response);
-	}
-
-	private PreparedStatement prepare(Connection con, String sql, Object... values) throws SQLException {
-		final PreparedStatement ptst = con.prepareStatement(sql);
-		for (int i = 0; i < values.length; i++) {
-			ptst.setObject(i+1, values[i]);
-		}
-		return ptst;
 	}
 }

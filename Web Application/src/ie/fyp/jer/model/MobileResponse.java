@@ -1,4 +1,4 @@
-package ie.fyp.jer.domain;
+package ie.fyp.jer.model;
 
 public class MobileResponse {
 	private Logged log;

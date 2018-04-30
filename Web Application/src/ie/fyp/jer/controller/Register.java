@@ -1,9 +1,6 @@
 package ie.fyp.jer.controller;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletException;
@@ -14,6 +11,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
 import org.mindrot.jbcrypt.BCrypt;
+
+import ie.fyp.jer.model.Database;
 
 /**
  * Servlet implementation class Register
@@ -66,22 +65,9 @@ public class Register extends HttpServlet {
 				"INSERT INTO FYP.Account (fname, lname, email, phone, street, town, county, regdate) VALUES (?, ?, ?, ?, ?, ?, ?, ?);" + 
 				"INSERT INTO FYP.Password (accountid, password, date) VALUES (currval('FYP.Account_id_seq'), ?, ?);" + 
 				"COMMIT;";
-		try (Connection con = dataSource.getConnection();
-				PreparedStatement ptst = prepare(con, sql, values)) {
-			ptst.executeUpdate();
+		Database db = new Database(dataSource);
+		if(db.execute(sql, values)==1)
 			registered = true;
-		}
-		catch (SQLException e) {
-			e.printStackTrace();
-		}
 		doGet(request, response);
-	}
-
-	private PreparedStatement prepare(Connection con, String sql, Object... values) throws SQLException {
-		final PreparedStatement ptst = con.prepareStatement(sql);
-		for (int i = 0; i < values.length; i++) {
-			ptst.setObject(i+1, values[i]);
-		}
-		return ptst;
 	}
 }

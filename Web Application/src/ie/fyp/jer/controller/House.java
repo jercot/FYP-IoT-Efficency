@@ -1,10 +1,6 @@
 package ie.fyp.jer.controller;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 
 import javax.annotation.Resource;
@@ -15,8 +11,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
-import ie.fyp.jer.domain.Logged;
-import ie.fyp.jer.domain.HouseData;
+import ie.fyp.jer.model.Database;
+import ie.fyp.jer.model.HouseData;
+import ie.fyp.jer.model.Logged;
 
 /**
  * Servlet implementation class House
@@ -40,7 +37,7 @@ public class House extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		Logged log = (Logged)request.getSession().getAttribute("logged");
 		if(request.getQueryString()==null)
-			response.sendRedirect("house?bName=" + request.getParameter("bName"));
+			response.sendRedirect("house?bName=" + getName(request));
 		else if(log!=null&&log.houseExists(request.getParameter("bName"))) {
 			Object values[] = {log.getId(), request.getParameter("bName")};
 			ArrayList<HouseData> rooms = new ArrayList<>();
@@ -50,19 +47,14 @@ public class House extends HttpServlet {
 					"FULL JOIN FYP.Room ro ON ro.id = re.roomId " +
 					"WHERE ro.buildingId IN (SELECT id FROM FYP.building WHERE accountId=? AND name=?) " + 
 					"ORDER BY ro.id, re.time DESC;";
-			try (Connection con = dataSource.getConnection();
-					PreparedStatement ptst = prepare(con, sql, values);
-					ResultSet rs = ptst.executeQuery()) {
-				while(rs.next())  {
-					rooms.add(new HouseData(rs.getString(1), rs.getInt(2), rs.getInt(3), rs.getInt(4), rs.getFloat(5)));
-				}
+			Database db = new Database(dataSource);
+			rooms = db.getHouse(sql, values);
+			if(rooms!=null) {
 				request.setAttribute("rooms", rooms);
 				request.setAttribute("bName", request.getParameter("bName"));
 				request.setAttribute("main", "house");
 				request.setAttribute("subtitle", request.getParameter("bName"));
-				request.getRequestDispatcher("/WEB-INF/index.jsp").forward(request, response);
-			} catch (SQLException e) {
-				e.printStackTrace();
+				request.getRequestDispatcher("/WEB-INF/index.jsp").forward(request, response);;
 			}
 		}
 		else
@@ -85,15 +77,14 @@ public class House extends HttpServlet {
 				location = null;
 			String sql = "UPDATE fyp.building SET name=COALESCE(?, name), location = COALESCE(?, location) WHERE name=? AND accountId=?;";
 			Object values[] = {bName, location, pName, id};
-			try (Connection con = dataSource.getConnection();
-					PreparedStatement ptst = prepare(con, sql, values)) {
-				ptst.executeUpdate();
+			Database db = new Database(dataSource);
+			int update = db.execute(sql, values);
+			if(update>0) {
 				if(bName!=null)
 					log.editBuilding(pName, bName);
 				request.setAttribute("message", "Building updated");
-			} catch (SQLException e) {
+			} else {
 				request.setAttribute("message", "Building with that name already exists");
-				e.printStackTrace();
 			}
 		}
 		else 
@@ -101,11 +92,9 @@ public class House extends HttpServlet {
 		doGet(request, response);
 	}
 
-	private PreparedStatement prepare(Connection con, String sql, Object... values) throws SQLException {
-		final PreparedStatement ptst = con.prepareStatement(sql);
-		for (int i = 0; i < values.length; i++) {
-			ptst.setObject(i+1, values[i]);
-		}
-		return ptst;
+	private String getName(HttpServletRequest request) {
+		if(request.getParameter("pName")!=null)
+			return request.getParameter("pName");
+		return request.getParameter("bName");
 	}
 }

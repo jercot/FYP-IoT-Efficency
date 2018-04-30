@@ -1,9 +1,6 @@
 package ie.fyp.jer.controller;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletException;
@@ -13,7 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
-import ie.fyp.jer.domain.Logged;
+import ie.fyp.jer.model.Database;
+import ie.fyp.jer.model.Logged;
 
 /**
  * Servlet implementation class Room
@@ -58,13 +56,8 @@ public class Room extends HttpServlet {
 						"SELECT id, ?, ?, ? " + 
 						"FROM FYP.building " + 
 						"WHERE name = ?;";
-				Object val[] = {request.getParameter("rName"), floor, 0, request.getParameter("bName")};
-				try (Connection con = dataSource.getConnection();
-						PreparedStatement ptst = prepare(con, sql, val)) {
-					ptst.executeUpdate();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
+				Object values[] = {getVal(request, "rName"), floor, 0, getVal(request, "bName")};
+				execute(sql, values);
 			}
 			else {
 				String sql = "UPDATE fyp.room " + 
@@ -74,24 +67,22 @@ public class Room extends HttpServlet {
 						"ELSE ? " + 
 						"END " + 
 						"WHERE name = ?;";
-				Object val[] = {request.getParameter("rName"), floor, floor, request.getParameter("oName")};
-				try (Connection con = dataSource.getConnection();
-						PreparedStatement ptst = prepare(con, sql, val)) {
-					ptst.executeUpdate();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
+				Object values[] = {getVal(request, "rName"), floor, floor, getVal(request, "oName")};
+				execute(sql, values);
 			}
 			request.setAttribute("message", "Room " + request.getParameter("rName") + " added!");
+		}
+		doGet(request, response);
 	}
-	doGet(request, response);
-}
 
-private PreparedStatement prepare(Connection con, String sql, Object... values) throws SQLException {
-	final PreparedStatement ptst = con.prepareStatement(sql);
-	for (int i = 0; i < values.length; i++) {
-		ptst.setObject(i+1, values[i]);
+	private void execute(String sql, Object...values) {
+		Database db = new Database(dataSource);
+		db.execute(sql, values);
 	}
-	return ptst;
-}
+
+	private String getVal(HttpServletRequest request, String name) {
+		if(request.getParameter(name)!=null&&request.getParameter(name).equals(""))
+			return null;
+		return request.getParameter(name);
+	}
 }

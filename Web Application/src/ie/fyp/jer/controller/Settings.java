@@ -1,10 +1,6 @@
 package ie.fyp.jer.controller;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletException;
@@ -17,7 +13,8 @@ import javax.sql.DataSource;
 import org.mindrot.jbcrypt.BCrypt;
 
 import ie.fyp.jer.config.Device;
-import ie.fyp.jer.domain.Logged;
+import ie.fyp.jer.model.Database;
+import ie.fyp.jer.model.Logged;
 
 /**
  * Servlet implementation class Dashboard
@@ -52,11 +49,13 @@ public class Settings extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		if(request.getSession().getAttribute("logged")!=null) {
-			Logged log = (Logged)request.getSession().getAttribute("logged");
+		Logged log = (Logged)request.getSession().getAttribute("logged");
+		if(log!=null&&log.compare(request.getParameter("token"))) {
 			String type = request.getParameter("type");
 			if(!type.equals("pass")&&!type.equals("2fa")) {
-				log.setEmail(updateAccount(request, log.getId()));
+				String temp = updateAccount(request, log.getId());
+				if(temp!=null)
+					log.setEmail(temp);
 				request.getSession().setAttribute("logged", log);				
 			}
 			else if(type.equals("pass"))
@@ -88,16 +87,10 @@ public class Settings extends HttpServlet {
 				"town = COALESCE(?, town), " + 
 				"county = COALESCE(?, county) " + 
 				"WHERE id = ?;";
-		try (Connection con = dataSource.getConnection();
-				PreparedStatement ptst = prepare(con, sql, values)) {
-			ptst.executeUpdate();
-			request.setAttribute("settings", "Settings updated!");
-			if(values[0]!=null)
-				return values[0].toString();
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		execute(sql, values);
+		request.setAttribute("settings", "Settings updated!");
+		if(values[2]!=null)
+			return values[2].toString();
 		return null;
 	}
 
@@ -111,50 +104,37 @@ public class Settings extends HttpServlet {
 					"					FROM FYP.Account " + 
 					"					WHERE id = ?) " + 
 					"ORDER BY date DESC;";
-			Object val[] = {log};
-			try(Connection con = dataSource.getConnection();
-					PreparedStatement ptst = prepare(con, sql, val);
-					ResultSet rs = ptst.executeQuery()) {
-				if(rs.next())
-					if(BCrypt.checkpw(cPass, rs.getString(1))) {
-						sql = "INSERT INTO FYP.Password (accountid, password, date) VALUES (?, ?, ?);";
-						Object val2[] = {log, BCrypt.hashpw(nPass1, BCrypt.gensalt()), System.currentTimeMillis()};
-						try (PreparedStatement ptst2 = prepare(con, sql, val2)) {
-							ptst2.executeUpdate();
-							request.setAttribute("settings", "Password Updated!");
-						}
-					}
-					else
-						request.setAttribute("settings", "Current password incorrect!");
-			} catch (SQLException e) {
-				e.printStackTrace();
+			Object values[] = {log};
+			if(BCrypt.checkpw(cPass, query(sql, values))) {
+				sql = "INSERT INTO FYP.Password (accountid, password, date) VALUES (?, ?, ?);";
+				Object values2[] = {log, BCrypt.hashpw(nPass1, BCrypt.gensalt()), System.currentTimeMillis()};
+				if(execute(sql, values2)>0)
+					request.setAttribute("settings", "Password Updated!");
 			}
+			else
+				request.setAttribute("settings", "Current password incorrect!");
 		}
 		else
 			request.setAttribute("settings", "New passwords did not match!");
 	}
 
 	private void updateSecurity(HttpServletRequest request, int log) {
-		//UPDATE FYP.Account SET twoStep = 10 WHERE id = 1;
 		String device = Device.generate();
 		if(request.getParameter("2fa")==null)
 			device = null;
 		String sql = "UPDATE FYP.Account SET twoStep = ? WHERE id = ?;";
-		Object val[] = {device, log};
-		try (Connection con = dataSource.getConnection();
-				PreparedStatement ptst = prepare(con,sql, val)) {
-			ptst.executeUpdate();
+		Object values[] = {device, log};
+		if(execute(sql, values)>0)
 			request.setAttribute("device", device);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
 	}
 
-	private PreparedStatement prepare(Connection con, String sql, Object... values) throws SQLException {
-		final PreparedStatement ptst = con.prepareStatement(sql);
-		for (int i = 0; i < values.length; i++) {
-			ptst.setObject(i+1, values[i]);
-		}
-		return ptst;
+	private int execute(String sql, Object...values) {
+		Database db = new Database(dataSource);
+		return db.execute(sql, values);
+	}
+
+	private String query(String sql, Object...values) {
+		Database db = new Database(dataSource);
+		return db.getPassword(sql, values);
 	}
 }

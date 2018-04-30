@@ -1,10 +1,6 @@
 package ie.fyp.jer.controller;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletException;
@@ -22,13 +18,13 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.mindrot.jbcrypt.BCrypt;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import ie.fyp.jer.config.LogCookie;
 import ie.fyp.jer.config.SecondFactor;
+import ie.fyp.jer.model.Database;
 
 /**
  * Servlet implementation class Login
@@ -68,50 +64,41 @@ public class Login extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String email = request.getParameter("email");
-		String password = request.getParameter("pass");
-		String ip = request.getRemoteAddr();
-		String user = request.getHeader("User-Agent");
 		String type = request.getParameter("type");
 		if(type==null||type.equals(""))
 			type = "browser";
-		request.getSession().setAttribute("cookieS", login(email, password, ip, user, type, request, response));
+		request.getSession().setAttribute("cookieS", login(type, request, response));
 		doGet(request, response);
 	}
 
-	private String login(String email, String password, String ip, String user, String type, HttpServletRequest request, HttpServletResponse response) {
+	private String login(String type, HttpServletRequest request, HttpServletResponse response) {
+		String email = request.getParameter("email");
+		String password = request.getParameter("pass");
 		if(!checkAttempts(email))
 			request.setAttribute("message", "Too many attempts, Please try again later.");
 		else if(email!=null&&password!=null) {
+			String ip = request.getRemoteAddr();
+			String user = request.getHeader("User-Agent");
+			String device = request.getParameter("device");
 			String sql = "SELECT a.email, a.id, a.twoStep, p.password, p.date " + 
 					"FROM FYP.Account a " + 
 					"LEFT JOIN FYP.Password p ON a.id = p.accountId " + 
 					"WHERE UPPER(a.email) = UPPER(?) " + 
 					"ORDER BY date DESC " + 
 					"LIMIT 1;";
-			Object val[] = {email};
-			try (Connection con = dataSource.getConnection();
-					PreparedStatement ptst = prepare(con, sql, val);
-					ResultSet rs = ptst.executeQuery()) {
-				if(rs.next()) {
-					if(BCrypt.checkpw(password, rs.getString(4))) {
-						if(rs.getString(3)!=null&&!type.equals("mobile")) {
-							request.setAttribute("safety", "on");
-							request.getSession().setAttribute("code", setCode(rs.getInt(2)));
-						}
-						return setLogin(con, ip, type, rs.getInt(2), user, "Login", response);
-					}
-					else {
-						request.setAttribute("message", "Password or Email incorrect");
-						return setLogin(con, ip, type, rs.getInt(2), user, "Login Attempt", response);
-					}
+			Object values[] = {email};
+			Database db = new Database(dataSource);
+			int id = db.getLogin(sql, password, device, values);
+			if(id!=-1&&db.isSuccess()) {
+				if(db.isSafety()&&!type.equals("mobile")) {
+					request.setAttribute("safety", "on");
+					request.getSession().setAttribute("code", setCode(id));
 				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			} catch (ClientProtocolException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
+				return setLogin(ip, type, id, user, "Login", response);
+			}
+			else {
+				request.setAttribute("message", "Password or Email incorrect");
+				return setLogin(ip, type, id, user, "Login Attempt", response);
 			}
 		}
 		return null;
@@ -120,13 +107,8 @@ public class Login extends HttpServlet {
 	private int setCode(int log) {
 		int code = SecondFactor.generate();
 		String sql = "INSERT INTO FYP.Token(accountId, expire, code) VALUES (?, ?, ?)";
-		Object val[] = {log, System.currentTimeMillis()+300000, code};
-		try(Connection con = dataSource.getConnection();
-				PreparedStatement ptst = prepare(con, sql, val)) {
-			ptst.executeUpdate();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		Object values[] = {log, System.currentTimeMillis()+300000, code};
+		execute(sql, values);
 		return code;
 	}
 
@@ -138,47 +120,43 @@ public class Login extends HttpServlet {
 				"				WHERE UPPER(email) = UPPER(?)) " + 
 				"				AND type = ? " + 
 				"				AND datetime > ?;";
-		Object val[] = {email, "Login Attempt", System.currentTimeMillis()-300000};
-		try(Connection con = dataSource.getConnection();
-				PreparedStatement ptst = prepare(con, sql, val);
-				ResultSet rs = ptst.executeQuery()) {
-			if(rs.next())
-				if(rs.getInt(1)<5)
-					return true;
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return false;
+		Object values[] = {email, "Login Attempt", System.currentTimeMillis()-300000};
+		Database db = new Database(dataSource);
+		return db.getAttempts(sql, values)<5;
 	}
 
-	private String setLogin(Connection con, String ip, String type, int id, String user, String login, HttpServletResponse httpResponse) throws ClientProtocolException, IOException, SQLException {
-		CloseableHttpClient httpclient = HttpClients.createDefault();
-		HttpGet httpGet = new HttpGet("http://ip-api.com/json/" + ip);
-		CloseableHttpResponse response = httpclient.execute(httpGet);
-		String location = "Unknown";
-
-		HttpEntity entity = response.getEntity();
-		String gson = EntityUtils.toString(entity);
-		JsonParser parse = new JsonParser();
-		JsonObject object = parse.parse(gson).getAsJsonObject();
+	private String setLogin(String ip, String type, int id, String user, String login, HttpServletResponse httpResponse) {
 		try {
-			location = (object.get("city").getAsString() + " " + object.get("countryCode").getAsString());
-		} catch (Exception e) {
-			System.out.println("GSON error occured in login controller - IP is likely local.");
-		}
-		response.close();
-		EntityUtils.consume(entity);
-		Long expire = System.currentTimeMillis() + ((long)1000 * 60 * 60 * 24 * 30);
-		String device = type;
-		String cookie = "None";
-		if(login.equals("Login"))
-			cookie = LogCookie.generate();
-		Object val3[] = {id, System.currentTimeMillis(), location, user, device, cookie, expire, login};
-		String sql = "INSERT INTO FYP.Login(accountid, datetime, location, osbrowser, device,"
-				+ "cookie, expire, type)VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
-		try (PreparedStatement ptst = prepare(con, sql, val3)) {
-			if(ptst.executeUpdate()==1&&login.equals("Login"))
+			CloseableHttpClient httpclient = HttpClients.createDefault();
+			HttpGet httpGet = new HttpGet("http://ip-api.com/json/" + ip);
+			CloseableHttpResponse response = httpclient.execute(httpGet);
+			String location = "Unknown";
+
+			HttpEntity entity = response.getEntity();
+			String gson = EntityUtils.toString(entity);
+			JsonParser parse = new JsonParser();
+			JsonObject object = parse.parse(gson).getAsJsonObject();
+			try {
+				location = (object.get("city").getAsString() + " " + object.get("countryCode").getAsString());
+			} catch (Exception e) {
+				System.out.println("GSON error occured in login controller - IP is likely local.");
+			}
+			response.close();
+			EntityUtils.consume(entity);
+			Long expire = System.currentTimeMillis() + ((long)1000 * 60 * 60 * 24 * 30);
+			String device = type;
+			String cookie = "None";
+			if(login.equals("Login"))
+				cookie = LogCookie.generate();
+			Object values[] = {id, System.currentTimeMillis(), location, user, device, cookie, expire, login};
+			String sql = "INSERT INTO FYP.Login(accountid, datetime, location, osbrowser, device,"
+					+ "cookie, expire, type)VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
+			if(execute(sql, values)>0&&login.equals("Login"))
 				return cookie;
+		} catch (ClientProtocolException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 		return null;
 	}
@@ -189,11 +167,8 @@ public class Login extends HttpServlet {
 		return temp;
 	}
 
-	private PreparedStatement prepare(Connection con, String sql, Object values[]) throws SQLException {
-		final PreparedStatement ptst = con.prepareStatement(sql);
-		for (int i = 0; i < values.length; i++) {
-			ptst.setObject(i+1, values[i]);
-		}
-		return ptst;
+	private int execute(String sql, Object...values) {
+		Database db = new Database(dataSource);
+		return db.execute(sql, values);
 	}
 }

@@ -24,6 +24,7 @@
 						To existing account
 					    <input class="required" type="email" placeholder="Enter Email" name="email" required><br>
 					    <input class="required" type="password" placeholder="Enter Password" name="pass" required><br>
+					    <input type="hidden" name="device" value="none">
 						<a href="">Forgot Password?</a>
 						<p id="message">${message}</p>
 					    <button type="submit">Login</button>

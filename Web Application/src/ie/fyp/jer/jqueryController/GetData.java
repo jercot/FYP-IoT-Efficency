@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
-import ie.fyp.jer.domain.Logged;
+import ie.fyp.jer.model.Logged;
 
 /**
  * Servlet implementation class Data
