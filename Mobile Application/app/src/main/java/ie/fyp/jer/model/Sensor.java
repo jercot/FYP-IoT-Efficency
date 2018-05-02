@@ -1,7 +1,7 @@
 package ie.fyp.jer.model;
 
 public class Sensor {
-    private int code, subnet;
+    private int code, octet;
     private String bucket, room;
 
     public Sensor(int code, String bucket) {
@@ -30,14 +30,14 @@ public class Sensor {
     }
 
     public void setRoom(String room) {
-        this.room = room;
+        this.room = room.replace(" ", "_");
     }
 
-    public int getSubnet() {
-        return subnet;
+    public int getOctet() {
+        return octet;
     }
 
-    public void setSubnet(int subnet) {
-        this.subnet = subnet;
+    public void setOctet(int octet) {
+        this.octet = octet;
     }
 }

@@ -38,7 +38,8 @@
 	<c:when test="${not empty rooms}">
 	Room List:<br>
 	<c:forEach items="${rooms}" var="room">
-	<div class="room">
+	<c:set var = "name" value = "${fn:replace(room.name, ' ', '_')}" />
+	<div class="room" id="${name}">
 		<span class="roomTitle">Room: ${fn:escapeXml(room.name)} - Floor: ${fn:escapeXml(room.floor)}</span> <br>
 		<div class="thermo">
 		<c:choose>
@@ -106,7 +107,11 @@
 	</c:otherwise>
 	</c:choose>
 </div>
-
+<c:choose>
+<c:when test="${logged.type == 'mobile'}">
+	<div id="sensorList"></div>
+</c:when>
+</c:choose>
 <br>
 <hr>
 <br>
@@ -149,7 +154,6 @@
 </script>
 </c:when>
 </c:choose>
-asd
 <script>
 	$(document).ready(function() {
 		startVisual("${bName}");

@@ -12,7 +12,6 @@ import javax.sql.DataSource;
 
 import org.mindrot.jbcrypt.BCrypt;
 
-import ie.fyp.jer.config.Device;
 import ie.fyp.jer.model.Database;
 import ie.fyp.jer.model.Logged;
 
@@ -119,7 +118,7 @@ public class Settings extends HttpServlet {
 	}
 
 	private void updateSecurity(HttpServletRequest request, int log) {
-		String device = Device.generate();
+		String device = request.getParameter("device");
 		if(request.getParameter("2fa")==null)
 			device = null;
 		String sql = "UPDATE FYP.Account SET twoStep = ? WHERE id = ?;";

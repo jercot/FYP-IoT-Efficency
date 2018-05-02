@@ -41,7 +41,12 @@
 		<input type="hidden" name="token" value="${fn:escapeXml(logged.token)}">
 	    <button type="submit">Update Security</button>
 	</form>
-	<script>var t = "${device!=null? device : 'null'}"</script>
+	<script>
+		$(document).ready(function() {
+			var t = Android.getDevice();
+			$("#secSet").append('<input type="hidden" name="device" value="' + t + '">');
+		});
+	</script>
 	</c:when>
 	</c:choose>
 </div>

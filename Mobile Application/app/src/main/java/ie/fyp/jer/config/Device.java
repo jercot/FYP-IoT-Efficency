@@ -3,8 +3,8 @@ package ie.fyp.jer.config;
 import java.util.Random;
 
 public class Device {
-	public static String generate() {
-		String SALTCHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+    public static String generate() {
+        String SALTCHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
         StringBuilder salt = new StringBuilder();
         Random rnd = new Random();
         while (salt.length() < 20) { // length of the random string.
@@ -13,5 +13,5 @@ public class Device {
         }
         String saltStr = salt.toString();
         return saltStr;
-	}
+    }
 }

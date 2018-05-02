@@ -31,7 +31,6 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -46,6 +45,7 @@ import java.util.Iterator;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import ie.fyp.jer.config.Device;
 import ie.fyp.jer.config.Website;
 import ie.fyp.jer.model.Logged;
 import ie.fyp.jer.model.Response;
@@ -110,17 +110,32 @@ public class MainActivity extends AppCompatActivity
 
     public void readFile() {
         File f = new File(getApplicationContext().getFilesDir(), fileName);
+        if(f.exists())
         try {
             BufferedReader br = new BufferedReader(new FileReader(f));
             String line;
-            while((line = br.readLine())!=null) {
+            if((line = br.readLine())!=null) {
                 Log.v("File line", line);
                 device = line;
             }
-        } catch (FileNotFoundException e) {
+        }  catch (IOException e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        }
+        else {
+            saveFile();
+        }
+    }
+
+    public void saveFile() {
+        device = Device.generate();
+        Context context = getApplicationContext();
+        try {
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput(fileName, Context.MODE_PRIVATE));
+            outputStreamWriter.write(device);
+            outputStreamWriter.close();
+        }
+        catch (IOException e) {
+            Log.e("Exception", "File write failed: " + e.toString());
         }
     }
 
@@ -202,17 +217,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     @JavascriptInterface
-    public void setDevice(final String device) {
-        this.device = device;
-        Context context = getApplicationContext();
-        try {
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput(fileName, Context.MODE_PRIVATE));
-            outputStreamWriter.write(device);
-            outputStreamWriter.close();
-        }
-        catch (IOException e) {
-            Log.e("Exception", "File write failed: " + e.toString());
-        }
+    public String getDevice() {
+        return device;
     }
 
     @JavascriptInterface
@@ -241,7 +247,7 @@ public class MainActivity extends AppCompatActivity
 
     private class ScanIpTask extends AsyncTask<Void, String, Void> {
 
-        ArrayList<String> ipList;
+        ArrayList<Sensor> ipList;
         String tokens[];
 
         public ScanIpTask(String token) {
@@ -264,8 +270,7 @@ public class MainActivity extends AppCompatActivity
 
         @Override
         protected void onPostExecute(Void aVoid) {
-
-            //webView.loadUrl("javascript:setLocal(" + new Gson().toJson(ipList) + ")");
+            webView.loadUrl("javascript:setLocal(" + new Gson().toJson(ipList) + ")");
         }
 
         private String getLocalIp() {
@@ -290,10 +295,10 @@ public class MainActivity extends AppCompatActivity
                             dataParams.put("", "");
                             Log.v("Attempt: " + i, url.toString());
                             Sensor sensor = new Gson().fromJson(new Req().send(url, method, dataParams), Sensor.class);
-                            if(sensor.getCode()==1) {
-                                sensor.setSubnet(i);
-                                sensor.setRoom(t.substring(0, t.lastIndexOf(' ')-2));
-                                ipList.add(subnet + i);
+                            if(sensor.getCode()==1||sensor.getCode()==0) {
+                                sensor.setRoom(t.substring(1, t.lastIndexOf(' ')-2));
+                                sensor.setOctet(i);
+                                ipList.add(sensor);
                             }
                         }
                     }

@@ -1,7 +1,4 @@
-var t;
-
-$(document).ready(function(){
-
+$(document).ready(function() {
 	$("a#dashSet").click(function(e){
 		e.preventDefault();
 		Android.setWeb("/settings", "Settings");
@@ -12,17 +9,16 @@ $(document).ready(function(){
 		e.preventDefault();
 		Android.setWeb("/" + href[0] + "=" + href[1] , href[1]);
 	});
-	
-	if(t!=null) {
-		Android.setDevice(t);
-	}
-	
-	
-
 });
 
 function setLocal(str) {
 	$("#ips").empty();
-	for(var i=0; i<str.length; i++)
-		$("#ips").append("<a href=\"http://" + str[i] + ":32109\">" + str[i] + "</a><br>")
+	for(var i=0; i<str.length; i++)	{
+		if(str[i].code==1) {
+			var t = $("#" + str[i].room);
+			t.append('Sensor connected at octet: ' + str[i].octet);	
+		}
+		else
+			$("#sensorList").append('Unset sensor at octet: ' + str[i].octet);
+	}
 }
