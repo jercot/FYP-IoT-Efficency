@@ -55,8 +55,9 @@ public class Room extends HttpServlet {
 				String sql = "INSERT INTO FYP.Room (buildingid, name, floor, notification) " + 
 						"SELECT id, ?, ?, ? " + 
 						"FROM FYP.building " + 
-						"WHERE name = ?;";
-				Object values[] = {getVal(request, "rName"), floor, 0, getVal(request, "bName")};
+						"WHERE name = ?" +
+						"AND accountId = ? ;";
+				Object values[] = {getVal(request, "rName"), floor, 0, getVal(request, "bName"), log.getId()};
 				execute(sql, values);
 			}
 			else {
@@ -66,8 +67,12 @@ public class Room extends HttpServlet {
 						"WHEN ?=-1 then floor " + 
 						"ELSE ? " + 
 						"END " + 
-						"WHERE name = ?;";
-				Object values[] = {getVal(request, "rName"), floor, floor, getVal(request, "oName")};
+						"WHERE name = ?" +
+						"AND buildingId IN (SELECT id" +
+						"					FROM FYP.building" +
+						"					WHERE accountId = ?" +
+						"					AND name = ?);";
+				Object values[] = {getVal(request, "rName"), floor, floor, getVal(request, "oName"), log.getId(), getVal(request, "bName")};
 				execute(sql, values);
 			}
 			request.setAttribute("message", "Room " + request.getParameter("rName") + " added!");
@@ -75,9 +80,9 @@ public class Room extends HttpServlet {
 		doGet(request, response);
 	}
 
-	private void execute(String sql, Object...values) {
+	private int execute(String sql, Object...values) {
 		Database db = new Database(dataSource);
-		db.execute(sql, values);
+		return db.execute(sql, values);
 	}
 
 	private String getVal(HttpServletRequest request, String name) {

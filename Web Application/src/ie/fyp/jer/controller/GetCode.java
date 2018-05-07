@@ -47,6 +47,7 @@ public class GetCode extends HttpServlet {
 					"									FROM FYP.Account " + 
 					"									WHERE twoStep = ?) " + 
 					"					AND type='Session' " + 
+					"					AND device='browser' " + 
 					"					ORDER BY dateTime DESC " + 
 					"					LIMIT 1) " + 
 					"ORDER BY id DESC;";

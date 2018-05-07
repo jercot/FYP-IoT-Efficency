@@ -49,6 +49,8 @@ public class Authentication extends HttpServlet {
 				check = code==(Integer)request.getSession().getAttribute("code");
 				if(check)		
 					response.addCookie(createCookie("login", (String)request.getSession().getAttribute("cookieS"), 60*60*24*30));
+				else
+					request.setAttribute("message", "Incorrect code. Try again");
 			}
 			else
 				request.setAttribute("message", "Too many attempts. Start over");

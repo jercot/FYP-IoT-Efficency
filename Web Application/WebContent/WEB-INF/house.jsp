@@ -1,10 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
-<c:choose>
-	<c:when test="${not empty message}">
-		<c:out value="${message}"/>
-	</c:when>
-</c:choose>
+${fn:escapeXml(message)}
 <div id="graph">
 	<div id="chartSwitch">
 		<svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 100 300" id="switchThermo">
